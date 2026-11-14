@@ -2,18 +2,29 @@
 /* ====================== helpers & storage ====================== */
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const nl = s => esc(s).replace(/\n/g, '<br>');
+/* ตัวห้อย/ตัวยกจริง: E_k, x_{ab}, ₀-₉, ², ^2 → <sub>/<sup> (ใช้กับข้อความเนื้อหาเท่านั้น ไม่ใช้กับ attribute) */
+const SUBM = { '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4', '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9', '₊': '+', '₋': '−', '₌': '=', '₍': '(', '₎': ')', 'ₐ': 'a', 'ₑ': 'e', 'ₒ': 'o', 'ₓ': 'x', 'ₕ': 'h', 'ₖ': 'k', 'ₗ': 'l', 'ₘ': 'm', 'ₙ': 'n', 'ₚ': 'p', 'ₛ': 's', 'ₜ': 't', 'ᵢ': 'i', 'ⱼ': 'j' };
+const SUPM = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁺': '+', '⁻': '−', '⁼': '=', '⁽': '(', '⁾': ')', 'ⁿ': 'n', 'ⁱ': 'i' };
+const uni = h => String(h ?? '')
+  .replace(/[₀-₉₊₋₌₍₎ₐₑₒₓₕₖₗₘₙₚₛₜᵢⱼ]+/g, m => '<sub>' + [...m].map(c => SUBM[c] || c).join('') + '</sub>')
+  .replace(/[⁰¹²³⁴-⁹⁺⁻⁼⁽⁾ⁿⁱ]+/g, m => '<sup>' + [...m].map(c => SUPM[c] || c).join('') + '</sup>');
+const rt = s => uni(esc(s).replace(/\\_/g, '\u0001')
+  .replace(/([A-Za-z0-9\u0370-\u03ff\)\]])_\{([^}]+)\}/g, '$1<sub>$2</sub>')
+  .replace(/([A-Za-z0-9\u0370-\u03ff\)\]])_([a-z]+|[0-9]+|[A-Z]{1,2}|[\u0E00-\u0E7F]+)/g, '$1<sub>$2</sub>')
+  .replace(/\^[{(]([^})]+)[})]/g, '<sup>$1</sup>')
+  .replace(/\^(-?[0-9A-Za-z\u0370-\u03ff]+)/g, '<sup>$1</sup>')).replace(/\u0001/g, '_');
+const nl = s => rt(s).replace(/\n/g, '<br>');
 // ตัวเลือกที่เป็นภาพ SVG (เฉพาะโจทย์ที่มากับแอป) แสดงเป็น HTML ดิบ; ที่เหลือ escape เสมอ
 const isFig = s => typeof s === 'string' && s.startsWith('<svg');
-const chHtml = c => isFig(c) ? c : esc(c);
-const chLabel = (q, i) => LETTERS[i] + (isFig(q.c[i]) ? '' : '. ' + esc(q.c[i]));
+const chHtml = c => isFig(c) ? c : rt(c);
+const chLabel = (q, i) => LETTERS[i] + (isFig(q.c[i]) ? '' : '. ' + rt(q.c[i]));
 // โจทย์ตอบเป็นตัวเลข (q.type === 'num', เฉลย q.ans ยอมคลาดเคลื่อน q.tol) เหมือน 5 ข้อท้ายของ A-Level จริง
 const isNum = q => q.type === 'num';
 const isRight = (q, v) => isNum(q) ? (v !== undefined && v !== null && v !== '' && Math.abs(+v - q.ans) <= (q.tol == null ? 1e-9 : q.tol)) : v === q.a;
-const showAns = (q, v) => isNum(q) ? esc(String(v)) + (q.unit ? ' ' + esc(q.unit) : '') : chLabel(q, v);
-const rightTxt = q => isNum(q) ? esc(String(q.ans)) + (q.unit ? ' ' + esc(q.unit) : '') : chLabel(q, q.a);
+const showAns = (q, v) => isNum(q) ? rt(String(v)) + (q.unit ? ' ' + rt(q.unit) : '') : chLabel(q, v);
+const rightTxt = q => isNum(q) ? rt(String(q.ans)) + (q.unit ? ' ' + rt(q.unit) : '') : chLabel(q, q.a);
 const numBox = (q, picked, shown) => `<div class="numbox"><label><span>ตอบเป็นตัวเลข${q.unit ? ' (หน่วย ' + esc(q.unit) + ')' : ''}${q.hint ? ' — ' + esc(q.hint) : ''}</span><input type="number" step="any" inputmode="decimal" id="numans" data-input="num" value="${picked != null ? esc(String(picked)) : ''}" ${shown ? 'disabled' : ''} placeholder="พิมพ์คำตอบ"></label>${shown || E.mode === 'mock' ? '' : '<button class="pri" data-a="numSubmit">ตรวจคำตอบ</button>'}</div>`;
-const whyHtml = q => isNum(q) ? (q.wrong ? `<div class="why"><b>คำตอบที่พบบ่อยแต่ผิด</b>${q.wrong.map(w => `<div><span class="wl">≠</span> ถ้าได้ <b>${esc(String(w[0]))}</b> → ${esc(w[1])}</div>`).join('')}</div>` : '') : q.why ? `<div class="why"><b>ทำไมข้ออื่นถึงไม่ใช่</b>${q.c.map((c, i) => i === q.a ? '' : `<div><span class="wl">${LETTERS[i]}</span> ${esc(q.why[i] || '')}</div>`).join('')}</div>` : '';
+const whyHtml = q => isNum(q) ? (q.wrong ? `<div class="why"><b>คำตอบที่พบบ่อยแต่ผิด</b>${q.wrong.map(w => `<div><span class="wl">≠</span> ถ้าได้ <b>${rt(String(w[0]))}</b> → ${rt(w[1])}</div>`).join('')}</div>` : '') : q.why ? `<div class="why"><b>ทำไมข้ออื่นถึงไม่ใช่</b>${q.c.map((c, i) => i === q.a ? '' : `<div><span class="wl">${LETTERS[i]}</span> ${rt(q.why[i] || '')}</div>`).join('')}</div>` : '';
 const store = {
   get(k, d) { try { const v = localStorage.getItem('sx_' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem('sx_' + k, JSON.stringify(v)); } catch { } },
@@ -197,7 +208,8 @@ function viewHome() {
       <div class="row" style="margin-top:6px"><button class="chip" data-a="setExam" data-v="${TCAS70.dates.tpat3}">TPAT3/TGAT 30 ม.ค. 70</button><button class="chip" data-a="setExam" data-v="${TCAS70.dates.alevel}">A-Level 13 มี.ค. 70</button></div></div>
   </div>
   <div class="card"><h2>แนะนำให้ทบทวน</h2>${weak.length ? weak.map(t => `<div class="row between" style="padding:6px 0"><span>${esc(t.topic)} <span class="mute">แม่นยำ ${pct(t.ok, t.n)}% · ${t.n} ข้อ</span></span><span><button data-a="practiceTopic" data-v="${esc(t.topic)}">ฝึก</button> ${LESSONS[t.topic] ? `<button data-a="openLesson" data-v="${esc(t.topic)}">อ่านบทเรียน</button>` : ''}</span></div>`).join('') : '<span class="mute">ยังไม่มีข้อมูลเพียงพอ — ทำโจทย์ให้ได้อย่างน้อย 3 ข้อต่อหัวข้อ แล้วระบบจะชี้จุดอ่อนให้</span>'}</div>
-  <div class="card"><h2>ชุดข้อสอบ</h2><div class="presets">${PRESETS.map((p, i) => `<button class="preset" data-a="preset" data-v="${i}"><b>${p.t}</b><small>${allQ().filter(p.f).length} ข้อ · ≈ ${mockMinutes(allQ().filter(p.f))} นาที</small></button>`).join('')}</div></div>`;
+  <div class="card"><h2>ชุดข้อสอบ</h2><div class="presets">${PRESETS.map((p, i) => `<button class="preset" data-a="preset" data-v="${i}"><b>${p.t}</b><small>${allQ().filter(p.f).length} ข้อ · ≈ ${mockMinutes(allQ().filter(p.f))} นาที</small></button>`).join('')}</div></div>
+  <div class="row" style="justify-content:center;margin:6px 0 2px"><button class="chip" data-a="adminOpen" style="opacity:.55;min-height:32px;padding:4px 12px;font-size:12.5px">🔧 แอดมิน</button></div>`;
 }
 
 /* ====================== exam setup ====================== */
@@ -269,7 +281,7 @@ function examPaper() {
     if (shown) cls = i === q.a ? 'ok' : (i === picked ? 'bad' : ''); else if (picked === i) cls = 'sel';
     return `<button class="opt ${cls}" role="radio" aria-checked="${picked === i}" data-a="pick" data-v="${i}" ${shown ? 'disabled' : ''}><span class="bub">${LETTERS[i] || i + 1}</span><span class="otx">${chHtml(c)}</span></button>`;
   }).join('')}</div>`}
-    ${shown ? `<div class="exp"><b>${isRight(q, picked) ? '✅ ถูกต้อง!' : '❌ เฉลย: ' + rightTxt(q)}</b><div style="margin-top:6px">${nl(q.exp || '')}</div>${whyHtml(q)}${q.tip ? `<div class="tip">💡 ${esc(q.tip)}</div>` : ''}
+    ${shown ? `<div class="exp"><b>${isRight(q, picked) ? '✅ ถูกต้อง!' : '❌ เฉลย: ' + rightTxt(q)}</b><div style="margin-top:6px">${nl(q.exp || '')}</div>${whyHtml(q)}${q.tip ? `<div class="tip">💡 ${rt(q.tip)}</div>` : ''}
       ${lessonFor(q) ? `<div style="margin-top:8px"><a href="#/library" data-a="openLesson" data-v="${esc(q.topic)}" onclick="return false">📚 อ่านบทเรียน: ${esc(q.topic)}</a></div>` : ''}</div>` : ''}
   </article></div>
   <div class="efoot"><div class="row"><button data-a="prev" ${E.i === 0 ? 'disabled' : ''} aria-label="ข้อก่อนหน้า">◀</button>
@@ -313,7 +325,7 @@ function examResult() {
   <div class="card"><h2>ทบทวนทีละข้อ</h2>${E.list.map((q, i) => { const mine = E.ans[i], ok = isRight(q, mine); return `<div class="rv"><div class="row between"><b>ข้อ ${i + 1}</b><span class="tag ${ok ? 'ok' : 'bad'}">${mine == null ? 'ไม่ได้ตอบ' : ok ? 'ถูก' : 'ผิด'}</span></div>
     ${q.passage ? `<details><summary>ดูบทอ่าน/ข้อมูล</summary><div class="passage">${nl(q.passage)}</div></details>` : ''}<div style="margin:4px 0">${nl(q.q)}</div>${q.fig ? q.fig : ''}
     <div class="mute">คุณตอบ: ${mine != null ? showAns(q, mine) : '(ว่าง)'} · เฉลย: <b style="color:var(--ok)">${rightTxt(q)}</b></div>
-    <div class="exp"><div>${nl(q.exp || '')}</div>${whyHtml(q)}${q.tip ? `<div class="tip">💡 ${esc(q.tip)}</div>` : ''}${lessonFor(q) ? `<div style="margin-top:6px"><a href="#/library" data-a="openLesson" data-v="${esc(q.topic)}" onclick="return false">📚 บทเรียน: ${esc(q.topic)}</a></div>` : ''}</div></div>`; }).join('')}</div>`;
+    <div class="exp"><div>${nl(q.exp || '')}</div>${whyHtml(q)}${q.tip ? `<div class="tip">💡 ${rt(q.tip)}</div>` : ''}${lessonFor(q) ? `<div style="margin-top:6px"><a href="#/library" data-a="openLesson" data-v="${esc(q.topic)}" onclick="return false">📚 บทเรียน: ${esc(q.topic)}</a></div>` : ''}</div></div>`; }).join('')}</div>`;
 }
 
 /* ====================== stats ====================== */
@@ -444,7 +456,7 @@ function lessonList() {
 function lessonListTopics() {
   const grp = g => Object.entries(LESSONS).filter(([, l]) => l.group === g).map(([k, l]) => {
     const n = allQ().filter(q => q.topic === k).length, st = topicStats().find(t => t.topic === k);
-    return `<button class="lcard" data-a="openLesson" data-v="${esc(k)}"><b>${esc(l.title)}</b><small>${n} ข้อฝึก${st ? ' · แม่นยำ ' + pct(st.ok, st.n) + '%' : ''} · ${l.refs.length} แหล่งอ้างอิง${l.slides ? ' · 🎛 มีซิมูเลเตอร์' : ''}</small></button>`;
+    return `<button class="lcard" data-a="openLesson" data-v="${esc(k)}"><b>${rt(l.title)}</b><small>${n} ข้อฝึก${st ? ' · แม่นยำ ' + pct(st.ok, st.n) + '%' : ''} · ${l.refs.length} แหล่งอ้างอิง${l.slides ? ' · 🎛 มีซิมูเลเตอร์' : ''}</small></button>`;
   }).join('');
   return Object.entries(GROUPS).map(([g, name]) => `<h2 style="margin-top:14px">${name}</h2><div class="presets">${grp(g)}</div>`).join('');
 }
@@ -461,15 +473,15 @@ function buildSlides(k) {
 }
 function slideHtml(sl, k) {
   const l = lessonMeta(k), n = allQ().filter(q => q.topic === l.topic).length, fig = sl.svg ? `<div class="slfig">${typeof sl.svg === 'function' ? sl.svg() : sl.svg}</div>` : '';
-  const note = sl.note ? `<div class="slnote">💡 ${esc(sl.note)}</div>` : '';
-  if (sl.type === 'cover') return `<div class="cover"><div class="big">${l.group === 'tpat3' ? '⚙️' : l.group === 'tgat' ? '🧠' : '🔬'}</div><h1>${esc(sl.h)}</h1><p>${esc(sl.intro)}</p><div class="mute">กด ▶ หรือปัดซ้ายเพื่อเริ่ม · มี ${LS.slides.filter(x => x.type === 'sim').length} ซิมูเลเตอร์ให้ลองปรับค่า</div></div>`;
-  if (sl.type === 'divider') return `<div class="cover"><div class="big">📐</div><h1>${esc(sl.h)}</h1></div>`;
-  if (sl.type === 'sim') return `<h2>🎛 ${esc(sl.h)}</h2><div id="simhost"></div>${note}`;
+  const note = sl.note ? `<div class="slnote">💡 ${rt(sl.note)}</div>` : '';
+  if (sl.type === 'cover') return `<div class="cover"><div class="big">${l.group === 'tpat3' ? '⚙️' : l.group === 'tgat' ? '🧠' : '🔬'}</div><h1>${rt(sl.h)}</h1><p>${rt(sl.intro)}</p><div class="mute">กด ▶ หรือปัดซ้ายเพื่อเริ่ม · มี ${LS.slides.filter(x => x.type === 'sim').length} ซิมูเลเตอร์ให้ลองปรับค่า</div></div>`;
+  if (sl.type === 'divider') return `<div class="cover"><div class="big">📐</div><h1>${rt(sl.h)}</h1></div>`;
+  if (sl.type === 'sim') return `<h2>🎛 ${rt(sl.h)}</h2><div id="simhost"></div>${note}`;
   if (sl.type === 'end') return `<h2>ไปต่อ</h2><div class="row" style="margin:10px 0"><button class="pri" data-a="practiceTopic" data-v="${esc(l.topic)}" ${n ? '' : 'disabled'}>ฝึกหัวข้อนี้ (${n} ข้อ)</button></div>${refsHtml(l.refs)}`;
-  if (sl.type === 'proof') return `<h2>🧪 ที่มาของสูตร: ${esc(sl.h)}</h2><div class="proofbadge">ส่วนเสริมสำหรับคนที่อยากรู้ที่มา — ข้ามได้ ไม่กระทบการทำข้อสอบ</div><ol class="steps proof">${sl.steps.map((s, i) => `<li style="animation-delay:${.15 + i * .3}s">${esc(s)}</li>`).join('')}</ol>${sl.concl ? `<div class="exans" style="animation-delay:${.2 + sl.steps.length * .3}s">∴ <b>${esc(sl.concl)}</b></div>` : ''}${note}`;
-  if (sl.type === 'formula') return `<h2>🧮 ${esc(sl.h)}</h2><div class="ftable">${sl.rows.map((r, i) => `<div class="frow" style="animation-delay:${.1 + i * .12}s"><code>${esc(r[0])}</code><span>${esc(r[1])}</span></div>`).join('')}</div>${note}`;
-  if (sl.type === 'example') return `<h2>✏️ ${esc(sl.h)}</h2><div class="exq">${nl(sl.q)}</div>${fig}<ol class="steps">${sl.steps.map((s, i) => `<li style="animation-delay:${.15 + i * .3}s">${esc(s)}</li>`).join('')}</ol><div class="exans" style="animation-delay:${.2 + sl.steps.length * .3}s">✔ คำตอบ: <b>${esc(sl.ans)}</b></div>${note}`;
-  return `<h2>${sl.cls === 'trap' ? '⚠️ ' : ''}${esc(sl.h)}</h2>${fig}<ul class="bul ${sl.cls || ''}">${(sl.bullets || []).map((b, i) => `<li style="animation-delay:${.12 + i * .2}s">${esc(b)}</li>`).join('')}</ul>${note}`;
+  if (sl.type === 'proof') return `<h2>🧪 ที่มาของสูตร: ${rt(sl.h)}</h2><div class="proofbadge">ส่วนเสริมสำหรับคนที่อยากรู้ที่มา — ข้ามได้ ไม่กระทบการทำข้อสอบ</div><ol class="steps proof">${sl.steps.map((s, i) => `<li style="animation-delay:${.15 + i * .3}s">${rt(s)}</li>`).join('')}</ol>${sl.concl ? `<div class="exans" style="animation-delay:${.2 + sl.steps.length * .3}s">∴ <b>${rt(sl.concl)}</b></div>` : ''}${note}`;
+  if (sl.type === 'formula') return `<h2>🧮 ${rt(sl.h)}</h2><div class="ftable">${sl.rows.map((r, i) => `<div class="frow" style="animation-delay:${.1 + i * .12}s"><code>${rt(r[0])}</code><span>${rt(r[1])}</span></div>`).join('')}</div>${note}`;
+  if (sl.type === 'example') return `<h2>✏️ ${rt(sl.h)}</h2><div class="exq">${nl(sl.q)}</div>${fig}<ol class="steps">${sl.steps.map((s, i) => `<li style="animation-delay:${.15 + i * .3}s">${rt(s)}</li>`).join('')}</ol><div class="exans" style="animation-delay:${.2 + sl.steps.length * .3}s">✔ คำตอบ: <b>${rt(sl.ans)}</b></div>${note}`;
+  return `<h2>${sl.cls === 'trap' ? '⚠️ ' : ''}${rt(sl.h)}</h2>${fig}<ul class="bul ${sl.cls || ''}">${(sl.bullets || []).map((b, i) => `<li style="animation-delay:${.12 + i * .2}s">${rt(b)}</li>`).join('')}</ul>${note}`;
 }
 function lessonView(k) {
   if (!LS || LS.k !== k) LS = { k, i: 0, slides: buildSlides(k), sim: null, dir: '' };
@@ -483,6 +495,7 @@ function lessonView(k) {
 
 /* ====================== actions ====================== */
 const ACT = {
+  ...ADMIN_ACT,
   setDate() { examDate = val('ed'); save(); render(true); },
   setExam(v) { examDate = v; save(); if ((location.hash || '#/') === '#/') render(true); else alert('ตั้งวันนับถอยหลังเป็น ' + v + ' แล้ว (ดูที่หน้าแรก)'); },
   themeOpen() { themeSheet(true); }, themeClose() { themeSheet(false); },

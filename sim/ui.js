@@ -19,7 +19,7 @@ const SU = (function () {
   function sim(host, cfg) {
     host.innerHTML = `<div class="sim"><div class="simgoal"></div><canvas class="simcv" role="img" aria-label="${cfg.label || 'ซิมูเลเตอร์'}"></canvas><div class="simbtns"></div><div class="simctl"></div><div class="simout"></div></div>`;
     const root = host.firstChild, cv = root.querySelector('canvas'), g = cv.getContext('2d'), ctl = root.querySelector('.simctl'), outEl = root.querySelector('.simout'), btns = root.querySelector('.simbtns'), goal = root.querySelector('.simgoal');
-    if (cfg.goal) goal.innerHTML = `🎯 <b>ลองทำ:</b> ${cfg.goal}`; else goal.remove();
+    if (cfg.goal) goal.innerHTML = uni(`🎯 <b>ลองทำ:</b> ${cfg.goal}`); else goal.remove();
     const S = {}; let t = 0, playing = !!cfg.animate, raf = 0, last = 0, W = 300, H = cfg.h || 220, dead = false, C = colors(), lastOut = '';
     const H0 = H, dur = () => typeof cfg.duration === 'function' ? cfg.duration(S) : cfg.duration;
     function size() { const w = cv.clientWidth || 300, d = window.devicePixelRatio || 1; W = w; H = cfg.h || H0; cv.style.height = H + 'px'; cv.width = Math.round(w * d); cv.height = Math.round(H * d); g.setTransform(d, 0, 0, d, 0, 0); }
@@ -27,7 +27,7 @@ const SU = (function () {
       S[c.id] = c.v;
       const lab = document.createElement('label'); lab.className = 'simc';
       const show = v => c.opts ? c.opts[v] : (c.fmt ? c.fmt(v) : f(v, c.dec == null ? (c.step < 1 ? 2 : 0) : c.dec)) + (c.unit ? ' ' + c.unit : '');
-      lab.innerHTML = `<span>${c.label} <b>${show(c.v)}</b></span><input type="range" min="${c.min}" max="${c.max}" step="${c.step || 1}" value="${c.v}" aria-label="${c.label}">`;
+      lab.innerHTML = uni(`<span>${c.label} <b>${show(c.v)}</b></span><input type="range" min="${c.min}" max="${c.max}" step="${c.step || 1}" value="${c.v}" aria-label="${c.label}">`);
       const inp = lab.querySelector('input'), b = lab.querySelector('b');
       inp.addEventListener('input', () => { S[c.id] = +inp.value; b.textContent = show(S[c.id]); if (c.reset) { t = 0; } draw(); });
       ctl.appendChild(lab);
@@ -42,7 +42,7 @@ const SU = (function () {
     function draw() {
       if (dead) return; C = colors(); g.clearRect(0, 0, W, H);
       try { cfg.draw(g, W, H, S, t, C); } catch (e) { console.error('sim draw', e); }
-      if (cfg.out) { const h = cfg.out(S, t); if (h !== lastOut) { outEl.innerHTML = h; lastOut = h; } }
+      if (cfg.out) { const h = cfg.out(S, t); if (h !== lastOut) { outEl.innerHTML = uni(h); lastOut = h; } }
     }
     function frame(ts) {
       if (dead) return;

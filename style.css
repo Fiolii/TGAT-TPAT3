@@ -267,3 +267,8 @@ details{border-top:1px solid var(--line);padding:8px 0}summary{cursor:pointer;fo
 .proofbadge{display:inline-block;background:var(--warnbg);border:1px dashed var(--warn);border-radius:999px;padding:3px 14px;font-size:12.5px;margin:0 0 10px}
 .steps.proof li::before{background:var(--warn);color:#1b1b1b}
 .steps.proof li{border-left:3px solid var(--warn);font-family:inherit}
+
+/* ตัวห้อย/ตัวยกจริง */
+sub,sup{font-size:.72em;line-height:0;position:relative;vertical-align:baseline;font-weight:inherit}
+sub{bottom:-.28em}sup{top:-.5em}
+.frow code sub,.frow code sup,.steps sub,.steps sup{font-size:.7em}

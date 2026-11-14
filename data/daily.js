@@ -94,7 +94,9 @@ function dailyCard() {
 }
 
 /* ---------- เสื้อช็อป ---------- */
-function xpNow() { return attempts.length + Math.round(studies.reduce((a, s) => a + s.secs, 0) / 600); } // 1 ข้อ = 1 แต้ม, อ่าน 10 นาที = 1 แต้ม
+function xpBase() { return attempts.length + Math.round(studies.reduce((a, s) => a + s.secs, 0) / 600); }
+function xpNow() { return Math.max(0, xpBase() + store.get('xpBonus', 0)); } // 1 ข้อ = 1 แต้ม, อ่าน 10 นาที = 1 แต้ม
+const ALLP = [['⚙️', 'ทำครบ 10 ข้อ'], ['🔧', 'ทำครบ 100 ข้อ'], ['🔌', 'อ่านต่อเนื่อง 3 วัน'], ['🔥', 'อ่านต่อเนื่อง 7 วัน'], ['📐', 'ทำสอบจำลองแล้ว'], ['🎯', 'ภารกิจครบ 5 วัน'], ['📚', 'อ่านครบ 10 บท']];
 function shirtInfo() {
   const xp = xpNow(), idx = TITLES.map(t => t[0]).filter(v => xp >= v).length - 1, next = TITLES[idx + 1];
   const patches = [], dl = store.get('dlog', {}), daysDone = Object.values(dl).filter(x => x.done >= x.total && x.total > 0).length + (Object.keys(getDaily().results).length >= getDaily().ids.length ? 1 : 0);
@@ -102,6 +104,7 @@ function shirtInfo() {
   if (streak() >= 3) patches.push(['🔌', 'อ่านต่อเนื่อง 3 วัน']); if (streak() >= 7) patches.push(['🔥', 'อ่านต่อเนื่อง 7 วัน']);
   if (mocks.length) patches.push(['📐', 'ทำสอบจำลองแล้ว']); if (daysDone >= 5) patches.push(['🎯', 'ภารกิจครบ 5 วัน']);
   if (Object.keys(readLog()).length >= 10) patches.push(['📚', 'อ่านครบ 10 บท']);
+  if (store.get('allPatches', false)) ALLP.forEach(p => { if (!patches.some(x => x[0] === p[0])) patches.push(p); });
   return { xp, title: TITLES[idx][1], next, patches };
 }
 function shirtSvg(name) {
@@ -121,3 +124,35 @@ function easterEgg() {
   if (logoTaps >= 5) { logoTaps = 0; const q = QUOTES[Math.floor(Math.random() * QUOTES.length)]; toast('⚙️ ' + q.t); confetti(); }
 }
 function toast(msg) { let t = $('#toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.textContent = msg; t.className = 'show'; clearTimeout(t._h); t._h = setTimeout(() => t.className = '', 4200); }
+
+/* ---------- หน้าต่างแอดมิน (รหัส 1234) — ใช้ลองเลเวล/แพทช์/ภารกิจ ----------
+   หมายเหตุ: เป็นแอปฝั่งเบราว์เซอร์ล้วน รหัสนี้ไม่ใช่ระบบรักษาความปลอดภัยจริง ใช้กันกดโดนเท่านั้น */
+const ADMIN_PASS = '1234';
+let adminOk = false;
+function adminSheet(open) {
+  let el = $('#adminsheet'); if (el) el.remove(); if (!open) return;
+  const si = shirtInfo(), d = getDaily(), done = Object.keys(d.results).length;
+  el = document.createElement('div'); el.id = 'adminsheet'; el.className = 'omr'; el.setAttribute('data-a', 'adminClose');
+  el.innerHTML = `<div><div class="row between"><h2 style="margin:0">🔧 แอดมิน</h2><button data-a="adminClose">ปิด</button></div>
+    <p class="mute" style="margin:6px 0">ตอนนี้: <b>${si.title}</b> · ${si.xp} แต้ม (โบนัสแอดมิน ${store.get('xpBonus', 0) >= 0 ? '+' : ''}${store.get('xpBonus', 0)})</p>
+    <p class="mute" style="margin:10px 0 4px">ข้ามไปเลเวล</p>
+    <div class="chips">${TITLES.map((t, i) => `<button class="chip ${si.title === t[1] ? 'on' : ''}" data-a="adminLevel" data-v="${i}">${t[1]}</button>`).join('')}</div>
+    <p class="mute" style="margin:10px 0 4px">ปรับแต้ม</p>
+    <div class="chips"><button class="chip" data-a="adminXp" data-v="-50">−50</button><button class="chip" data-a="adminXp" data-v="50">+50</button><button class="chip" data-a="adminXp" data-v="200">+200</button><button class="chip" data-a="adminXp" data-v="0">รีเซ็ตโบนัส</button></div>
+    <p class="mute" style="margin:10px 0 4px">แพทช์และภารกิจ</p>
+    <div class="chips"><button class="chip ${store.get('allPatches', false) ? 'on' : ''}" data-a="adminPatches">🧷 ปลดล็อกแพทช์ทั้งหมด</button><button class="chip" data-a="adminMission" data-v="done">ทำภารกิจวันนี้ให้ครบ (${done}/${d.ids.length})</button><button class="chip" data-a="adminMission" data-v="reset">รีเซ็ตภารกิจวันนี้</button></div>
+    <p class="mute" style="margin:10px 0 4px">อันตราย</p>
+    <div class="chips"><button class="chip" data-a="adminWipe">🗑 ล้างข้อมูลทั้งหมดในเครื่องนี้</button><button class="chip" data-a="adminLock">🔒 ออกจากโหมดแอดมิน</button></div>
+    <p class="mute" style="font-size:12px">โบนัสแอดมินเป็นแต้มที่บวกเพิ่ม ไม่ได้ปลอมสถิติโจทย์ — ยกเลิกได้ด้วย "รีเซ็ตโบนัส"</p></div>`;
+  document.body.appendChild(el);
+}
+const ADMIN_ACT = {
+  adminOpen() { if (!adminOk) { const p = prompt('รหัสแอดมิน'); if (p === null) return; if (p !== ADMIN_PASS) { toast('รหัสไม่ถูกต้อง'); return; } adminOk = true; } adminSheet(true); },
+  adminClose() { adminSheet(false); },
+  adminLock() { adminOk = false; adminSheet(false); toast('ออกจากโหมดแอดมินแล้ว'); },
+  adminLevel(v) { store.set('xpBonus', TITLES[+v][0] - xpBase()); render(true); adminSheet(true); if (+v > 0) confetti(); },
+  adminXp(v) { store.set('xpBonus', +v === 0 ? 0 : store.get('xpBonus', 0) + +v); render(true); adminSheet(true); },
+  adminPatches() { store.set('allPatches', !store.get('allPatches', false)); render(true); adminSheet(true); },
+  adminMission(v) { const d = getDaily(); d.results = {}; if (v === 'done') d.ids.forEach(id => d.results[id] = true); store.set('daily', d); render(true); adminSheet(true); },
+  adminWipe() { if (!confirm('ลบข้อมูลทั้งหมดของแอปในเครื่องนี้ (สถิติ, ภารกิจ, ธีม, ชื่อเสื้อ)? ย้อนกลับไม่ได้')) return; Object.keys(localStorage).filter(k => k.startsWith('sx_')).forEach(k => localStorage.removeItem(k)); location.reload(); },
+};

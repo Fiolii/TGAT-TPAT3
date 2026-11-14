@@ -1,5 +1,5 @@
-// Service worker: เก็บไฟล์แอปไว้ใช้ออฟไลน์ (เปลี่ยน VERSION เมื่อแก้ไฟล์เพื่อบังคับอัปเดต)
-const VERSION = 'sixent-v6';
+﻿// Service worker: เก็บไฟล์แอปไว้ใช้ออฟไลน์ (เปลี่ยน VERSION เมื่อแก้ไฟล์เพื่อบังคับอัปเดต)
+const VERSION = 'sixent-v7';
 const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest',
   'data/themes.js', 'data/thwiki.js', 'data/daily.js', 'data/proofs.js', 'data/meta.js', 'data/tcas.js', 'data/lessons.js', 'data/figs.js', 'data/q_tpat3.js', 'data/q_spatial.js', 'data/q_tgat.js', 'data/q_alevel.js', 'data/slides.js', 'data/q_num.js', 'data/course.js', 'data/course_phy.js', 'data/course_chem.js', 'data/course_math.js', 'data/course_tpat3.js', 'data/course_tgat.js',
   'sim/ui.js', 'sim/physics.js', 'sim/math.js', 'sim/science.js', 'sim/spatial.js',
