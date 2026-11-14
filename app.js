@@ -505,7 +505,7 @@ function lessonView(k) {
 
 /* ====================== actions ====================== */
 const ACT = {
-  ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT, ...CHAR_ACT,
+  ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT, ...CHAR_ACT, ...SOC_ACT,
   setDate() { examDate = val('ed'); save(); render(true); },
   setExam(v) { examDate = v; save(); if ((location.hash || '#/') === '#/') render(true); else alert('ตั้งวันนับถอยหลังเป็น ' + v + ' แล้ว (ดูที่หน้าแรก)'); },
   themeOpen() { uniPage(null); themeSheet(true); }, themeClose() { themeSheet(false); },

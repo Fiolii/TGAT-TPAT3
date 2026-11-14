@@ -162,16 +162,16 @@ function shopTab() {
 function viewMe() {
   const hist = (coinData().log || []).slice(0, 6);
   return `<h1>ตัวละครของฉัน</h1>${avStage()}
-    <div class="seg tabs2"><button class="${ME.tab === 'dress' ? 'on' : ''}" data-a="avTab" data-v="dress">👕 ห้องแต่งตัว</button><button class="${ME.tab === 'shop' ? 'on' : ''}" data-a="avTab" data-v="shop">🛍 ร้านค้า</button></div>
-    ${ME.tab === 'dress' ? dressTab() : shopTab()}
+    <div class="seg tabs2"><button class="${ME.tab === 'dress' ? 'on' : ''}" data-a="avTab" data-v="dress">👕 ห้องแต่งตัว</button><button class="${ME.tab === 'shop' ? 'on' : ''}" data-a="avTab" data-v="shop">🛍 ร้านค้า</button><button class="${ME.tab === 'friends' ? 'on' : ''}" data-a="avTab" data-v="friends">👥 เพื่อน</button></div>
+    ${ME.tab === 'dress' ? dressTab() : ME.tab === 'shop' ? shopTab() : friendsTab()}
     ${hist.length ? `<div class="card"><h2>เหรียญล่าสุด</h2><ul class="coinparts">${hist.map(h => `<li><span>${esc(h.t)}</span><b class="${h.n < 0 ? 'neg' : ''}">${h.n > 0 ? '+' : ''}${h.n}</b></li>`).join('')}</ul></div>` : ''}`;
 }
 
 /* ---------- การกระทำ ---------- */
 function avUpdateHero(id) { const h = document.querySelector('.uh-meav'); if (h) h.innerHTML = avatarSvg({ top: 'uni:' + id }, { w: 92 }); }
 const CHAR_ACT = {
-  avOpen(v) { ME.tab = v === 'shop' ? 'shop' : 'dress'; ME.try = {}; uniPage(null); if (location.hash !== '#/me') location.hash = '#/me'; else render(true); },
-  avTab(v) { ME.tab = v; ME.try = {}; render(true); },
+  avOpen(v) { ME.tab = v === 'shop' ? 'shop' : v === 'friends' ? 'friends' : 'dress'; ME.try = {}; uniPage(null); if (location.hash !== '#/me') location.hash = '#/me'; else render(true); },
+  avTab(v) { ME.tab = v; ME.try = {}; render(true); if (v === 'friends' && typeof socLoadFriends === 'function') socLoadFriends(); },
   avFilter(v) { ME.filter = v; render(true); },
   avSet(v) { const [slot, val] = v.split('|'), c = avCfg(); if (slot === 'top' && val !== c.top) { /* เปลี่ยนเสื้อ */ } c[slot] = val; avSave(c); ME.try = {}; render(true); },
   avGender(v) { const c = avCfg(), o = GD[c.g] || GD.m, n = GD[v]; if (c.hair === o.hair) c.hair = n.hair; if (c.bottom === o.bottom) c.bottom = n.bottom; c.g = v; avSave(c); render(true); },

@@ -17,7 +17,7 @@ svg.av{display:block;overflow:visible}
 .seg{display:flex;gap:4px;padding:4px;border-radius:14px;background:var(--pri2);width:fit-content;max-width:100%;flex-wrap:wrap}
 .seg button{border:0;background:transparent;border-radius:11px;padding:8px 16px;min-height:40px;font-weight:600;color:var(--ink)}
 .seg button.on{background:var(--card);color:var(--pri);box-shadow:0 2px 8px -2px rgba(0,0,0,.3)}
-.seg.tabs2{display:grid;grid-template-columns:1fr 1fr;width:100%;margin:12px 0}
+.seg.tabs2{display:grid;grid-template-columns:repeat(3,1fr);width:100%;margin:12px 0}
 .avstage{display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap;padding:18px 14px;position:relative;overflow:hidden;background:radial-gradient(90% 80% at 30% 20%,color-mix(in srgb,var(--pri) 18%,var(--card)),var(--card))}
 .avbig{flex:none;width:210px;max-width:62vw;filter:drop-shadow(0 10px 14px rgba(0,0,0,.28))}.avbig svg{width:100%;height:auto}
 .avmeta{min-width:190px;flex:1;display:grid;gap:8px;align-content:center}
@@ -62,3 +62,13 @@ svg.av{display:block;overflow:visible}
 @media (max-width:560px){.avstage{flex-direction:column}.avmeta{text-align:center;justify-items:center}.itgrid{grid-template-columns:repeat(2,1fr)}.itp svg{width:100px}}
 .avtp svg.av,.itp svg.av,.uh-meav svg.av{overflow:hidden}
 .lockmsg.soft{color:var(--mute);font-weight:500}
+
+/* เพื่อน */
+.socode{font:800 34px/1.2 ui-monospace,Menlo,Consolas,monospace;letter-spacing:.28em;color:var(--pri);margin:2px 0 8px;user-select:all}
+.socme{background:linear-gradient(135deg,color-mix(in srgb,var(--pri) 12%,var(--card)),var(--card))}
+.socerr{margin-top:8px;padding:8px 12px;border-radius:12px;background:var(--badbg);color:var(--bad);font-size:13.5px}
+.frgrid{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}.frgrid>*{min-width:0}
+.frc{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:18px;border:1px solid var(--line);background:var(--card)}
+.frav{flex:none;border:0;padding:0;background:radial-gradient(80% 70% at 50% 30%,color-mix(in srgb,var(--pri) 16%,transparent),transparent 75%);border-radius:14px;overflow:hidden;cursor:pointer}.frav svg.av{overflow:hidden}
+.frin{min-width:0;display:grid;gap:2px}.frin b{font-size:16px}
+.socview{text-align:center}.socview .avbig{width:230px;max-width:70vw}

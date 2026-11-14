@@ -141,8 +141,8 @@ function avBg(bg, uid) {
 // over = ค่าที่ทับ (เช่น {top:'uni:chula'}) ; o = {w, view:'full'|'half', bg:true}
 function avatarSvg(over, o) {
   o = o || {}; const c = Object.assign({}, typeof avCfg === 'function' ? avCfg() : AVDEF, over || {}), uid = ++AVC;
-  const skin = AVSKIN[c.skin] || AVSKIN.b, hc = c.hc || '#1f1b1b', uc = avUniCol(typeof curThemeId === 'function' ? curThemeId() : 'sixent');
-  const nick = (typeof store !== 'undefined' ? store.get('nick', 'น้องวิศวะ') : 'น้องวิศวะ');
+  const skin = AVSKIN[c.skin] || AVSKIN.b, hc = c.hc || '#1f1b1b', uc = avUniCol(o.uni || (typeof curThemeId === 'function' ? curThemeId() : 'sixent'));
+  const nick = o.nick != null ? String(o.nick) : (typeof store !== 'undefined' ? store.get('nick', 'น้องวิศวะ') : 'น้องวิศวะ');
   const isUni = /^unig?:/.test(c.top);
   let top;
   if (isUni) {
