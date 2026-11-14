@@ -402,3 +402,81 @@ sub{bottom:-.28em}sup{top:-.5em}
 .board.mini{margin:0;padding:8px 10px;border-width:8px}
 .board.mini .bdfig{position:static;border:0;background:none;padding:0}
 .chalkfig figcaption{padding-top:8px}
+
+/* ===== อัตลักษณ์มหาวิทยาลัย ===== */
+:root{--patimg:none;--patbg:none}
+.hero{background:var(--patimg) 0 0/64px 64px repeat,var(--grad)}
+.shirtcard{background:var(--patbg) 0 0/64px 64px repeat,var(--card)}
+.heroicon{position:absolute;right:16px;top:12px;z-index:1;filter:drop-shadow(0 4px 8px rgba(0,0,0,.35));animation:heroBob 4s ease-in-out infinite}
+.heroicon .uniemoji{display:block;line-height:1}.unilogo{object-fit:contain;display:inline-block;vertical-align:middle}
+@keyframes heroBob{50%{transform:translateY(-5px) rotate(3deg)}}
+.unimotto{font-size:13.5px;line-height:1.55;margin:2px 0 4px;font-style:italic;color:var(--mute)}
+.unimotto.herom{color:#fff;opacity:.95;font-size:15px;margin:0 0 8px;max-width:calc(100% - 96px)}
+.unichips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.unichips span{background:var(--pri2);border-radius:999px;padding:2px 10px;font-size:12.5px}
+.uniinfo{display:flex;gap:12px;align-items:center;margin:8px 0 10px;padding:10px 12px;border-radius:16px;border:1px solid var(--line);background:var(--patbg) 0 0/64px 64px repeat,var(--card)}
+.shirtprev{flex:none;width:92px}.shirtprev .shirt{width:100%;height:auto;filter:drop-shadow(0 4px 6px rgba(0,0,0,.25))}
+.uniinfob{flex:1;min-width:0}.uniinfoh{display:flex;align-items:center;gap:8px}
+.swatch i{display:grid;place-items:center}.swatch i b{font-size:18px;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+.shirtimg{position:relative;width:100%;height:100%;display:grid;place-items:center}.shirtimg img{max-width:100%;max-height:100%;object-fit:contain;filter:drop-shadow(0 4px 6px rgba(0,0,0,.25))}
+.shirtimg .shirtnm{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.9);color:#222;font-size:10px;font-weight:700;border-radius:6px;padding:0 6px}
+.shirtprev .shirtimg{height:100px}
+@media (max-width:560px){.heroicon{transform:scale(.8);right:8px}}
+
+/* ===== หน้ารู้จักมหาวิทยาลัย + ตราสัญลักษณ์ ===== */
+.uic{vertical-align:-3px;flex:none}
+.logo.emb{background:none;width:34px;height:34px;display:block;border-radius:0}.logo.emb .emb,.logo.emb svg{display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.28))}
+.themebtn svg{display:block;margin:auto}
+.swatch i{background:none!important;width:40px;height:40px;border-radius:0}.swatch i svg{filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+.emb{display:block}
+.heroicon .emb,.heroicon .unilogo{display:block}
+.unipick{background:var(--patbg) 0 0/64px 64px repeat,var(--card)}
+.unipickemb{flex:none;filter:drop-shadow(0 3px 5px rgba(0,0,0,.25))}
+.unichips span{display:inline-flex;align-items:center;gap:5px}.unichips span .uic{color:var(--pri)}
+.unichips.big{gap:8px;margin:8px 0}.unichips.big span{font-size:13.5px;padding:5px 13px;border:1px solid var(--line)}.unichips.big span.hl{background:var(--pri);color:var(--onpri,#fff);border-color:var(--pri);font-weight:600}
+body.uni-open{overflow:hidden}
+.uniomr{align-items:flex-end;z-index:45}
+.uniomr>div{max-width:780px;max-height:94vh;height:94vh;padding:0;display:flex;flex-direction:column;overflow:hidden;border-radius:22px 22px 0 0}
+.unitop{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--card);flex:none}
+.unitop b{display:flex;align-items:center;gap:6px}.unitop button{min-height:38px;padding:6px 14px}
+.unibody{flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+.unibody section{padding:6px 16px 10px}.unibody h3{margin:16px 0 8px;font-size:20px;display:flex;align-items:center;gap:8px}.unibody h3::before{content:"";width:5px;height:20px;border-radius:3px;background:var(--grad)}
+.unibody h4{margin:18px 0 6px;font-size:15px;color:var(--pri)}
+.unihero{display:flex;gap:16px;align-items:center;padding:22px 16px;color:#fff;background:var(--patimg) 0 0/64px 64px repeat,var(--grad);position:relative}
+.uniheroemb{flex:none;filter:drop-shadow(0 8px 14px rgba(0,0,0,.4));animation:heroBob 4.5s ease-in-out infinite}
+.unihero h2{margin:0;font-size:22px;line-height:1.3;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.3)}.uni-en{opacity:.92;font-size:13.5px;margin:2px 0 8px}
+.uni-q{display:flex;gap:6px;align-items:flex-start;font-style:italic;font-size:14.5px;line-height:1.5;background:rgba(0,0,0,.18);border-radius:12px;padding:6px 10px}.uni-q .uic{margin-top:3px;opacity:.85}
+.uninav{position:sticky;top:0;z-index:3;display:flex;gap:6px;overflow-x:auto;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--line);scrollbar-width:none}.uninav::-webkit-scrollbar{display:none}.uninav .chip{flex:none;min-height:36px;padding:4px 14px;font-size:13.5px}
+.uniprose{font-size:15.5px;line-height:1.9;margin:6px 0 12px}
+.unifacts{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.unifact{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.unifact i{flex:none;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--pri2);color:var(--pri)}.unifact small{color:var(--mute);font-size:12px}.unifact div{font-size:14px;line-height:1.5}
+.unistrong{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.unis{position:relative;padding:12px 14px 12px 50px;border:1px solid var(--line);border-radius:14px;background:var(--patbg) 0 0/64px 64px repeat,var(--card)}
+.unis .n{position:absolute;left:12px;top:12px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:var(--onpri,#fff);background:var(--grad)}.unis b{display:block}.unis p{margin:2px 0 0;font-size:13.5px;color:var(--mute);line-height:1.6}
+.engban{display:flex;gap:14px;align-items:center;margin-top:14px;padding:14px;border-radius:18px;color:#fff;background:var(--patimg) 0 0/64px 64px repeat,var(--grad)}
+.engban h3{color:#fff}.engban h3::before{display:none}.engkick{display:flex;gap:5px;align-items:center;font-size:12.5px;opacity:.92;letter-spacing:.3px}.engtag{font-size:13.5px;opacity:.95}
+.engyear{flex:none;text-align:center;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);border-radius:14px;padding:6px 12px;line-height:1.1}.engyear b{display:block;font-size:30px;letter-spacing:.5px}.engyear small{font-size:11px;opacity:.9}
+.unipeople{display:grid;gap:8px}.unipeople>div{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--line);border-radius:12px}.unipeople i{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--pri2);color:var(--pri)}.unipeople b{display:block;font-size:14.5px}.unipeople span{font-size:13px;color:var(--mute);line-height:1.5}
+.unifl{list-style:none;margin:0;padding:0;display:grid;gap:7px}.unifl li{display:flex;gap:8px;align-items:flex-start;font-size:14.5px;line-height:1.6}.unifl .uic{margin-top:4px;color:var(--pri)}
+.untl{list-style:none;margin:8px 0 4px 8px;padding:0}.untl li{position:relative;padding:0 0 16px 20px;border-left:2px solid color-mix(in srgb,var(--pri) 45%,var(--line))}.untl li:last-child{border-left-color:transparent}
+.untl li::before{content:"";position:absolute;left:-7px;top:3px;width:12px;height:12px;border-radius:50%;background:var(--card);border:3px solid var(--pri)}
+.untl li b{display:inline-block;background:var(--pri);color:var(--onpri,#fff);border-radius:999px;padding:0 11px;font-size:12.5px;margin-bottom:3px}.untl li span{display:block;font-size:14.5px;line-height:1.65}
+.uniend{border-top:1px solid var(--line);margin-top:10px;padding-top:12px!important}
+.unibody details{border:1px solid var(--line);border-radius:14px;padding:8px 12px;margin:8px 0;background:var(--card)}.unibody details[open]{background:var(--pri2)}
+@media (max-width:560px){.unihero{flex-direction:column;text-align:center}.uni-q{text-align:left}.unihero h2{font-size:20px}.engban{flex-direction:column;text-align:center}.engkick{justify-content:center}}
+@media (prefers-reduced-motion:reduce){.uniheroemb,.heroicon{animation:none}}
+.unibody{position:relative}
+#themesheet h2{display:flex;align-items:center;gap:8px}
+
+/* ===== 3D: ตราหมุนเอียงเล็กน้อย เสื้อโยกตามเมาส์/นิ้ว การ์ดมีมิติ ===== */
+.heroicon,.uniheroemb,.unipickemb,.shirtbtn{perspective:520px}
+.heroicon .emb,.uniheroemb .emb{transform-style:preserve-3d;animation:embSway 7s ease-in-out infinite;filter:drop-shadow(0 12px 12px rgba(0,0,0,.38))}
+@keyframes embSway{0%,100%{transform:rotateY(-22deg) rotateX(5deg)}50%{transform:rotateY(22deg) rotateX(-3deg)}}
+.shirtbtn svg,.shirtbtn .shirtimg{transform-style:preserve-3d;transition:transform .35s cubic-bezier(.2,.8,.2,1);animation:shirtSway 8s ease-in-out infinite}
+.shirtbtn:hover svg,.shirtbtn:active svg{animation-play-state:paused;transform:rotateY(-16deg) rotateX(5deg) scale(1.04)}
+@keyframes shirtSway{0%,100%{transform:rotateY(-9deg)}50%{transform:rotateY(9deg)}}
+.unifact,.unis,.unipeople>div,.unibody details{box-shadow:0 1px 0 rgba(255,255,255,.55) inset,0 8px 16px -10px rgba(0,0,0,.3)}
+.unihero{box-shadow:inset 0 -30px 40px -30px rgba(0,0,0,.35)}
+.uniheroemb::after{content:"";display:block;width:70%;height:10px;margin:6px auto 0;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.4),transparent)}
+.engyear{box-shadow:0 8px 18px -8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.45)}
+@media (prefers-reduced-motion:reduce){.heroicon .emb,.uniheroemb .emb,.shirtbtn svg,.shirtbtn .shirtimg{animation:none}}

@@ -107,14 +107,16 @@ function shirtInfo() {
   if (store.get('allPatches', false)) ALLP.forEach(p => { if (!patches.some(x => x[0] === p[0])) patches.push(p); });
   return { xp, title: TITLES[idx][1], next, patches };
 }
-function shirtSvg(name) {
+function shirtSvg(name) { return typeof uniShirt === 'function' ? uniShirt(name) : shirtSvgBase(name); }
+function shirtSvgBase(name) {
   const nm = esc(String(name || 'น้องวิศวะ').slice(0, 8));
   return `<svg class="shirt" viewBox="0 0 120 130" role="img" aria-label="เสื้อช็อปของ ${nm}"><path d="M38 10 L18 22 L4 54 L24 62 L30 48 L30 120 L90 120 L90 48 L96 62 L116 54 L102 22 L82 10 Q60 32 38 10Z" fill="var(--pri)" stroke="rgba(0,0,0,.28)" stroke-width="1.5" stroke-linejoin="round"/><path d="M38 10 L52 32 L60 20 L68 32 L82 10 Q60 32 38 10Z" fill="#fff" opacity=".92" stroke="rgba(0,0,0,.2)"/><line x1="60" y1="34" x2="60" y2="120" stroke="rgba(0,0,0,.28)" stroke-width="1.5"/>${[48, 66, 84, 102].map(y => `<circle cx="60" cy="${y}" r="2" fill="rgba(255,255,255,.85)"/>`).join('')}<rect x="66" y="56" width="20" height="22" rx="2" fill="rgba(0,0,0,.12)" stroke="rgba(0,0,0,.28)"/><line x1="66" y1="62" x2="86" y2="62" stroke="rgba(0,0,0,.28)"/><rect x="31" y="58" width="25" height="10" rx="2" fill="#fff" stroke="rgba(0,0,0,.25)"/><text x="43.5" y="66" text-anchor="middle" font-size="6.5" font-weight="700" fill="#222">${nm}</text><g transform="translate(14 44) rotate(-12)"><circle r="7" fill="#fff" opacity=".9"/><circle r="5" fill="none" stroke="var(--pri)" stroke-width="2" stroke-dasharray="1.6"/><circle r="1.6" fill="var(--pri)"/></g></svg>`;
 }
 function shirtCard() {
   const si = shirtInfo(), nm = store.get('nick', 'น้องวิศวะ'), pct_ = si.next ? Math.min(100, Math.round((si.xp - TITLES[TITLES.findIndex(t => t[1] === si.title)][0]) / (si.next[0] - TITLES[TITLES.findIndex(t => t[1] === si.title)][0]) * 100)) : 100;
   return `<div class="card shirtcard"><button class="shirtbtn" data-a="nickEdit" aria-label="แก้ชื่อบนเสื้อช็อป" title="แตะเพื่อแก้ชื่อบนอก">${shirtSvg(nm)}</button>
-    <div class="shirtinfo"><div class="mute">เสื้อช็อปของฉัน</div><b style="font-size:19px">${esc(nm)}</b> <span class="tag">${si.title}</span>
+    <div class="shirtinfo"><div class="mute">เสื้อช็อป${(THEMES.find(t => t.id === curThemeId()) || {}).s ? ' · ' + esc(THEMES.find(t => t.id === curThemeId()).s) : 'ของฉัน'}</div><b style="font-size:19px">${esc(nm)}</b> <span class="tag">${si.title}</span>
+    ${curThemeId() !== 'sixent' ? `<div class="unimotto">“${esc(uniOf(curThemeId()).motto)}”</div>` : ''}
     <div class="bar" style="margin:8px 0 4px"><i style="width:${pct_}%"></i></div><div class="mute" style="font-size:12px">${si.next ? 'อีก ' + (si.next[0] - si.xp) + ' แต้ม (ข้อที่ทำ + เวลาอ่าน) → ' + si.next[1] : 'ระดับสูงสุดแล้ว 🎓'}</div>
     <div class="patches">${si.patches.length ? si.patches.map(p => `<span title="${esc(p[1])}">${p[0]}</span>`).join('') : '<span class="mute" style="font-size:12px">ทำโจทย์เพื่อสะสมแพทช์ติดเสื้อ</span>'}</div></div></div>`;
 }

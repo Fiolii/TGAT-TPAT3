@@ -195,8 +195,10 @@ function viewHome() {
   if (examDate) { const d = Math.ceil((new Date(examDate + 'T00:00:00') - Date.now()) / 864e5); cd = d >= 0 ? d : '✓'; cdsub = d >= 0 ? 'วันก่อนสอบ' : 'สอบแล้ว'; }
   const weak = weakTopics().slice(0, 3);
   const th = THEMES.find(x => x.id === store.get('theme', 'sixent')) || THEMES[0];
-  return `<div class="card hero"><svg class="gearmark" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="10" stroke-dasharray="9.95"/><circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/></svg><h1>${th.s ? 'สู่วิศวะ ' + esc(th.s) + ' ⚙️' : 'พร้อมติวหรือยัง? 🚀'}</h1><p>เปิดข้อสอบทีละหน้าเหมือนสนามจริง ทบทวนจุดอ่อน และจับเวลาการอ่าน</p>
+  const un = uniOf(th.id);
+  return `<div class="card hero uni-${th.id}">${th.id === 'sixent' ? '<svg class="gearmark" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="10" stroke-dasharray="9.95"/><circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/></svg>' : `<div class="heroicon" aria-hidden="true">${uniLogoHtml(th.id, 74)}</div>`}<h1>${th.s ? 'สู่วิศวะ ' + esc(th.s) : 'พร้อมติวหรือยัง? 🚀'}</h1>${th.s ? `<div class="unimotto herom">“${esc(un.motto)}”</div>` : ''}<p>เปิดข้อสอบทีละหน้าเหมือนสนามจริง ทบทวนจุดอ่อน และจับเวลาการอ่าน</p>
     <div class="row"><a class="btn w" href="#/exam">เริ่มทำข้อสอบ</a><a class="btn" href="#/timer">เริ่มจับเวลา</a></div></div>
+  ${uniCard()}
   ${dailyCard()}
   ${achCard()}
   <div class="grid2">${shirtCard()}<div class="card" style="display:grid;align-content:center"><div class="mute" style="margin-bottom:6px">คำคมประจำวัน</div>${quoteHtml()}</div></div>
@@ -503,8 +505,11 @@ const ACT = {
   ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT,
   setDate() { examDate = val('ed'); save(); render(true); },
   setExam(v) { examDate = v; save(); if ((location.hash || '#/') === '#/') render(true); else alert('ตั้งวันนับถอยหลังเป็น ' + v + ' แล้ว (ดูที่หน้าแรก)'); },
-  themeOpen() { themeSheet(true); }, themeClose() { themeSheet(false); },
-  themePick(v) { setTheme(v); render(true); themeSheet(true); },
+  themeOpen() { uniPage(null); themeSheet(true); }, themeClose() { themeSheet(false); },
+  themePick(v) { setTheme(v); render(true); if (v === 'sixent') themeSheet(true); else { themeSheet(false); uniPage(v); } },
+  uniOpen(v) { themeSheet(false); uniPage(v || curThemeId()); }, uniClose() { uniPage(null); },
+  uniGo(v) { const m = document.getElementById('unipage'), t = m && m.querySelector('#us-' + v); if (t) m.querySelector('.unibody').scrollTo({ top: t.offsetTop - 54, behavior: 'smooth' }); },
+  uniPickOther() { uniPage(null); themeSheet(true); },
   schemePick(v) { setScheme(v); render(true); themeSheet(true); },
   xmode(v) { X.mode = v; render(true); },
   preset(v) { const p = PRESETS[+v], l = allQ().filter(p.f), mode = location.hash === '#/exam' ? X.mode : 'mock'; beginExam(mode, mode === 'practice' ? shuffle(l) : l, p.t); },
@@ -596,7 +601,14 @@ function applyTheme() {
   if (sc === 'auto') r.removeAttribute('data-scheme'); else r.setAttribute('data-scheme', sc);
   ['--pri', '--pri2', '--grad', '--onpri'].forEach(p => r.style.removeProperty(p));
   if (t.id !== 'sixent') { r.style.setProperty('--pri', dark ? t.pd : t.pl); r.style.setProperty('--pri2', `color-mix(in srgb, var(--pri) ${dark ? 24 : 12}%, var(--card))`); r.style.setProperty('--grad', `linear-gradient(135deg,${t.g[0]},${t.g[1]} 55%,${t.g[2]})`); r.style.setProperty('--onpri', dark ? '#10131f' : '#fff'); }
-  const mt = document.querySelector('meta[name=theme-color]'); if (mt) mt.content = t.pl;
+  const un = uniOf(t.id);
+  r.style.setProperty('--patimg', t.id === 'sixent' && !un.pat ? 'none' : uniPat(un.pat, '#ffffff', .26));
+  r.style.setProperty('--patbg', t.id === 'sixent' ? 'none' : uniPat(un.pat, dark ? t.pd : t.pl, dark ? .16 : .12));
+  uniProbe(t.id);
+  const lg = document.querySelector('.logo'); if (lg) { if (t.id === 'sixent') { lg.classList.remove('emb'); lg.textContent = 'S'; } else { lg.classList.add('emb'); lg.innerHTML = uniMark(t.id, 32); } }
+  const tb = document.querySelector('.themebtn[data-a=themeOpen]'); if (tb) tb.innerHTML = t.id === 'sixent' ? uic('palette', 22) : uniMark(t.id, 28);
+  uniFavicon(t.id);
+  const mt =document.querySelector('meta[name=theme-color]'); if (mt) mt.content = t.pl;
   const sub = document.querySelector('.brand small'); if (sub) sub.textContent = t.s ? 'ติวเข้าวิศวะ · ' + t.s : 'ติวเข้าวิศวะ';
 }
 function setTheme(id) { store.set('theme', id); achMark('theme', id); applyTheme(); }
@@ -604,15 +616,16 @@ function setScheme(s) { store.set('scheme', s); applyTheme(); }
 function themeSheet(open) {
   let el = $('#themesheet'); if (el) el.remove(); if (!open) return;
   const cur = store.get('theme', 'sixent'), sc = store.get('scheme', 'auto');
-  const sw = t => `<button class="swatch ${cur === t.id ? 'on' : ''}" data-a="themePick" data-v="${t.id}" style="--s1:${t.g[0]};--s2:${t.g[1]};--s3:${t.g[2]}"><i></i><span><b>${esc(t.s || 'SIXENT')}</b><small>${esc(t.c)}</small></span>${cur === t.id ? '<em>✓</em>' : ''}</button>`;
+  const sw = t => `<button class="swatch ${cur === t.id ? 'on' : ''}" data-a="themePick" data-v="${t.id}" style="--s1:${t.g[0]};--s2:${t.g[1]};--s3:${t.g[2]}"><i>${uniMark(t.id, 36)}</i><span><b>${esc(t.s || 'SIXENT')}</b><small>${esc(t.c)}</small></span>${cur === t.id ? '<em>✓</em>' : ''}</button>`;
   el = document.createElement('div'); el.id = 'themesheet'; el.className = 'omr';
   el.setAttribute('data-a', 'themeClose');
-  el.innerHTML = `<div><div class="row between"><h2 style="margin:0">🎨 ธีมสีตามมหาวิทยาลัย</h2><button data-a="themeClose">ปิด</button></div>
-    <p class="mute" style="margin:6px 0">เลือกสีของมหาวิทยาลัยวิศวะที่อยากเข้า — แปดเสือวิศวะ</p>
+  el.innerHTML = `<div><div class="row between"><h2 style="margin:0">${uic('palette', 22)} เลือกมหาวิทยาลัย</h2><button data-a="themeClose">ปิด</button></div>
+    <p class="mute" style="margin:6px 0">เลือกมหาวิทยาลัยวิศวะที่อยากเข้า — แอปจะเปลี่ยนทั้งสี ตราสัญลักษณ์ ลวดลาย คติพจน์ และเสื้อช็อป พร้อมเปิดหน้ารู้จักมหาวิทยาลัยให้ดูว่าเด่นด้านอะไร มีคณะอะไร และวิศวะที่นั่นเกิดขึ้นได้อย่างไร (แปดเสือวิศวะอยู่แถวแรก)</p>
+    ${cur !== 'sixent' ? (() => { const t = THEMES.find(x => x.id === cur), u = uniOf(cur); return `<div class="uniinfo"><div class="shirtprev">${shirtSvg(store.get('nick', 'น้องวิศวะ'))}</div><div class="uniinfob"><div class="uniinfoh">${uniLogoHtml(cur, 34)}<b>${esc(t.n)}</b></div><div class="unimotto">“${esc(u.motto)}”</div>${uniFacts(cur)}<div class="row" style="margin-top:8px"><button class="pri" data-a="uniOpen" data-v="${cur}">ประวัติและวิศวะที่นี่</button></div></div></div>`; })() : ''}
     <div class="swgrid">${THEMES.filter(t => t.id === 'sixent' || t.e8).map(sw).join('')}</div>
     <p class="mute" style="margin:10px 0 4px">มหาวิทยาลัยอื่นที่มีคณะวิศวะ</p><div class="swgrid">${THEMES.filter(t => t.id !== 'sixent' && !t.e8).map(sw).join('')}</div>
     <p class="mute" style="margin:10px 0 4px">โหมดหน้าจอ</p><div class="chips">${[['auto', 'อัตโนมัติ'], ['light', '☀ สว่าง'], ['dark', '🌙 มืด']].map(([k, v]) => `<button class="chip ${sc === k ? 'on' : ''}" data-a="schemePick" data-v="${k}">${v}</button>`).join('')}</div>
-    <p class="mute" style="font-size:12px">ชื่อสีอ้างอิงสีประจำมหาวิทยาลัยจาก Wikipedia เฉดที่แสดงเป็นค่าโดยประมาณ ไม่ใช่รหัสสีทางการ</p></div>`;
+    <p class="mute" style="font-size:12px">คติพจน์ สี ต้นไม้ สัญลักษณ์ และประวัติคณะอ้างอิงจาก Wikipedia ไทยของแต่ละมหาวิทยาลัย ตราสัญลักษณ์ เฉดสี ลายพื้นหลัง และเสื้อช็อปเป็นภาพที่วาดเองตามสัญลักษณ์ ไม่ใช่ตราหรือเสื้อทางการ — อยากใช้ตราหรือเสื้อจริง วางรูปไว้ในโฟลเดอร์ icons/uni/ (ดูไฟล์ README ในโฟลเดอร์)</p></div>`;
   document.body.appendChild(el);
 }
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change', applyTheme);
