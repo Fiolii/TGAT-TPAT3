@@ -126,4 +126,12 @@ const THWIKI = {
   'Wave': 'คลื่น',
   'Wave_interference': 'การแทรกสอด',
   'Work_(physics)': 'งาน (ฟิสิกส์)',
+  'Limit_of_a_function': 'ลิมิตของฟังก์ชัน',
+  'Continuous_function': 'ฟังก์ชันต่อเนื่อง',
+  'Intermediate_value_theorem': 'ทฤษฎีบทค่าระหว่างกลาง',
+  'Chain_rule': 'กฎลูกโซ่',
+  'Product_rule': 'กฎผลคูณ',
+  'Quotient_rule': 'กฎผลหาร',
+  'Tangent': 'เส้นสัมผัส',
+  'Mathematical_optimization': 'การหาค่าเหมาะที่สุด',
 };

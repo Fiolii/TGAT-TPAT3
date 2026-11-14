@@ -272,3 +272,14 @@ details{border-top:1px solid var(--line);padding:8px 0}summary{cursor:pointer;fo
 sub,sup{font-size:.72em;line-height:0;position:relative;vertical-align:baseline;font-weight:inherit}
 sub{bottom:-.28em}sup{top:-.5em}
 .frow code sub,.frow code sup,.steps sub,.steps sup{font-size:.7em}
+
+/* ความสำเร็จ */
+.achcard{display:block;width:100%;text-align:left;cursor:pointer}
+.achrow{display:flex;gap:8px;font-size:24px;min-height:30px;align-items:center}
+.achgrid{display:grid;gap:8px;grid-template-columns:1fr}
+@media (min-width:520px){.achgrid{grid-template-columns:1fr 1fr}}
+.ach{display:flex;gap:10px;padding:10px;border:1px solid var(--line);border-radius:14px;opacity:.62}
+.ach.on{opacity:1;border-color:var(--pri);background:color-mix(in srgb,var(--pri) 10%,transparent)}
+.ach>i{font-style:normal;font-size:26px;flex:none;width:34px;text-align:center}
+.ach>div{flex:1;min-width:0}.ach b{display:block;font-size:14.5px}.ach small{display:block;color:var(--mute);font-size:12.5px;margin-top:2px}
+.ach .bar{margin:6px 0 2px}.ach .when{color:var(--ok)}

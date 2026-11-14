@@ -121,7 +121,7 @@ function shirtCard() {
 let logoTaps = 0, logoTimer = 0;
 function easterEgg() {
   logoTaps++; clearTimeout(logoTimer); logoTimer = setTimeout(() => logoTaps = 0, 1500);
-  if (logoTaps >= 5) { logoTaps = 0; const q = QUOTES[Math.floor(Math.random() * QUOTES.length)]; toast('⚙️ ' + q.t); confetti(); }
+  if (logoTaps >= 5) { logoTaps = 0; store.set('egg', 1); const q = QUOTES[Math.floor(Math.random() * QUOTES.length)]; toast('⚙️ ' + q.t); confetti(); }
 }
 function toast(msg) { let t = $('#toast'); if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } t.textContent = msg; t.className = 'show'; clearTimeout(t._h); t._h = setTimeout(() => t.className = '', 4200); }
 
@@ -142,7 +142,7 @@ function adminSheet(open) {
     <p class="mute" style="margin:10px 0 4px">แพทช์และภารกิจ</p>
     <div class="chips"><button class="chip ${store.get('allPatches', false) ? 'on' : ''}" data-a="adminPatches">🧷 ปลดล็อกแพทช์ทั้งหมด</button><button class="chip" data-a="adminMission" data-v="done">ทำภารกิจวันนี้ให้ครบ (${done}/${d.ids.length})</button><button class="chip" data-a="adminMission" data-v="reset">รีเซ็ตภารกิจวันนี้</button></div>
     <p class="mute" style="margin:10px 0 4px">อันตราย</p>
-    <div class="chips"><button class="chip" data-a="adminWipe">🗑 ล้างข้อมูลทั้งหมดในเครื่องนี้</button><button class="chip" data-a="adminLock">🔒 ออกจากโหมดแอดมิน</button></div>
+    <div class="chips"><button class="chip" data-a="adminAchAll">🏆 ปลดล็อกความสำเร็จทั้งหมด</button><button class="chip" data-a="adminAchReset">รีเซ็ตความสำเร็จ</button><button class="chip" data-a="adminWipe">🗑 ล้างข้อมูลทั้งหมดในเครื่องนี้</button><button class="chip" data-a="adminLock">🔒 ออกจากโหมดแอดมิน</button></div>
     <p class="mute" style="font-size:12px">โบนัสแอดมินเป็นแต้มที่บวกเพิ่ม ไม่ได้ปลอมสถิติโจทย์ — ยกเลิกได้ด้วย "รีเซ็ตโบนัส"</p></div>`;
   document.body.appendChild(el);
 }

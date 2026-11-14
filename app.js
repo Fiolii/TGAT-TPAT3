@@ -136,6 +136,7 @@ function render(keepScroll) {
   killSim();
   $('#app').innerHTML = `<div class="${r === 'exam' && E && !E.done ? '' : 'view'}">${(routes[r] || viewHome)()}</div>`;
   mountSim();
+  achAfterRender(r);
   if (!keepScroll) window.scrollTo(0, 0);
   tick();
 }
@@ -197,6 +198,7 @@ function viewHome() {
   return `<div class="card hero"><svg class="gearmark" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="10" stroke-dasharray="9.95"/><circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/></svg><h1>${th.s ? 'สู่วิศวะ ' + esc(th.s) + ' ⚙️' : 'พร้อมติวหรือยัง? 🚀'}</h1><p>เปิดข้อสอบทีละหน้าเหมือนสนามจริง ทบทวนจุดอ่อน และจับเวลาการอ่าน</p>
     <div class="row"><a class="btn w" href="#/exam">เริ่มทำข้อสอบ</a><a class="btn" href="#/timer">เริ่มจับเวลา</a></div></div>
   ${dailyCard()}
+  ${achCard()}
   <div class="grid2">${shirtCard()}<div class="card" style="display:grid;align-content:center"><div class="mute" style="margin-bottom:6px">คำคมประจำวัน</div>${quoteHtml()}</div></div>
   <div class="grid2">
     <div class="card"><h2>เป้าหมายวันนี้</h2><div class="row" style="gap:18px">${ring(mins / goalMin, 120, mins + ' น.', 'จาก ' + goalMin)}
@@ -495,7 +497,7 @@ function lessonView(k) {
 
 /* ====================== actions ====================== */
 const ACT = {
-  ...ADMIN_ACT,
+  ...ADMIN_ACT, ...ACH_ACT,
   setDate() { examDate = val('ed'); save(); render(true); },
   setExam(v) { examDate = v; save(); if ((location.hash || '#/') === '#/') render(true); else alert('ตั้งวันนับถอยหลังเป็น ' + v + ' แล้ว (ดูที่หน้าแรก)'); },
   themeOpen() { themeSheet(true); }, themeClose() { themeSheet(false); },
@@ -594,7 +596,7 @@ function applyTheme() {
   const mt = document.querySelector('meta[name=theme-color]'); if (mt) mt.content = t.pl;
   const sub = document.querySelector('.brand small'); if (sub) sub.textContent = t.s ? 'ติวเข้าวิศวะ · ' + t.s : 'ติวเข้าวิศวะ';
 }
-function setTheme(id) { store.set('theme', id); applyTheme(); }
+function setTheme(id) { store.set('theme', id); achMark('theme', id); applyTheme(); }
 function setScheme(s) { store.set('scheme', s); applyTheme(); }
 function themeSheet(open) {
   let el = $('#themesheet'); if (el) el.remove(); if (!open) return;
@@ -614,3 +616,9 @@ matchMedia('(prefers-color-scheme:dark)').addEventListener('change', applyTheme)
 applyTheme();
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => { });
 render();
+
+// หลัง render: บันทึกสไลด์พิสูจน์/ซิมูเลเตอร์ที่เปิดดู แล้วตรวจความสำเร็จ
+function achAfterRender(r) {
+  if (r === 'library' && LS) { const sl = LS.slides[LS.i]; if (sl && sl.type === 'proof') achMark('proof', LS.k + ':' + LS.i); if (sl && sl.type === 'sim' && sl.sim) achMark('sim', sl.sim); }
+  achCheck(store.get('ach', null) === null); // ครั้งแรกที่มีระบบนี้: ปลดล็อกของเดิมแบบเงียบ ๆ ไม่ให้ toast ท่วม
+}
