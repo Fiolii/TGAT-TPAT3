@@ -3,6 +3,14 @@
 // ชนิดสไลด์ { type:'read', h, blocks:[ {p}|{h}|{eq,name,vars,use}|{fig,cap}|{tbl}|{tip,warn} ] }
 const artTxt = s => rt(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 
+// ขนาดตัวอักษรของสัญลักษณ์ในช่องตัวแปร (ช่องกว้าง 54px): ยิ่งยาวยิ่งเล็กลง ตัวห้อย/ตัวยกนับเป็นครึ่งตัว
+function avWide(sym) { return avLen(sym) > 5.5; } // สัญลักษณ์ยาว (เช่น Δ = b² − 4ac) ใช้ช่องเต็มความกว้าง
+function avFit(sym) { const n = avLen(sym); if (n > 5.5) return 17; return n <= 1.6 ? 24 : n <= 2.6 ? 20 : n <= 3.4 ? 16 : n <= 4.4 ? 13 : 11; }
+function avLen(sym) {
+  let n = 0; // นับจาก HTML ที่ rt() สร้างจริง: ข้อความปกติ 1 ต่อตัว, ใน <sub>/<sup> 0.55 ต่อตัว
+  rt(sym).split(/(<(?:sub|sup)>.*?<\/(?:sub|sup)>)/).forEach(p => { const sm = /^<(?:sub|sup)>(.*)<\/(?:sub|sup)>$/.exec(p); n += (sm ? sm[1] : p).replace(/<[^>]*>|&[a-z#0-9]+;/g, 'x').length * (sm ? 0.55 : 1); });
+  return n;
+}
 function readHtml(sl) {
   const out = sl.blocks.map(b => {
     if (b.p) return `<p class="ap">${artTxt(b.p)}</p>`;
@@ -12,7 +20,7 @@ function readHtml(sl) {
     if (b.tip) return `<div class="atip ${b.warn ? 'warn' : ''}">${b.warn ? '⚠️ ' : '💡 '}${artTxt(b.tip)}</div>`;
     if (b.tbl) return `<div class="atbl"><table><tr>${b.tbl.head.map(h => `<th>${artTxt(h)}</th>`).join('')}</tr>${b.tbl.rows.map(r => `<tr>${r.map(c => `<td>${artTxt(c)}</td>`).join('')}</tr>`).join('')}</table></div>`;
     if (b.eq) return `<div class="aeq"><div class="aeqn">🧮 ${artTxt(b.name || 'สูตร')}</div><div class="aeqf">${rt(b.eq)}</div>
-      ${b.vars ? `<div class="avgrid">${b.vars.map(v => `<div class="avc"><div class="avs">${rt(v[0])}</div><div class="avm">${artTxt(v[1])}</div><div class="avu">${v[2] === null ? '' : v[2] ? `<span class="vu">หน่วย ${rt(v[2])}</span>` : '<span class="vu none">ไม่มีหน่วย</span>'}</div></div>`).join('')}</div>` : ''}
+      ${b.vars ? `<div class="avgrid">${b.vars.map(v => `<div class="avc ${avWide(v[0]) ? 'wide' : ''}"><div class="avs"><span class="avsi" style="font-size:${avFit(v[0])}px">${rt(v[0])}</span></div><div class="avm">${artTxt(v[1])}</div><div class="avu">${v[2] === null ? '' : v[2] ? `<span class="vu">หน่วย ${rt(v[2])}</span>` : '<span class="vu none">ไม่มีหน่วย</span>'}</div></div>`).join('')}</div>` : ''}
       ${b.use ? `<div class="aequse">📌 ${artTxt(b.use)}</div>` : ''}</div>`;
     return '';
   }).join('');
@@ -194,7 +202,7 @@ function boardHtml(sl, o) {
   return `${o.noH ? `<h3 class="bdh3">${rt(sl.h)}</h3>` : `<h2>✏️ ${rt(sl.h)}</h2>`}
   <div class="board ${o.lvl != null ? 'lv' + o.lvl : ''}"><div class="bdq"><span class="bdtag">โจทย์</span>${nl(sl.q)}</div>
     <div class="bdgf"><div class="bdg"><b>📘 โจทย์ให้</b><ul>${(sl.given || []).map(g => `<li>${rt(g)}</li>`).join('')}</ul></div><div class="bdf"><b>🎯 ต้องหา</b><ul>${(sl.find || []).map(g => `<li>${rt(g)}</li>`).join('')}</ul></div></div>
-    <div class="bdmain ${sl.fig ? 'hasfig' : ''}">${sl.fig ? `<div class="bdfig"><div class="bdfigt">🖍 ภาพที่ครูวาดบนกระดาน</div>${AF.boardSvg(sl.fig, n, sl.fw || 420, sl.fh || 250, sl.h)}</div>` : ''}<div class="bdlines">${lines}</div></div>
+    <div class="bdmain ${sl.fig ? 'hasfig' : ''}">${sl.fig ? `<div class="bdfig" data-a="figZoom" role="button" tabindex="0" aria-label="แตะเพื่อขยายภาพ"><div class="bdfigt">🖍 ภาพที่ครูวาดบนกระดาน · 🔍 แตะเพื่อขยาย</div>${AF.boardSvg(sl.fig, n, sl.fw || 420, sl.fh || 250, sl.h)}</div>` : ''}<div class="bdlines">${lines}</div></div>
     ${done ?`<div class="bdans">✔ คำตอบ: <b>${rt(sl.ans)}</b></div>` : ''}
     <div class="bdtray"><i></i><i></i><i></i></div></div>
   <div class="tchrow ${o.lvl != null ? 'lv' + o.lvl : ''}"><div class="tchwrap ${n === 0 ? '' : 'talk'}">${P ? personSvg(o.who) : teacherSvg()}</div>
@@ -210,7 +218,17 @@ function bdCur() {
   if (sl.type === 'exlv') { const L = exLvl(sl), bi = exBi(sl, L); return { b: sl.lv[LV_KEYS[L]][bi], key: LS.i + ':' + L + ':' + bi }; }
   return null;
 }
+// ขยายรูปบนกระดานเต็มจอ (มือถือรูปเล็ก ตัวหนังสือในรูปอ่านยาก) — เลื่อนดูได้ แตะที่ใดก็ได้เพื่อปิด
+function figZoomClose() { const z = document.getElementById('figzoom'); if (z) z.remove(); document.body.style.overflow = ''; }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') figZoomClose(); });
 const ART_ACT = {
+  figZoom(v, el) {
+    const svg = el && el.querySelector('svg'); if (!svg) return; figZoomClose();
+    const z = document.createElement('div'); z.id = 'figzoom'; z.className = 'figzoom'; z.setAttribute('data-a', 'figZoomClose'); z.setAttribute('role', 'dialog'); z.setAttribute('aria-label', 'ภาพขยาย');
+    z.innerHTML = `<div class="fzbar"><b>🔍 ภาพขยาย · เลื่อนดูได้</b><button data-a="figZoomClose">ปิด ✕</button></div><div class="fzbody"><div class="${((el.closest('.board') || {}).className || 'board')} fzboard">${svg.outerHTML}</div></div>`;
+    document.body.appendChild(z); document.body.style.overflow = 'hidden';
+  },
+  figZoomClose,
   bdNext() { const c = bdCur(); if (!c) return; LS.bd = LS.bd || {}; LS.bd[c.key] = Math.min((LS.bd[c.key] || 0) + 1, c.b.steps.length); render(true); },
   bdPrev() { const c = bdCur(); if (!c) return; LS.bd = LS.bd || {}; LS.bd[c.key] = Math.max((LS.bd[c.key] || 0) - 1, 0); render(true); },
   bdAll() { const c = bdCur(); if (!c) return; LS.bd = LS.bd || {}; LS.bd[c.key] = c.b.steps.length; render(true); },

@@ -32,6 +32,7 @@ function applyLevels() {
     const olds = ch.slides.filter(s => s.type === 'board');
     const pick = x => typeof x === 'string' && x.startsWith('old:') ? olds[+x.slice(4)] : x;
     const lv = {}; LV_KEYS.forEach(k => { lv[k] = (d.def[k] || []).map(pick).filter(Boolean); });
+    if (typeof applyFigs === 'function') applyFigs(ch.id, lv);
     const isEx = s => s.type === 'board' || s.type === 'example';
     const first = ch.slides.findIndex(isEx), rest = ch.slides.filter(s => !isEx(s));
     let pos = first >= 0 ? first : rest.findIndex(s => s.type === 'danger'); if (pos < 0) pos = rest.length;

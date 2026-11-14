@@ -317,7 +317,8 @@ sub{bottom:-.28em}sup{top:-.5em}
 .aeqf{background:var(--pri2);padding:20px 12px;font-size:28px;text-align:center;font-weight:800;color:var(--ink);font-family:ui-monospace,"Cascadia Code",Consolas,monospace;border-bottom:1px solid var(--line)}
 .avgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;padding:14px}
 .avc{display:grid;grid-template-columns:54px 1fr;grid-template-areas:"s m" "s u";gap:2px 12px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
-.avs{grid-area:s;width:54px;height:54px;border-radius:14px;background:var(--grad);color:#fff;display:grid;place-items:center;font-size:20px;font-weight:800;font-family:ui-monospace,Consolas,monospace;text-align:center;line-height:1.1;padding:2px;overflow:hidden;word-break:break-all}
+.avs{grid-area:s;width:54px;height:54px;border-radius:14px;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:ui-monospace,Consolas,monospace;text-align:center;line-height:1.1;padding:2px;overflow:hidden}
+.avsi{display:block;max-width:100%;white-space:nowrap;letter-spacing:-.02em}
 .avs sub,.avs sup{font-size:.62em}
 .avm{grid-area:m;font-size:14.5px;line-height:1.5}
 .avu{grid-area:u}
@@ -507,3 +508,17 @@ body.uni-open{overflow:hidden}
 .tchrow.lv2 .bubble{border-color:#d4202f}.tchrow.lv2 .bubble::before{border-right-color:#d4202f}.tchrow.lv2 .bchip{background:#d4202f}
 @media (max-width:560px){.lvt b{font-size:13.5px}.lvt small{font-size:10.5px}.lvwhoa{width:62px}}
 @media (prefers-reduced-motion:reduce){.board.lv2,.lvwho{animation:none}}
+/* ช่องตัวแปรที่สัญลักษณ์ยาว: วางสัญลักษณ์เต็มความกว้างด้านบน ตามด้วยความหมายและหน่วย */
+.avc.wide{grid-template-columns:1fr;grid-template-areas:"s" "m" "u";gap:6px}
+.avc.wide .avs{width:auto;height:auto;min-height:42px;padding:8px 12px;justify-content:center}
+.avc.wide .avsi{white-space:normal;letter-spacing:0}
+/* ขยายรูปบนกระดานเต็มจอ */
+.bdfig{cursor:zoom-in}
+.figzoom{position:fixed;inset:0;z-index:9998;background:rgba(6,10,8,.92);display:flex;flex-direction:column}
+.fzbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;color:#fff;font-size:14px}
+.fzbar button{min-height:40px;padding:6px 14px;background:#f5d547;color:#2b2b1e;border:0;font-weight:700}
+.fzbody{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:8px 10px 24px}
+.fzboard{width:max(680px,100%);box-sizing:border-box;padding:10px;margin:0 auto;cursor:zoom-out}
+.fzboard svg{width:100%;height:auto;display:block}
+.fzboard svg text{font-family:"Segoe Print","Bradley Hand","Noto Sans Thai",sans-serif}
+.board.mini .bdfig{cursor:default}

@@ -1,0 +1,174 @@
+/* SIXENT — Liquid Glass layer
+   ชั้นสไตล์กระจกใส (แรงบันดาลใจจาก liquid glass ของ Apple): พื้นผิวโปร่งแสงเบลอฉากหลัง มีขอบสะท้อนแสง เงานุ่ม
+   และการเคลื่อนไหวแบบสปริง โหลดหลัง style.css เสมอ — ลบไฟล์นี้ออกจาก index.html ก็กลับเป็นหน้าตาเดิม
+   สีทั้งหมดอิงตัวแปร --pri/--grad ของธีมมหาวิทยาลัย จึงเปลี่ยนตามธีมอัตโนมัติ */
+
+:root{
+  --spring:cubic-bezier(.34,1.45,.64,1);
+  --ease:cubic-bezier(.22,.8,.24,1);
+  --gl-fill:linear-gradient(150deg,rgba(255,255,255,.74),rgba(255,255,255,.42) 55%,rgba(255,255,255,.58));
+  --gl-fill2:rgba(255,255,255,.5);
+  --gl-edge:rgba(255,255,255,.85);
+  --gl-edge2:rgba(255,255,255,.35);
+  --gl-shadow:0 1px 1px rgba(255,255,255,.9) inset,0 -1px 0 rgba(255,255,255,.3) inset,0 14px 34px -10px rgba(36,42,110,.22),0 2px 6px rgba(36,42,110,.06);
+  --gl-blur:blur(24px) saturate(185%);
+  --gl-text-shadow:none;
+  --amb1:color-mix(in srgb,var(--pri) 30%,transparent);
+  --amb2:color-mix(in srgb,var(--pri) 18%,#ff7ab8);
+  --amb3:color-mix(in srgb,var(--pri) 20%,#55d6ff);
+  --bg:#eceefa;
+}
+@media (prefers-color-scheme:dark){:root:not([data-scheme="light"]){
+  --gl-fill:linear-gradient(150deg,rgba(255,255,255,.13),rgba(255,255,255,.05) 55%,rgba(255,255,255,.09));
+  --gl-fill2:rgba(255,255,255,.08);
+  --gl-edge:rgba(255,255,255,.28);--gl-edge2:rgba(255,255,255,.08);
+  --gl-shadow:0 1px 1px rgba(255,255,255,.22) inset,0 -1px 0 rgba(255,255,255,.04) inset,0 18px 40px -12px rgba(0,0,0,.6),0 2px 8px rgba(0,0,0,.25);
+  --amb1:color-mix(in srgb,var(--pri) 36%,transparent);--amb2:color-mix(in srgb,var(--pri) 22%,#ff5fa8);--amb3:color-mix(in srgb,var(--pri) 24%,#2a9dff);
+  --bg:#080a16;}}
+:root[data-scheme="dark"]{
+  --gl-fill:linear-gradient(150deg,rgba(255,255,255,.13),rgba(255,255,255,.05) 55%,rgba(255,255,255,.09));
+  --gl-fill2:rgba(255,255,255,.08);
+  --gl-edge:rgba(255,255,255,.28);--gl-edge2:rgba(255,255,255,.08);
+  --gl-shadow:0 1px 1px rgba(255,255,255,.22) inset,0 -1px 0 rgba(255,255,255,.04) inset,0 18px 40px -12px rgba(0,0,0,.6),0 2px 8px rgba(0,0,0,.25);
+  --amb1:color-mix(in srgb,var(--pri) 36%,transparent);--amb2:color-mix(in srgb,var(--pri) 22%,#ff5fa8);--amb3:color-mix(in srgb,var(--pri) 24%,#2a9dff);
+  --bg:#080a16;}
+
+/* ---------- ฉากหลังเรืองแสง (ให้กระจกมีอะไรให้เบลอ) ---------- */
+html{background:var(--bg)}
+body{background:transparent;position:relative;overscroll-behavior-y:none}
+body::before{content:'';position:fixed;inset:-20vmax;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(38vmax 38vmax at 12% 8%,var(--amb1),transparent 70%),
+    radial-gradient(34vmax 34vmax at 92% 22%,var(--amb2),transparent 70%),
+    radial-gradient(42vmax 42vmax at 70% 96%,var(--amb3),transparent 72%),
+    radial-gradient(30vmax 30vmax at 8% 82%,var(--amb1),transparent 70%);
+  animation:ambient 38s ease-in-out infinite alternate}
+@keyframes ambient{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-2vmax,1.5vmax,0) scale(1.06)}100%{transform:translate3d(1.5vmax,-2vmax,0) scale(1.02)}}
+
+/* ---------- พื้นผิวกระจก ---------- */
+.card,.stat,.slide,.sheet.glass,.preset,.lcard,.swatch,.ach,.achcard,.uniinfo,.unipick,.unis,.shirtcard,.bubble,details.card{
+  background:var(--gl-fill);
+  -webkit-backdrop-filter:var(--gl-blur);backdrop-filter:var(--gl-blur);
+  border:1px solid var(--gl-edge2);
+  border-top-color:var(--gl-edge);border-left-color:var(--gl-edge);
+  box-shadow:var(--gl-shadow);
+  border-radius:22px}
+.card{padding:18px}
+.stat{border-radius:20px}
+/* การ์ดที่มีลวดลายตามมหาวิทยาลัย: เก็บลวดลายไว้ใต้กระจก */
+.shirtcard,.uniinfo,.unipick,.unis{background:var(--patbg) 0 0/64px 64px repeat,var(--gl-fill)}
+.hero{background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0) 42%),var(--patimg) 0 0/64px 64px repeat,var(--grad);
+  border:1px solid rgba(255,255,255,.45);border-radius:28px;
+  box-shadow:0 1px 1px rgba(255,255,255,.7) inset,0 22px 50px -14px color-mix(in srgb,var(--pri) 60%,transparent),0 4px 12px rgba(0,0,0,.1)}
+.hero::after{background:radial-gradient(closest-side,rgba(255,255,255,.34),rgba(255,255,255,0))}
+
+/* ส่วนหัวและแถบล่าง: แคปซูลกระจกลอยอยู่เหนือเนื้อหา */
+.top{margin:10px 10px 0;top:10px;border-radius:24px;padding:8px 14px;padding-top:8px;
+  background:var(--gl-fill);-webkit-backdrop-filter:var(--gl-blur);backdrop-filter:var(--gl-blur);
+  border:1px solid var(--gl-edge2);border-top-color:var(--gl-edge);box-shadow:var(--gl-shadow)}
+@supports (top:max(0px)){.top{top:max(10px,env(safe-area-inset-top))}}
+.tabbar{left:12px;right:12px;bottom:max(10px,env(safe-area-inset-bottom));border-radius:28px;padding:5px;
+  background:var(--gl-fill);-webkit-backdrop-filter:blur(30px) saturate(200%);backdrop-filter:blur(30px) saturate(200%);
+  border:1px solid var(--gl-edge2);border-top-color:var(--gl-edge);box-shadow:var(--gl-shadow),0 20px 40px -14px rgba(0,0,0,.35)}
+.tabbar a{border-radius:22px;min-height:54px;transition:color .25s var(--ease),transform .35s var(--spring),background .3s var(--ease)}
+.tabbar a:active{transform:scale(.92)}
+.tabbar a.on{background:color-mix(in srgb,var(--pri) 16%,rgba(255,255,255,.35));color:var(--pri);
+  box-shadow:0 1px 1px rgba(255,255,255,.55) inset,0 6px 14px -6px color-mix(in srgb,var(--pri) 55%,transparent)}
+.tabbar a.on::before{display:none}
+.dnav a{border-radius:14px;transition:background .25s var(--ease),transform .3s var(--spring)}
+.dnav a:hover{transform:translateY(-1px)}
+.dnav a.on{background:color-mix(in srgb,var(--pri) 15%,rgba(255,255,255,.3));box-shadow:0 1px 1px rgba(255,255,255,.5) inset}
+body{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+@media (min-width:860px){body{padding-bottom:36px}.top{margin:12px auto 0;max-width:1000px;top:12px}}
+
+/* ปุ่ม ชิป ช่องกรอก */
+button,.btn{background:var(--gl-fill2);-webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%);
+  border:1px solid var(--gl-edge2);border-top-color:var(--gl-edge);
+  box-shadow:0 1px 1px rgba(255,255,255,.55) inset,0 6px 16px -8px rgba(30,36,90,.3);
+  border-radius:16px;transition:transform .35s var(--spring),box-shadow .3s var(--ease),background .25s var(--ease),filter .2s}
+button:hover,.btn:hover{border-color:var(--gl-edge);box-shadow:0 1px 1px rgba(255,255,255,.7) inset,0 10px 22px -8px rgba(30,36,90,.38)}
+@media (hover:hover){button:hover,.btn:hover{transform:translateY(-1.5px)}}
+button:active,.btn:active{transform:scale(.955);transition-duration:.12s}
+.pri{background:linear-gradient(180deg,color-mix(in srgb,var(--pri) 82%,#fff),var(--pri) 60%,color-mix(in srgb,var(--pri) 88%,#000));
+  border:1px solid color-mix(in srgb,var(--pri) 70%,#fff);
+  box-shadow:0 1px 1px rgba(255,255,255,.55) inset,0 -1px 0 rgba(0,0,0,.12) inset,0 10px 22px -8px color-mix(in srgb,var(--pri) 80%,transparent);text-shadow:0 1px 1px rgba(0,0,0,.14)}
+.pri:hover{filter:brightness(1.07)}
+.chip{border-radius:999px}
+.chip.on{background:linear-gradient(180deg,color-mix(in srgb,var(--pri) 82%,#fff),var(--pri));border-color:color-mix(in srgb,var(--pri) 70%,#fff);box-shadow:0 1px 1px rgba(255,255,255,.5) inset,0 8px 18px -8px color-mix(in srgb,var(--pri) 80%,transparent)}
+.hero .btn,.hero button{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.55);box-shadow:0 1px 1px rgba(255,255,255,.5) inset}
+.hero .btn.w{background:linear-gradient(180deg,#fff,#f1f2fb);box-shadow:0 8px 20px -8px rgba(0,0,0,.35)}
+select,input,textarea{background:var(--gl-fill2);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border:1px solid var(--gl-edge2);border-top-color:var(--gl-edge);border-radius:16px;
+  box-shadow:0 1px 2px rgba(20,24,70,.1) inset;transition:box-shadow .25s var(--ease),border-color .25s}
+select:focus,input:focus,textarea:focus{outline:0;border-color:var(--pri);box-shadow:0 0 0 4px color-mix(in srgb,var(--pri) 22%,transparent)}
+.tag{backdrop-filter:blur(8px);border:1px solid var(--gl-edge2)}
+.bar{background:color-mix(in srgb,var(--ink) 10%,transparent);box-shadow:0 1px 2px rgba(0,0,0,.08) inset;height:10px}
+.bar i{background:linear-gradient(90deg,color-mix(in srgb,var(--pri) 80%,#fff),var(--pri));transition:width .8s var(--ease);box-shadow:0 0 12px color-mix(in srgb,var(--pri) 55%,transparent)}
+.prog{border-radius:6px}.prog i{box-shadow:0 0 10px color-mix(in srgb,var(--pri) 60%,transparent)}
+hr,details,th,td{border-color:color-mix(in srgb,var(--ink) 10%,transparent)}
+
+/* หน้าต่างลอย (ธีม รู้จักมหาวิทยาลัย ฯลฯ) */
+.omr{background:rgba(8,10,28,.42);-webkit-backdrop-filter:blur(10px) saturate(140%);backdrop-filter:blur(10px) saturate(140%);animation:glFade .3s var(--ease) both}
+.omr>div{background:var(--gl-fill);-webkit-backdrop-filter:blur(34px) saturate(200%);backdrop-filter:blur(34px) saturate(200%);
+  border:1px solid var(--gl-edge2);border-top-color:var(--gl-edge);box-shadow:var(--gl-shadow),0 -20px 60px -20px rgba(0,0,0,.4);
+  border-radius:30px 30px 0 0;animation:glSheet .5s var(--spring) both}
+@media (min-width:700px){.omr{align-items:center}.omr>div{border-radius:30px;margin:20px}}
+@keyframes glFade{from{opacity:0}to{opacity:1}}
+@keyframes glSheet{from{opacity:0;transform:translateY(40px) scale(.97)}to{opacity:1;transform:none}}
+.uniomr>div{border-radius:30px 30px 0 0}
+
+/* ---------- การเคลื่อนไหวนุ่ม ๆ ---------- */
+html{scroll-behavior:smooth}
+.view{animation:glView .55s var(--ease) both}
+@keyframes glView{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.view>.card,.view>.grid>*,.view>.grid2>*{animation:glRise .6s var(--ease) both}
+.view>*:nth-child(2){animation-delay:.04s}.view>*:nth-child(3){animation-delay:.08s}.view>*:nth-child(4){animation-delay:.12s}.view>*:nth-child(5){animation-delay:.16s}.view>*:nth-child(n+6){animation-delay:.2s}
+@keyframes glRise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.preset,.lcard,.swatch,.stat,.achcard{transition:transform .4s var(--spring),box-shadow .3s var(--ease),border-color .25s}
+@media (hover:hover){.preset:hover,.lcard:hover,.swatch:hover,.achcard:hover{transform:translateY(-3px) scale(1.01);box-shadow:var(--gl-shadow),0 18px 36px -14px color-mix(in srgb,var(--pri) 40%,transparent)}}
+.preset:active,.lcard:active,.swatch:active{transform:scale(.97)}
+.slide.next,.slide.prev{animation-duration:.6s;animation-timing-function:var(--spring)}
+.swatch.on,.ach.on{border-color:color-mix(in srgb,var(--pri) 70%,#fff);background:linear-gradient(150deg,color-mix(in srgb,var(--pri) 22%,rgba(255,255,255,.5)),color-mix(in srgb,var(--pri) 8%,rgba(255,255,255,.2)))}
+
+/* ข้อสอบ: แถบด้านบนเป็นกระจก ส่วนกระดาษข้อสอบคงเดิมแต่เงานุ่มขึ้น */
+.ebar{background:var(--gl-fill);-webkit-backdrop-filter:var(--gl-blur);backdrop-filter:var(--gl-blur);border-bottom:1px solid var(--gl-edge2);box-shadow:0 8px 30px -14px rgba(20,24,70,.4)}
+.sheet{box-shadow:0 24px 60px -18px rgba(30,36,100,.35),inset 14px 0 18px -14px rgba(0,0,0,.16)}
+.eclock{box-shadow:0 1px 1px rgba(255,255,255,.5) inset}
+
+/* กระดานดำ: เปลี่ยนเป็นกรอบกระจกนุ่ม ๆ แต่ยังเป็นกระดานดำ */
+.board{box-shadow:inset 0 0 40px rgba(0,0,0,.45),inset 0 1px 1px rgba(255,255,255,.18),0 26px 60px -20px rgba(10,30,24,.55),0 4px 14px rgba(0,0,0,.18);transition:box-shadow .4s var(--ease)}
+.bdfig{backdrop-filter:blur(6px);border-radius:16px;box-shadow:inset 0 1px 1px rgba(255,255,255,.22)}
+.bubble{background:var(--gl-fill)}
+.lvbar .lvt{border-radius:18px;transition:transform .35s var(--spring),box-shadow .3s,border-color .25s}
+.lvbar .lvt.on{box-shadow:0 10px 24px -10px color-mix(in srgb,var(--pri) 70%,transparent)}
+
+/* ---------- มือถือ ---------- */
+@media (max-width:560px){
+  main{padding:12px 12px 6px}
+  .top{margin:8px 8px 0;border-radius:20px}
+  .card{padding:15px;border-radius:20px}
+  .hero{border-radius:24px}
+  h1{font-size:22px}
+  .tabbar{left:10px;right:10px}
+  .tabbar a{font-size:10.5px}
+  .brand small{display:none}
+  .omr>div{border-radius:26px 26px 0 0}
+  /* บนมือถือลดความเบลอเล็กน้อยให้ลื่นขึ้น */
+  :root{--gl-blur:blur(18px) saturate(170%)}
+  body::before{animation:none}
+}
+/* เครื่องที่ไม่รองรับ backdrop-filter: ใช้พื้นทึบกึ่งโปร่งแทน */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .card,.stat,.slide,.preset,.lcard,.swatch,.top,.tabbar,.omr>div,.ebar{background:color-mix(in srgb,var(--card) 92%,transparent)}
+}
+@media (prefers-reduced-motion:reduce){
+  body::before{animation:none}
+  .view,.view>*,.omr,.omr>div{animation:none!important}
+  *{scroll-behavior:auto!important}
+}
+@media (prefers-reduced-transparency:reduce){
+  .card,.stat,.slide,.preset,.lcard,.swatch,.top,.tabbar,.omr>div,.ebar,button,.btn{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--card)}
+}
+.exam{background:transparent}
+/* โหมดมืด: ตัวอักษรแท็บที่เลือกใช้สีขาวให้ชัดบนฟองสี */
+@media (prefers-color-scheme:dark){:root:not([data-scheme="light"]) .tabbar a.on,:root:not([data-scheme="light"]) .dnav a.on{color:#fff}}
+:root[data-scheme="dark"] .tabbar a.on,:root[data-scheme="dark"] .dnav a.on{color:#fff}
