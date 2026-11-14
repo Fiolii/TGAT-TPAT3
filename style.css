@@ -154,3 +154,59 @@ details{border-top:1px solid var(--line);padding:8px 0}summary{cursor:pointer;fo
 .warnbox{background:var(--warnbg);border-radius:12px;padding:10px 14px;font-size:14px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:560px){h1{font-size:21px}.clock{font-size:44px}.sheet{padding:16px 14px 16px 26px}.sheet::before{left:10px}.qtext{font-size:16px}main{padding:12px}}
+
+/* ---------- ภาพประกอบโจทย์/ตัวเลือกที่เป็นภาพ ---------- */
+.ofig{width:100%;max-width:150px;height:auto;max-height:130px;color:var(--ink)}
+.opt .otx{flex:1;min-width:0}
+.opt .otx svg.ofig{display:block;margin:2px 0}
+.figrow{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:flex-end;margin:8px 0 12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
+.figrow figure{margin:0;text-align:center}.figrow figcaption{font-size:12px;color:var(--mute);margin-bottom:2px}
+.figrow .ofig{max-width:140px}
+.why{margin-top:10px;font-size:13.5px;border-top:1px dashed var(--line);padding-top:8px}
+.why>div{margin:3px 0}.wl{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--pri2);color:var(--pri);font-weight:700;font-size:12px}
+
+/* ---------- สไลด์บทเรียน + ซิมูเลเตอร์ ---------- */
+.deck{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:0 0 12px;margin-top:10px;box-shadow:var(--shadow);overflow:hidden;perspective:1600px}
+.deck .prog{margin:0;border-radius:0}
+.slide{padding:18px 20px 8px;min-height:340px;transform-origin:left center}
+.slide.next{animation:flipNext .45s cubic-bezier(.2,.7,.2,1) both}.slide.prev{animation:flipPrev .45s cubic-bezier(.2,.7,.2,1) both}
+.slide h2{font-size:20px;margin:0 0 12px}
+.cover{text-align:center;padding:28px 6px}.cover .big{font-size:56px;line-height:1}.cover h1{margin:10px 0}
+.bul{list-style:none;margin:6px 0;padding:0}
+.bul li{position:relative;padding:8px 12px 8px 34px;margin:8px 0;background:var(--pri2);border-radius:12px;opacity:0;animation:fadeUp .45s ease forwards;font-size:15.5px}
+.bul li::before{content:'';position:absolute;left:13px;top:17px;width:10px;height:10px;border-radius:50%;background:var(--grad)}
+.slfig{margin:6px 0 10px;text-align:center}.slfig svg{max-width:100%;height:auto;max-height:260px}
+.slnote{margin-top:12px;background:var(--warnbg);border-radius:12px;padding:8px 12px;font-size:14px}
+.deckfoot{display:flex;align-items:center;gap:10px;padding:6px 14px 0}
+.deckfoot button{min-width:52px}
+.dots{flex:1;display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.dots .d{width:9px;height:9px;border-radius:50%;background:var(--line);cursor:pointer;transition:.2s}
+.dots .d.on{background:var(--pri);transform:scale(1.4)}.dots .d.sm{border-radius:3px}
+.sim{display:block}
+.simgoal{background:var(--pri2);border-radius:12px;padding:8px 12px;font-size:14px;margin-bottom:8px}
+.simcv{width:100%;display:block;background:var(--bg);border:1px solid var(--line);border-radius:14px}
+.simbtns{display:flex;gap:8px;margin:8px 0}
+.simctl{display:grid;gap:6px 14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin:8px 0}
+.simc{display:block;margin:0}.simc span{display:flex;justify-content:space-between;color:var(--ink);font-size:13.5px;margin-bottom:0}.simc b{color:var(--pri)}
+.simc input[type=range]{width:100%;min-height:34px;padding:0;accent-color:var(--pri)}
+.simout{background:var(--card);border:1px dashed var(--pri);border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.8;margin-top:6px}
+.simout b{color:var(--pri)}
+@media (max-width:560px){.slide{padding:14px 12px 6px}.slide h2{font-size:18px}}
+
+/* ---------- ซิมมิติสัมพันธ์ ---------- */
+.bwrap{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:center}
+.bgrid{display:grid;grid-template-columns:repeat(3,56px);gap:6px;margin:6px 0}
+.bcell{width:56px;height:56px;padding:0;font-size:22px;font-weight:700;border-radius:12px;min-height:0}
+.bcell.h1{background:#e3e8ff;color:#2b3170}.bcell.h2{background:#aab7ff;color:#1b2160}.bcell.h3{background:#7e8ff0;color:#fff}
+.biso{flex:1;min-width:180px;text-align:center}.ofig.big{max-width:240px;max-height:200px}
+.bviews{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0}
+.bviews figure,.fpres figure{margin:0;text-align:center}.bviews figcaption,.fpres figcaption{font-size:12px;color:var(--mute)}
+.fpfig svg{max-width:100%;height:auto;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;margin:6px 0}
+.fpres{display:flex;justify-content:center}
+.net-scene{perspective:900px;height:280px;display:grid;place-items:center;background:var(--bg);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.net-root{position:relative;width:0;height:0;transform-style:preserve-3d;transform:rotateX(58deg) rotateZ(35deg)}
+.nf{position:absolute;transform-style:preserve-3d;background:#e3e8ff;border:2px solid #2b3170;box-sizing:border-box;display:grid;place-items:center;backface-visibility:visible}
+.nfsvg{width:70%;height:70%}
+
+/* ตัวเลือกที่ถูกล็อกหลังเฉลย: ข้อถูก/ข้อที่เลือกยังเห็นชัด ข้ออื่นจาง */
+.opt:disabled{opacity:1}.opt:disabled:not(.ok):not(.bad){opacity:.65}

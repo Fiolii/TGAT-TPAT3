@@ -3,6 +3,11 @@
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const nl = s => esc(s).replace(/\n/g, '<br>');
+// ตัวเลือกที่เป็นภาพ SVG (เฉพาะโจทย์ที่มากับแอป) แสดงเป็น HTML ดิบ; ที่เหลือ escape เสมอ
+const isFig = s => typeof s === 'string' && s.startsWith('<svg');
+const chHtml = c => isFig(c) ? c : esc(c);
+const chLabel = (q, i) => LETTERS[i] + (isFig(q.c[i]) ? '' : '. ' + esc(q.c[i]));
+const whyHtml = q => q.why ? `<div class="why"><b>ทำไมข้ออื่นถึงไม่ใช่</b>${q.c.map((c, i) => i === q.a ? '' : `<div><span class="wl">${LETTERS[i]}</span> ${esc(q.why[i] || '')}</div>`).join('')}</div>` : '';
 const store = {
   get(k, d) { try { const v = localStorage.getItem('sx_' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem('sx_' + k, JSON.stringify(v)); } catch { } },
@@ -19,9 +24,10 @@ const save = () => { ['attempts', 'studies', 'mocks', 'records', 'custom', 'mark
 const allQ = () => QUESTIONS.concat(custom);
 // กระจายตำแหน่งคำตอบที่ถูกให้สมดุล (กำหนดตายตัวจาก id) — ข้ามข้อที่ตัวเลือกเป็นตัวเลขเรียงค่า
 QUESTIONS.forEach(q => {
-  if (q.c.every(s => /^[\d−\-.([]/.test(s))) return;
   let h = 0; for (const ch of q.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
-  const t = h % q.c.length;[q.c[q.a], q.c[t]] = [q.c[t], q.c[q.a]]; q.a = t;
+  // ตัวเลือกตัวเลขเรียงค่า: ไม่สลับตำแหน่ง แต่บางข้อเรียงจากมากไปน้อย (ได้ทั้งสองแบบในข้อสอบจริง) เพื่อกระจายตำแหน่งคำตอบ
+  if (q.c.every(s => /^[\d−\-.([]/.test(s))) { if (h % 2) { q.c.reverse(); if (q.why) q.why.reverse(); q.a = q.c.length - 1 - q.a; } return; }
+  const t = h % q.c.length;[q.c[q.a], q.c[t]] = [q.c[t], q.c[q.a]]; if (q.why) [q.why[q.a], q.why[t]] = [q.why[t], q.why[q.a]]; q.a = t;
 });
 const dayKey = ts => { const d = new Date(ts); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 const fmt = s => { s = Math.max(0, Math.round(s)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ':' : '') + String(m).padStart(h ? 2 : 1, '0') + ':' + String(x).padStart(2, '0'); };
@@ -108,9 +114,18 @@ function render(keepScroll) {
   const r = (location.hash.replace(/^#\/?/, '') || '').split('/')[0];
   document.querySelectorAll('[data-r]').forEach(a => a.classList.toggle('on', a.dataset.r === r));
   document.body.classList.toggle('in-exam', r === 'exam' && !!E && !E.done);
+  killSim();
   $('#app').innerHTML = `<div class="${r === 'exam' && E && !E.done ? '' : 'view'}">${(routes[r] || viewHome)()}</div>`;
+  mountSim();
   if (!keepScroll) window.scrollTo(0, 0);
   tick();
+}
+// ซิมูเลเตอร์ในสไลด์บทเรียน: ปิดตัวเก่าและเปิดตัวใหม่ทุกครั้งที่ render
+let LS = null; // สถานะสไลด์ {k,i,slides,sim,dir}
+function killSim() { if (LS && LS.sim) { try { LS.sim.destroy(); } catch { } LS.sim = null; } }
+function mountSim() {
+  const host = $('#simhost'); if (!host || !LS) return; const sl = LS.slides[LS.i];
+  if (sl && sl.type === 'sim' && SIMS[sl.sim]) { try { LS.sim = SIMS[sl.sim].mount(host); } catch (e) { host.textContent = 'โหลดซิมูเลเตอร์ไม่สำเร็จ'; console.error(e); } }
 }
 window.addEventListener('hashchange', () => render());
 document.addEventListener('click', e => {
@@ -127,13 +142,16 @@ document.addEventListener('change', e => {
 });
 // ปัดซ้าย-ขวาเพื่อพลิกหน้าข้อสอบ
 let tx = 0, ty = 0, tOn = false;
-document.addEventListener('touchstart', e => { tOn = !!e.target.closest('.sheet'); tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+document.addEventListener('touchstart', e => { tOn = e.target.closest('.sheet') ? 'exam' : (e.target.closest('.slide') && !e.target.closest('.sim') ? 'slide' : ''); tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
 document.addEventListener('touchend', e => {
-  if (!tOn || !E || E.done) return; tOn = false;
+  if (!tOn) return; const kind = tOn; tOn = '';
   const dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
-  if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.6) (dx < 0 ? ACT.next : ACT.prev)();
+  if (!(Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.6)) return;
+  if (kind === 'exam' && E && !E.done) (dx < 0 ? ACT.next : ACT.prev)();
+  else if (kind === 'slide' && LS) (dx < 0 ? ACT.slideNext : ACT.slidePrev)();
 }, { passive: true });
 document.addEventListener('keydown', e => {
+  if (LS && (!E || E.done) && location.hash === '#/library' && !/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) { if (e.key === 'ArrowRight') ACT.slideNext(); else if (e.key === 'ArrowLeft') ACT.slidePrev(); return; }
   if (!E || E.done || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
   if (e.key === 'ArrowRight') ACT.next(); else if (e.key === 'ArrowLeft') ACT.prev();
   else if ('12345'.includes(e.key) && E.list[E.i].c[+e.key - 1] !== undefined) ACT.pick(String(+e.key - 1));
@@ -230,9 +248,9 @@ function examPaper() {
     <div role="radiogroup">${q.c.map((c, i) => {
     let cls = '';
     if (shown) cls = i === q.a ? 'ok' : (i === picked ? 'bad' : ''); else if (picked === i) cls = 'sel';
-    return `<button class="opt ${cls}" role="radio" aria-checked="${picked === i}" data-a="pick" data-v="${i}" ${shown ? 'disabled' : ''}><span class="bub">${LETTERS[i] || i + 1}</span><span>${esc(c)}</span></button>`;
+    return `<button class="opt ${cls}" role="radio" aria-checked="${picked === i}" data-a="pick" data-v="${i}" ${shown ? 'disabled' : ''}><span class="bub">${LETTERS[i] || i + 1}</span><span class="otx">${chHtml(c)}</span></button>`;
   }).join('')}</div>
-    ${shown ? `<div class="exp"><b>${picked === q.a ? '✅ ถูกต้อง!' : '❌ เฉลย: ' + LETTERS[q.a] + '. ' + esc(q.c[q.a])}</b><div style="margin-top:6px">${nl(q.exp || '')}</div>${q.tip ? `<div class="tip">💡 ${esc(q.tip)}</div>` : ''}
+    ${shown ? `<div class="exp"><b>${picked === q.a ? '✅ ถูกต้อง!' : '❌ เฉลย: ' + chLabel(q, q.a)}</b><div style="margin-top:6px">${nl(q.exp || '')}</div>${whyHtml(q)}${q.tip ? `<div class="tip">💡 ${esc(q.tip)}</div>` : ''}
       ${lessonFor(q) ? `<div style="margin-top:8px"><a href="#/library" data-a="openLesson" data-v="${esc(q.topic)}" onclick="return false">📚 อ่านบทเรียน: ${esc(q.topic)}</a></div>` : ''}</div>` : ''}
   </article></div>
   <div class="efoot"><div class="row"><button data-a="prev" ${E.i === 0 ? 'disabled' : ''} aria-label="ข้อก่อนหน้า">◀</button>
@@ -275,8 +293,8 @@ function examResult() {
   <div class="card"><h2>รายหัวข้อ</h2><div class="tbl"><table>${Object.entries(by).map(([t, v]) => `<tr><td>${esc(t)}</td><td>${v.ok}/${v.n}</td><td style="width:40%"><div class="bar ${pct(v.ok, v.n) >= 60 ? 'g' : 'r'}"><i style="width:${pct(v.ok, v.n)}%"></i></div></td></tr>`).join('')}</table></div></div>
   <div class="card"><h2>ทบทวนทีละข้อ</h2>${E.list.map((q, i) => { const mine = E.ans[i], ok = mine === q.a; return `<div class="rv"><div class="row between"><b>ข้อ ${i + 1}</b><span class="tag ${ok ? 'ok' : 'bad'}">${mine == null ? 'ไม่ได้ตอบ' : ok ? 'ถูก' : 'ผิด'}</span></div>
     ${q.passage ? `<details><summary>ดูบทอ่าน/ข้อมูล</summary><div class="passage">${nl(q.passage)}</div></details>` : ''}<div style="margin:4px 0">${nl(q.q)}</div>${q.fig ? q.fig : ''}
-    <div class="mute">คุณตอบ: ${mine != null ? LETTERS[mine] + '. ' + esc(q.c[mine]) : '(ว่าง)'} · เฉลย: <b style="color:var(--ok)">${LETTERS[q.a]}. ${esc(q.c[q.a])}</b></div>
-    <div class="exp"><div>${nl(q.exp || '')}</div>${q.tip ? `<div class="tip">💡 ${esc(q.tip)}</div>` : ''}${lessonFor(q) ? `<div style="margin-top:6px"><a href="#/library" data-a="openLesson" data-v="${esc(q.topic)}" onclick="return false">📚 บทเรียน: ${esc(q.topic)}</a></div>` : ''}</div></div>`; }).join('')}</div>`;
+    <div class="mute">คุณตอบ: ${mine != null ? chLabel(q, mine) : '(ว่าง)'} · เฉลย: <b style="color:var(--ok)">${chLabel(q, q.a)}</b></div>
+    <div class="exp"><div>${nl(q.exp || '')}</div>${whyHtml(q)}${q.tip ? `<div class="tip">💡 ${esc(q.tip)}</div>` : ''}${lessonFor(q) ? `<div style="margin-top:6px"><a href="#/library" data-a="openLesson" data-v="${esc(q.topic)}" onclick="return false">📚 บทเรียน: ${esc(q.topic)}</a></div>` : ''}</div></div>`; }).join('')}</div>`;
 }
 
 /* ====================== stats ====================== */
@@ -348,23 +366,42 @@ function viewLibrary() {
   {"group":"tpat3","subject":"TPAT3","topic":"เชิงกลและฟิสิกส์","q":"โจทย์ตัวอย่าง","c":["ก","ข","ค","ง","จ"],"a":0,"exp":"คำอธิบาย"}
 ]</textarea>
     <div class="row" style="margin-top:8px"><button class="pri" data-a="doImport">นำเข้า</button><span class="mute">นำเข้าแล้ว ${custom.length} ข้อ</span>${custom.length ? '<button data-a="clearImport">ลบที่นำเข้า</button>' : ''}</div></div>`;
+  if (libTab === 'lessons' && libOpen && LESSONS[libOpen]) return body; // โหมดสไลด์: ใช้พื้นที่เต็มจอ
   return `<h1>คลังความรู้</h1><div class="chips">${tabs.map(([k, v]) => `<button class="chip ${libTab === k ? 'on' : ''}" data-a="ltab" data-v="${k}">${v}</button>`).join('')}</div>${body}`;
 }
 function lessonList() {
   const grp = g => Object.entries(LESSONS).filter(([, l]) => l.group === g).map(([k, l]) => {
     const n = allQ().filter(q => q.topic === k).length, st = topicStats().find(t => t.topic === k);
-    return `<button class="lcard" data-a="openLesson" data-v="${esc(k)}"><b>${esc(l.title)}</b><small>${n} ข้อฝึก${st ? ' · แม่นยำ ' + pct(st.ok, st.n) + '%' : ''} · ${l.refs.length} แหล่งอ้างอิง</small></button>`;
+    return `<button class="lcard" data-a="openLesson" data-v="${esc(k)}"><b>${esc(l.title)}</b><small>${n} ข้อฝึก${st ? ' · แม่นยำ ' + pct(st.ok, st.n) + '%' : ''} · ${l.refs.length} แหล่งอ้างอิง${l.slides ? ' · 🎛 มีซิมูเลเตอร์' : ''}</small></button>`;
   }).join('');
   return Object.entries(GROUPS).map(([g, name]) => `<h2 style="margin-top:14px">${name}</h2><div class="presets">${grp(g)}</div>`).join('');
 }
+/* ---------- บทเรียนแบบสไลด์ (ข้อความ + ภาพ SVG + ซิมูเลเตอร์โต้ตอบ) ---------- */
+function buildSlides(k) {
+  const l = LESSONS[k], secs = l.sections.map(s => ({ type: 'text', h: s.h, bullets: s.items }));
+  const s = [{ type: 'cover', h: l.title, intro: l.intro }];
+  if (l.slides) { s.push(...l.slides); s.push({ type: 'divider', h: 'สรุปสูตรและแนวคิดสำคัญ' }); s.push(...secs); } else s.push(...secs);
+  s.push({ type: 'text', h: 'ตัวอย่างทำให้ดู', bullets: [l.example.q, 'วิธีทำ: ' + l.example.sol] });
+  s.push({ type: 'text', h: 'ข้อผิดพลาดที่พบบ่อย', bullets: l.pitfalls });
+  s.push({ type: 'end' }); return s;
+}
+function slideHtml(sl, k) {
+  const l = LESSONS[k], n = allQ().filter(q => q.topic === k).length, fig = sl.svg ? `<div class="slfig">${typeof sl.svg === 'function' ? sl.svg() : sl.svg}</div>` : '';
+  const note = sl.note ? `<div class="slnote">💡 ${esc(sl.note)}</div>` : '';
+  if (sl.type === 'cover') return `<div class="cover"><div class="big">${l.group === 'tpat3' ? '⚙️' : l.group === 'tgat' ? '🧠' : '🔬'}</div><h1>${esc(sl.h)}</h1><p>${esc(sl.intro)}</p><div class="mute">กด ▶ หรือปัดซ้ายเพื่อเริ่ม · มี ${LS.slides.filter(x => x.type === 'sim').length} ซิมูเลเตอร์ให้ลองปรับค่า</div></div>`;
+  if (sl.type === 'divider') return `<div class="cover"><div class="big">📐</div><h1>${esc(sl.h)}</h1></div>`;
+  if (sl.type === 'sim') return `<h2>🎛 ${esc(sl.h)}</h2><div id="simhost"></div>${note}`;
+  if (sl.type === 'end') return `<h2>ไปต่อ</h2><div class="row" style="margin:10px 0"><button class="pri" data-a="practiceTopic" data-v="${esc(k)}" ${n ? '' : 'disabled'}>ฝึกหัวข้อนี้ (${n} ข้อ)</button></div><h3>แหล่งที่มา / อ่านต่อ</h3><div class="refs">${l.refs.map(r => `<a href="${r.u}" target="_blank" rel="noopener">🔗 ${esc(r.t)}</a>`).join('')}</div>`;
+  return `<h2>${esc(sl.h)}</h2>${fig}<ul class="bul">${(sl.bullets || []).map((b, i) => `<li style="animation-delay:${.12 + i * .2}s">${esc(b)}</li>`).join('')}</ul>${note}`;
+}
 function lessonView(k) {
-  const l = LESSONS[k], n = allQ().filter(q => q.topic === k).length;
-  return `<button data-a="lessonBack">← กลับ</button><div class="card lesson" style="margin-top:12px"><h1 style="margin-top:0">${esc(l.title)}</h1><p>${esc(l.intro)}</p>
-  ${l.sections.map(s => `<h3>${esc(s.h)}</h3><ul>${s.items.map(i => `<li>${esc(i)}</li>`).join('')}</ul>`).join('')}
-  <div class="ex"><b>ตัวอย่าง</b><div>${esc(l.example.q)}</div><div class="mute" style="margin-top:4px">วิธีทำ: ${esc(l.example.sol)}</div></div>
-  <h3>ข้อผิดพลาดที่พบบ่อย</h3><ul>${l.pitfalls.map(p => `<li>${esc(p)}</li>`).join('')}</ul>
-  <div class="row" style="margin:12px 0"><button class="pri" data-a="practiceTopic" data-v="${esc(k)}" ${n ? '' : 'disabled'}>ฝึกหัวข้อนี้ (${n} ข้อ)</button></div>
-  <h3>แหล่งที่มา / อ่านต่อ</h3><div class="refs">${l.refs.map(r => `<a href="${r.u}" target="_blank" rel="noopener">🔗 ${esc(r.t)}</a>`).join('')}</div></div>`;
+  if (!LS || LS.k !== k) LS = { k, i: 0, slides: buildSlides(k), sim: null, dir: '' };
+  const n = LS.slides.length, sl = LS.slides[LS.i], dir = LS.dir; LS.dir = '';
+  const dots = n <= 22 ? LS.slides.map((s, i) => `<i class="d ${i === LS.i ? 'on' : ''} ${s.type === 'sim' ? 'sm' : ''}" data-a="slideGo" data-v="${i}"></i>`).join('') : '';
+  return `<div class="row between"><button data-a="lessonBack">← รายการบทเรียน</button><span class="mute">${LS.i + 1} / ${n}</span></div>
+  <div class="deck"><div class="prog"><i style="width:${(LS.i + 1) / n * 100}%"></i></div>
+  <article class="slide ${dir}">${slideHtml(sl, k)}</article>
+  <div class="deckfoot"><button data-a="slidePrev" ${LS.i === 0 ? 'disabled' : ''} aria-label="สไลด์ก่อนหน้า">◀</button><div class="dots">${dots}</div><button class="pri" data-a="slideNext" ${LS.i === n - 1 ? 'disabled' : ''} aria-label="สไลด์ถัดไป">▶</button></div></div>`;
 }
 
 /* ====================== actions ====================== */
@@ -398,8 +435,11 @@ const ACT = {
   tpreset(v) { const [f, b] = v.split(',').map(Number); T.focusMin = f; T.breakMin = b; if (!T.running) { T.phase = 'focus'; T.remain = f * 60; } render(true); },
   tstart: tStart, tpause: tPause, treset() { tReset(false); }, tstop() { tReset(true); },
   ltab(v) { libTab = v; if (v !== 'lessons') libOpen = ''; render(true); },
-  openLesson(v) { libTab = 'lessons'; libOpen = v; if (location.hash !== '#/library') location.hash = '#/library'; else render(); },
-  lessonBack() { libOpen = ''; render(); },
+  openLesson(v) { killSim(); LS = null; libTab = 'lessons'; libOpen = v; if (location.hash !== '#/library') location.hash = '#/library'; else render(); },
+  lessonBack() { killSim(); libOpen = ''; LS = null; render(); },
+  slideNext() { if (LS && LS.i < LS.slides.length - 1) { LS.i++; LS.dir = 'next'; render(true); } },
+  slidePrev() { if (LS && LS.i > 0) { LS.i--; LS.dir = 'prev'; render(true); } },
+  slideGo(v) { if (LS) { LS.dir = +v > LS.i ? 'next' : 'prev'; LS.i = +v; render(true); } },
   addRec() { const p = +val('rp'), t = +val('rt'); if (!val('ry') || !t) return; records.push({ y: val('ry'), s: val('rs'), p, t, n: val('rn') }); save(); render(true); },
   delRec(v) { records.splice(+v, 1); save(); render(true); },
   doImport() {
@@ -408,7 +448,7 @@ const ACT = {
       let n = 0;
       arr.forEach(o => {
         if (!o || !o.q || !Array.isArray(o.c) || o.c.length < 2 || o.c.length > 5 || !(o.a >= 0 && o.a < o.c.length) || !GROUPS[o.group]) return;
-        custom.push({ id: 'c' + Date.now() + '-' + n, group: o.group, subject: String(o.subject || 'นำเข้า'), topic: String(o.topic || 'นำเข้า'), diff: 2, q: String(o.q), c: o.c.map(String), a: o.a, exp: String(o.exp || ''), passage: o.passage ? String(o.passage) : undefined }); n++;
+        custom.push({ id: 'c' + Date.now() + '-' + n, group: o.group, subject: String(o.subject || 'นำเข้า'), topic: String(o.topic || 'นำเข้า'), diff: 2, q: String(o.q), c: o.c.map(x => { x = String(x); return isFig(x) ? ' ' + x : x; }), a: o.a, exp: String(o.exp || ''), passage: o.passage ? String(o.passage) : undefined }); n++;
       });
       save(); alert(`นำเข้าสำเร็จ ${n} ข้อ`); render(true);
     } catch { alert('รูปแบบ JSON ไม่ถูกต้อง'); }
