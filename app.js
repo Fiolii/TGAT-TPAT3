@@ -133,6 +133,7 @@ let LS = null; // สถานะสไลด์ {k,i,slides,sim,dir}
 function killSim() { if (LS && LS.sim) { try { LS.sim.destroy(); } catch { } LS.sim = null; } }
 function mountSim() {
   const host = $('#simhost'); if (!host || !LS) return; const sl = LS.slides[LS.i];
+  if (sl && sl.type === 'sim' && (typeof SIMS === 'undefined' || !SIMS[sl.sim])) { host.innerHTML = '<div class="warnbox">โหลดซิมูเลเตอร์ไม่สำเร็จ — ลองรีเฟรชหน้า หรือเปิดแอปใหม่เมื่อออนไลน์</div>'; return; }
   if (sl && sl.type === 'sim' && SIMS[sl.sim]) { try { LS.sim = SIMS[sl.sim].mount(host); } catch (e) { host.textContent = 'โหลดซิมูเลเตอร์ไม่สำเร็จ'; console.error(e); } }
 }
 window.addEventListener('hashchange', () => render());
