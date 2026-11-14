@@ -481,6 +481,7 @@ function slideHtml(sl, k) {
   if (sl.type === 'cover') return `<div class="cover"><div class="big">${l.group === 'tpat3' ? '⚙️' : l.group === 'tgat' ? '🧠' : '🔬'}</div><h1>${rt(sl.h)}</h1><p>${rt(sl.intro)}</p><div class="mute">กด ▶ หรือปัดซ้ายเพื่อเริ่ม · มี ${LS.slides.filter(x => x.type === 'sim').length} ซิมูเลเตอร์ให้ลองปรับค่า</div></div>`;
   if (sl.type === 'read') return readHtml(sl);
   if (sl.type === 'board') return boardHtml(sl);
+  if (sl.type === 'exlv') return exlvHtml(sl);
   if (sl.type === 'danger') return dangerHtml(sl);
   if (sl.type === 'divider') return `<div class="cover"><div class="big">📐</div><h1>${rt(sl.h)}</h1></div>`;
   if (sl.type === 'sim') return `<h2>🎛 ${rt(sl.h)}</h2><div id="simhost"></div>${note}`;
@@ -496,7 +497,7 @@ function lessonView(k) {
   const dots = n <= 22 ? LS.slides.map((s, i) => `<i class="d ${i === LS.i ? 'on' : ''} ${s.type === 'sim' ? 'sm' : ''}" data-a="slideGo" data-v="${i}"></i>`).join('') : '';
   return `<div class="row between"><button data-a="lessonBack">← รายการบทเรียน</button><span class="mute">${LS.i + 1} / ${n}</span></div>
   <div class="deck"><div class="prog"><i style="width:${(LS.i + 1) / n * 100}%"></i></div>
-  <article class="slide ${['read', 'board', 'danger'].includes(sl.type) ? 'read rd-' + sl.type + ' ' : ''}${dir}">${slideHtml(sl, k)}</article>
+  <article class="slide ${['read', 'board', 'danger', 'exlv'].includes(sl.type) ? 'read rd-' + (sl.type === 'exlv' ? 'board rd-exlv' : sl.type) + ' ' : ''}${dir}">${slideHtml(sl, k)}</article>
   <div class="deckfoot"><button data-a="slidePrev" ${LS.i === 0 ? 'disabled' : ''} aria-label="สไลด์ก่อนหน้า">◀</button><div class="dots">${dots}</div><button class="pri" data-a="slideNext" ${LS.i === n - 1 ? 'disabled' : ''} aria-label="สไลด์ถัดไป">▶</button></div></div>`;
 }
 

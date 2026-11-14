@@ -184,28 +184,38 @@ const teacherSvg = () => `<svg class="tchsvg" viewBox="0 0 170 210" role="img" a
 
 /* ---------- ตัวอย่างแบบกระดานดำ: ครูสอนทีละขั้น ----------
    { type:'board', h, q, given:[], find:[], plan, steps:[{w:'ที่เขียนบนกระดาน', s:'ครูอธิบาย', hl}], ans, outro } */
-function boardHtml(sl) {
-  LS.bd = LS.bd || {};
-  const n = Math.min(LS.bd[LS.i] || 0, sl.steps.length), N = sl.steps.length, done = n === N;
+function boardHtml(sl, o) {
+  o = o || {}; LS.bd = LS.bd || {};
+  const key = o.key != null ? o.key : LS.i, P = o.who && typeof PEOPLE !== 'undefined' ? PEOPLE[o.who] : null;
+  const n = Math.min(LS.bd[key] || 0, sl.steps.length), N = sl.steps.length, done = n === N;
   const lines = sl.steps.slice(0, n).map((s, i) => `<div class="bdl ${i === n - 1 ? 'new' : ''} ${s.hl ? 'hl' : ''}"><span class="bdn">${i + 1}</span><div class="bdw">${rt(s.w)}</div></div>`).join('');
-  const say = n === 0 ? sl.plan : sl.steps[n - 1].s + (done && sl.outro ? '<br><br>🎓 ' + sl.outro : '');
-  const chip = n === 0 ? 'ครูอ่านโจทย์ให้ฟัง' : `ขั้นที่ ${n} จาก ${N}`;
-  return `<h2>✏️ ${rt(sl.h)}</h2>
-  <div class="board"><div class="bdq"><span class="bdtag">โจทย์</span>${nl(sl.q)}</div>
+  const say = n === 0 ? (P ? '“' + P.hi + '”<br><br>' : '') + sl.plan : sl.steps[n - 1].s + (done && sl.outro ? '<br><br>🎓 ' + sl.outro : '');
+  const chip = (P ? '🎓 ' + P.n + ' · ' : '👩‍🏫 ') + (n === 0 ? 'อ่านโจทย์ให้ฟัง' : `ขั้นที่ ${n} จาก ${N}`);
+  return `${o.noH ? `<h3 class="bdh3">${rt(sl.h)}</h3>` : `<h2>✏️ ${rt(sl.h)}</h2>`}
+  <div class="board ${o.lvl != null ? 'lv' + o.lvl : ''}"><div class="bdq"><span class="bdtag">โจทย์</span>${nl(sl.q)}</div>
     <div class="bdgf"><div class="bdg"><b>📘 โจทย์ให้</b><ul>${(sl.given || []).map(g => `<li>${rt(g)}</li>`).join('')}</ul></div><div class="bdf"><b>🎯 ต้องหา</b><ul>${(sl.find || []).map(g => `<li>${rt(g)}</li>`).join('')}</ul></div></div>
     <div class="bdmain ${sl.fig ? 'hasfig' : ''}">${sl.fig ? `<div class="bdfig"><div class="bdfigt">🖍 ภาพที่ครูวาดบนกระดาน</div>${AF.boardSvg(sl.fig, n, sl.fw || 420, sl.fh || 250, sl.h)}</div>` : ''}<div class="bdlines">${lines}</div></div>
     ${done ?`<div class="bdans">✔ คำตอบ: <b>${rt(sl.ans)}</b></div>` : ''}
     <div class="bdtray"><i></i><i></i><i></i></div></div>
-  <div class="tchrow"><div class="tchwrap ${n === 0 ? '' : 'talk'}">${teacherSvg()}</div>
-    <div class="bubble" key="${n}"><span class="bchip">👩‍🏫 ${chip}</span><div class="btxt">${artTxt(say).replace(/&lt;br&gt;/g, '<br>')}</div></div></div>
+  <div class="tchrow ${o.lvl != null ? 'lv' + o.lvl : ''}"><div class="tchwrap ${n === 0 ? '' : 'talk'}">${P ? personSvg(o.who) : teacherSvg()}</div>
+    <div class="bubble" key="${n}"><span class="bchip">${chip}</span><div class="btxt">${artTxt(say).replace(/&lt;br&gt;/g, '<br>')}</div></div></div>
   <div class="bdctl"><button data-a="bdPrev" ${n === 0 ? 'disabled' : ''}>◀ ย้อนขั้น</button>
     <button class="pri" data-a="bdNext" ${done ? 'disabled' : ''}>${n === 0 ? '▶ เริ่มสอน' : done ? '✓ ครบแล้ว' : `ขั้นต่อไป (${n + 1}/${N}) ▶`}</button>
     <button data-a="bdAll" ${done ? 'disabled' : ''}>ดูทั้งหมด</button></div>`;
 }
+// กระดานที่กำลังแสดงอยู่ (สไลด์ board เดี่ยว หรือกระดานในระดับที่เลือกของสไลด์ exlv)
+function bdCur() {
+  const sl = LS && LS.slides[LS.i]; if (!sl) return null;
+  if (sl.type === 'board') return { b: sl, key: LS.i };
+  if (sl.type === 'exlv') { const L = exLvl(sl), bi = exBi(sl, L); return { b: sl.lv[LV_KEYS[L]][bi], key: LS.i + ':' + L + ':' + bi }; }
+  return null;
+}
 const ART_ACT = {
-  bdNext() { const sl = LS && LS.slides[LS.i]; if (!sl || sl.type !== 'board') return; LS.bd = LS.bd || {}; LS.bd[LS.i] = Math.min((LS.bd[LS.i] || 0) + 1, sl.steps.length); render(true); },
-  bdPrev() { const sl = LS && LS.slides[LS.i]; if (!sl || sl.type !== 'board') return; LS.bd = LS.bd || {}; LS.bd[LS.i] = Math.max((LS.bd[LS.i] || 0) - 1, 0); render(true); },
-  bdAll() { const sl = LS && LS.slides[LS.i]; if (!sl || sl.type !== 'board') return; LS.bd = LS.bd || {}; LS.bd[LS.i] = sl.steps.length; render(true); }
+  bdNext() { const c = bdCur(); if (!c) return; LS.bd = LS.bd || {}; LS.bd[c.key] = Math.min((LS.bd[c.key] || 0) + 1, c.b.steps.length); render(true); },
+  bdPrev() { const c = bdCur(); if (!c) return; LS.bd = LS.bd || {}; LS.bd[c.key] = Math.max((LS.bd[c.key] || 0) - 1, 0); render(true); },
+  bdAll() { const c = bdCur(); if (!c) return; LS.bd = LS.bd || {}; LS.bd[c.key] = c.b.steps.length; render(true); },
+  lvSet(v) { const sl = LS && LS.slides[LS.i]; if (!sl || sl.type !== 'exlv') return; LS.lvl = LS.lvl || {}; LS.lvl[LS.i] = +v; if (typeof achMark === 'function') achMark('lvl', LS.k + ':' + v); render(true); },
+  bsSet(v) { const sl = LS && LS.slides[LS.i]; if (!sl || sl.type !== 'exlv') return; LS.bsel = LS.bsel || {}; LS.bsel[LS.i + ':' + exLvl(sl)] = +v; render(true); }
 };
 
 /* ---------- หน้าเตือนจุดตาย: { type:'danger', h, intro, traps:[{t, bad, good, why}] } ---------- */

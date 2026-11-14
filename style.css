@@ -480,3 +480,30 @@ body.uni-open{overflow:hidden}
 .uniheroemb::after{content:"";display:block;width:70%;height:10px;margin:6px auto 0;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.4),transparent)}
 .engyear{box-shadow:0 8px 18px -8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.45)}
 @media (prefers-reduced-motion:reduce){.heroicon .emb,.uniheroemb .emb,.shirtbtn svg,.shirtbtn .shirtimg{animation:none}}
+
+/* ===== ตัวอย่าง 3 ระดับ + ครูบุคคลสำคัญ ===== */
+.lvbar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 6px}
+.lvt{flex-direction:column;gap:0;height:auto;min-height:68px;padding:8px 6px;border-radius:14px;line-height:1.3;text-align:center;border-width:2px;transition:.2s}
+.lvt b{font-size:15px}.lvt small{color:var(--mute);font-size:11.5px}.lvst{font-size:11px;letter-spacing:2px;color:#d9a010}
+.lvt.lv0.on{background:color-mix(in srgb,#2f8f5b 18%,var(--card));border-color:#2f8f5b}
+.lvt.lv1.on{background:color-mix(in srgb,#2b5fd9 18%,var(--card));border-color:#2b5fd9}
+.lvt.lv2.on{background:color-mix(in srgb,#d4202f 20%,var(--card));border-color:#d4202f;box-shadow:0 0 0 3px color-mix(in srgb,#d4202f 22%,transparent)}
+.lvt.on{transform:translateY(-2px)}
+.lvwho{display:flex;gap:12px;align-items:center;padding:10px 12px;border-radius:16px;border:2px solid;margin:6px 0;animation:lvSwap .5s cubic-bezier(.2,.8,.2,1) both}
+.lvwho.lv0{border-color:#2f8f5b;background:color-mix(in srgb,#2f8f5b 10%,var(--card))}
+.lvwho.lv1{border-color:#2b5fd9;background:color-mix(in srgb,#2b5fd9 10%,var(--card))}
+.lvwho.lv2{border-color:#d4202f;background:color-mix(in srgb,#d4202f 11%,var(--card))}
+@keyframes lvSwap{from{opacity:0;transform:translateX(26px) scale(.96)}to{opacity:1;transform:none}}
+.lvwhoa{flex:none;width:74px}.lvwhoa .tchsvg{width:100%;height:auto;display:block}
+.lvwhot{min-width:0}.lvwhot b{font-size:17px}.lvy{font-size:12px;color:var(--mute);margin-left:8px}.lvwhot p{margin:2px 0 0;font-size:13px;color:var(--mute);line-height:1.55}
+.lvwk{font-size:12px;font-weight:700;letter-spacing:.3px}.lvwho.lv0 .lvwk{color:#2f8f5b}.lvwho.lv1 .lvwk{color:#2b5fd9}.lvwho.lv2 .lvwk{color:#d4202f}
+.lvdesc{font-size:13px;color:var(--mute);margin:4px 2px 6px}.lvsel{display:flex;gap:6px;margin:6px 0}.lvsel .chip{min-height:36px;padding:2px 14px}
+.bdh3{margin:8px 0 4px;font-size:16px}.lvfoot{font-size:11.5px;color:var(--mute);text-align:center;margin:2px 8px 10px}
+.board.lv1{background:radial-gradient(120% 100% at 30% 0%,#2f5aa6,#1b2f5e 60%,#122046);border-color:#6b7da0;--pri:#ffd54a;--warn:#ff9f6b;--card:#1f3466}
+.board.lv2{background:radial-gradient(120% 100% at 30% 0%,#34293a,#17131c 60%,#0d0a12);border-color:#3b3b46;box-shadow:inset 0 0 40px rgba(0,0,0,.75),0 0 0 2px #b8202e,0 8px 30px rgba(184,32,46,.38);--pri:#ff8b95;--warn:#ffd54a;--card:#261d2d;animation:lvGlow 3s ease-in-out infinite}
+@keyframes lvGlow{50%{box-shadow:inset 0 0 40px rgba(0,0,0,.75),0 0 0 2px #e0303f,0 8px 36px rgba(224,48,63,.6)}}
+.tchrow.lv0 .bubble{border-color:#2f8f5b}.tchrow.lv0 .bubble::before{border-right-color:#2f8f5b}.tchrow.lv0 .bchip{background:#2f8f5b}
+.tchrow.lv1 .bubble{border-color:#2b5fd9}.tchrow.lv1 .bubble::before{border-right-color:#2b5fd9}.tchrow.lv1 .bchip{background:#2b5fd9}
+.tchrow.lv2 .bubble{border-color:#d4202f}.tchrow.lv2 .bubble::before{border-right-color:#d4202f}.tchrow.lv2 .bchip{background:#d4202f}
+@media (max-width:560px){.lvt b{font-size:13.5px}.lvt small{font-size:10.5px}.lvwhoa{width:62px}}
+@media (prefers-reduced-motion:reduce){.board.lv2,.lvwho{animation:none}}
