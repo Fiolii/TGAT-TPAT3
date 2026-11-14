@@ -7,7 +7,13 @@ const nl = s => esc(s).replace(/\n/g, '<br>');
 const isFig = s => typeof s === 'string' && s.startsWith('<svg');
 const chHtml = c => isFig(c) ? c : esc(c);
 const chLabel = (q, i) => LETTERS[i] + (isFig(q.c[i]) ? '' : '. ' + esc(q.c[i]));
-const whyHtml = q => q.why ? `<div class="why"><b>ทำไมข้ออื่นถึงไม่ใช่</b>${q.c.map((c, i) => i === q.a ? '' : `<div><span class="wl">${LETTERS[i]}</span> ${esc(q.why[i] || '')}</div>`).join('')}</div>` : '';
+// โจทย์ตอบเป็นตัวเลข (q.type === 'num', เฉลย q.ans ยอมคลาดเคลื่อน q.tol) เหมือน 5 ข้อท้ายของ A-Level จริง
+const isNum = q => q.type === 'num';
+const isRight = (q, v) => isNum(q) ? (v !== undefined && v !== null && v !== '' && Math.abs(+v - q.ans) <= (q.tol == null ? 1e-9 : q.tol)) : v === q.a;
+const showAns = (q, v) => isNum(q) ? esc(String(v)) + (q.unit ? ' ' + esc(q.unit) : '') : chLabel(q, v);
+const rightTxt = q => isNum(q) ? esc(String(q.ans)) + (q.unit ? ' ' + esc(q.unit) : '') : chLabel(q, q.a);
+const numBox = (q, picked, shown) => `<div class="numbox"><label><span>ตอบเป็นตัวเลข${q.unit ? ' (หน่วย ' + esc(q.unit) + ')' : ''}${q.hint ? ' — ' + esc(q.hint) : ''}</span><input type="number" step="any" inputmode="decimal" id="numans" data-input="num" value="${picked != null ? esc(String(picked)) : ''}" ${shown ? 'disabled' : ''} placeholder="พิมพ์คำตอบ"></label>${shown || E.mode === 'mock' ? '' : '<button class="pri" data-a="numSubmit">ตรวจคำตอบ</button>'}</div>`;
+const whyHtml = q => isNum(q) ? (q.wrong ? `<div class="why"><b>คำตอบที่พบบ่อยแต่ผิด</b>${q.wrong.map(w => `<div><span class="wl">≠</span> ถ้าได้ <b>${esc(String(w[0]))}</b> → ${esc(w[1])}</div>`).join('')}</div>` : '') : q.why ? `<div class="why"><b>ทำไมข้ออื่นถึงไม่ใช่</b>${q.c.map((c, i) => i === q.a ? '' : `<div><span class="wl">${LETTERS[i]}</span> ${esc(q.why[i] || '')}</div>`).join('')}</div>` : '';
 const store = {
   get(k, d) { try { const v = localStorage.getItem('sx_' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) { try { localStorage.setItem('sx_' + k, JSON.stringify(v)); } catch { } },
@@ -26,6 +32,7 @@ const allQ = () => QUESTIONS.concat(custom);
 QUESTIONS.forEach(q => {
   let h = 0; for (const ch of q.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   // ตัวเลือกตัวเลขเรียงค่า: ไม่สลับตำแหน่ง แต่บางข้อเรียงจากมากไปน้อย (ได้ทั้งสองแบบในข้อสอบจริง) เพื่อกระจายตำแหน่งคำตอบ
+  if (!q.c) return;
   if (q.c.every(s => /^[\d−\-.([]/.test(s))) { if (h % 2) { q.c.reverse(); if (q.why) q.why.reverse(); q.a = q.c.length - 1 - q.a; } return; }
   const t = h % q.c.length;[q.c[q.a], q.c[t]] = [q.c[t], q.c[q.a]]; if (q.why) [q.why[q.a], q.why[t]] = [q.why[t], q.why[q.a]]; q.a = t;
 });
@@ -47,7 +54,8 @@ const NAV = [['', 'หน้าแรก', 'home'], ['exam', 'ทำข้อส
 $('#dnav').innerHTML = NAV.map(([r, t, i]) => `<a href="#/${r}" data-r="${r}">${ico(i)}${t}</a>`).join('');
 $('#tabbar').innerHTML = NAV.map(([r, t, i]) => `<a href="#/${r}" data-r="${r}">${ico(i)}<span>${t}</span></a>`).join('');
 
-const PER_MIN = { TPAT3: 180 / 70, TGAT1: 1, TGAT2: 60 / 80, TGAT3: 1.5 }; // นาที/ข้อ ตามโครงสร้างจริงโดยประมาณ
+// นาที/ข้อ ตาม blueprint ของ mytcas: TPAT3 70 ข้อ/180 นาที, TGAT1 60/60, TGAT2 80/60, TGAT3 60/60, A-Level 90 นาที (Math1/ฟิสิกส์ 30 ข้อ, เคมี 35, ชีวะ 40)
+const PER_MIN = { TPAT3: 180 / 70, TGAT1: 1, TGAT2: 60 / 80, TGAT3: 1, 'คณิต': 3, 'ฟิสิกส์': 3, 'เคมี': 90 / 35, 'ชีววิทยา': 90 / 40 };
 const mockMinutes = list => Math.max(1, Math.ceil(list.reduce((a, q) => a + (PER_MIN[q.subject] ?? 1.8), 0)));
 const lessonFor = q => LESSONS[q.topic];
 
@@ -133,6 +141,11 @@ document.addEventListener('click', e => {
   if (b.classList.contains('omr') && e.target !== b) return; // คลิกในแผ่นกระดาษคำตอบไม่ปิด
   const fn = ACT[b.dataset.a]; if (fn) fn(b.dataset.v, b);
 });
+// โหมดสอบจำลอง: เก็บคำตอบตัวเลขทันทีที่พิมพ์ (ไม่เฉลย)
+document.addEventListener('input', e => {
+  if (e.target.dataset.input !== 'num' || !E || E.done || E.mode !== 'mock') return;
+  const v = e.target.value; if (v === '') delete E.ans[E.i]; else E.ans[E.i] = v;
+});
 document.addEventListener('change', e => {
   const k = e.target.dataset.change; if (!k) return;
   if (k.startsWith('x:')) { X[k.slice(2)] = e.target.type === 'checkbox' ? e.target.checked : (['n'].includes(k.slice(2)) ? +e.target.value : e.target.value); if (k === 'x:group') { X.subject = ''; X.topic = ''; } if (k === 'x:subject') X.topic = ''; render(true); }
@@ -154,7 +167,7 @@ document.addEventListener('keydown', e => {
   if (LS && (!E || E.done) && location.hash === '#/library' && !/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) { if (e.key === 'ArrowRight') ACT.slideNext(); else if (e.key === 'ArrowLeft') ACT.slidePrev(); return; }
   if (!E || E.done || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
   if (e.key === 'ArrowRight') ACT.next(); else if (e.key === 'ArrowLeft') ACT.prev();
-  else if ('12345'.includes(e.key) && E.list[E.i].c[+e.key - 1] !== undefined) ACT.pick(String(+e.key - 1));
+  else if ('12345'.includes(e.key) && E.list[E.i].c && E.list[E.i].c[+e.key - 1] !== undefined) ACT.pick(String(+e.key - 1));
 });
 
 /* ====================== home ====================== */
@@ -167,7 +180,8 @@ function viewHome() {
   let cd = '-', cdsub = 'ยังไม่ตั้งวันสอบ';
   if (examDate) { const d = Math.ceil((new Date(examDate + 'T00:00:00') - Date.now()) / 864e5); cd = d >= 0 ? d : '✓'; cdsub = d >= 0 ? 'วันก่อนสอบ' : 'สอบแล้ว'; }
   const weak = weakTopics().slice(0, 3);
-  return `<div class="card hero"><h1>พร้อมติวหรือยัง? 🚀</h1><p>เปิดข้อสอบทีละหน้าเหมือนสนามจริง ทบทวนจุดอ่อน และจับเวลาการอ่าน</p>
+  const th = THEMES.find(x => x.id === store.get('theme', 'sixent')) || THEMES[0];
+  return `<div class="card hero"><svg class="gearmark" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="10" stroke-dasharray="9.95"/><circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/></svg><h1>${th.s ? 'สู่วิศวะ ' + esc(th.s) + ' ⚙️' : 'พร้อมติวหรือยัง? 🚀'}</h1><p>เปิดข้อสอบทีละหน้าเหมือนสนามจริง ทบทวนจุดอ่อน และจับเวลาการอ่าน</p>
     <div class="row"><a class="btn w" href="#/exam">เริ่มทำข้อสอบ</a><a class="btn" href="#/timer">เริ่มจับเวลา</a></div></div>
   <div class="grid2">
     <div class="card"><h2>เป้าหมายวันนี้</h2><div class="row" style="gap:18px">${ring(mins / goalMin, 120, mins + ' น.', 'จาก ' + goalMin)}
@@ -175,7 +189,8 @@ function viewHome() {
     <div class="card"><h2>ภาพรวม</h2><div class="grid" style="grid-template-columns:1fr 1fr">
       <div><b style="font-size:26px">${total ? pct(ok, total) + '%' : '-'}</b><div class="mute">แม่นยำ (${total} ข้อ)</div></div>
       <div><b style="font-size:26px">${cd}</b><div class="mute">${cdsub}</div></div></div>
-      <div class="row" style="margin-top:10px"><input type="date" id="ed" value="${esc(examDate)}"><button data-a="setDate">ตั้งวันสอบ</button></div></div>
+      <div class="row" style="margin-top:10px"><input type="date" id="ed" value="${esc(examDate)}"><button data-a="setDate">ตั้งวันสอบ</button></div>
+      <div class="row" style="margin-top:6px"><button class="chip" data-a="setExam" data-v="${TCAS70.dates.tpat3}">TPAT3/TGAT 30 ม.ค. 70</button><button class="chip" data-a="setExam" data-v="${TCAS70.dates.alevel}">A-Level 13 มี.ค. 70</button></div></div>
   </div>
   <div class="card"><h2>แนะนำให้ทบทวน</h2>${weak.length ? weak.map(t => `<div class="row between" style="padding:6px 0"><span>${esc(t.topic)} <span class="mute">แม่นยำ ${pct(t.ok, t.n)}% · ${t.n} ข้อ</span></span><span><button data-a="practiceTopic" data-v="${esc(t.topic)}">ฝึก</button> ${LESSONS[t.topic] ? `<button data-a="openLesson" data-v="${esc(t.topic)}">อ่านบทเรียน</button>` : ''}</span></div>`).join('') : '<span class="mute">ยังไม่มีข้อมูลเพียงพอ — ทำโจทย์ให้ได้อย่างน้อย 3 ข้อต่อหัวข้อ แล้วระบบจะชี้จุดอ่อนให้</span>'}</div>
   <div class="card"><h2>ชุดข้อสอบ</h2><div class="presets">${PRESETS.map((p, i) => `<button class="preset" data-a="preset" data-v="${i}"><b>${p.t}</b><small>${allQ().filter(p.f).length} ข้อ · ≈ ${mockMinutes(allQ().filter(p.f))} นาที</small></button>`).join('')}</div></div>`;
@@ -245,12 +260,12 @@ function examPaper() {
     ${q.passage ? `<div class="passage">${nl(q.passage)}</div>` : ''}
     <div class="qtext">${nl(q.q)}</div>
     ${q.fig ? q.fig : ''}
-    <div role="radiogroup">${q.c.map((c, i) => {
+    ${isNum(q) ? numBox(q, picked, shown) : `<div role="radiogroup">${q.c.map((c, i) => {
     let cls = '';
     if (shown) cls = i === q.a ? 'ok' : (i === picked ? 'bad' : ''); else if (picked === i) cls = 'sel';
     return `<button class="opt ${cls}" role="radio" aria-checked="${picked === i}" data-a="pick" data-v="${i}" ${shown ? 'disabled' : ''}><span class="bub">${LETTERS[i] || i + 1}</span><span class="otx">${chHtml(c)}</span></button>`;
-  }).join('')}</div>
-    ${shown ? `<div class="exp"><b>${picked === q.a ? '✅ ถูกต้อง!' : '❌ เฉลย: ' + chLabel(q, q.a)}</b><div style="margin-top:6px">${nl(q.exp || '')}</div>${whyHtml(q)}${q.tip ? `<div class="tip">💡 ${esc(q.tip)}</div>` : ''}
+  }).join('')}</div>`}
+    ${shown ? `<div class="exp"><b>${isRight(q, picked) ? '✅ ถูกต้อง!' : '❌ เฉลย: ' + rightTxt(q)}</b><div style="margin-top:6px">${nl(q.exp || '')}</div>${whyHtml(q)}${q.tip ? `<div class="tip">💡 ${esc(q.tip)}</div>` : ''}
       ${lessonFor(q) ? `<div style="margin-top:8px"><a href="#/library" data-a="openLesson" data-v="${esc(q.topic)}" onclick="return false">📚 อ่านบทเรียน: ${esc(q.topic)}</a></div>` : ''}</div>` : ''}
   </article></div>
   <div class="efoot"><div class="row"><button data-a="prev" ${E.i === 0 ? 'disabled' : ''} aria-label="ข้อก่อนหน้า">◀</button>
@@ -274,7 +289,7 @@ function submitExam(auto) {
   const n = E.list.length, mock = E.mode === 'mock';
   let score = 0;
   E.list.forEach((q, i) => {
-    const ok = E.ans[i] === q.a; if (ok) score++;
+    const ok = isRight(q, E.ans[i]); if (ok) score++;
     if (mock && E.ans[i] != null) attempts.push({ ts: Date.now(), qid: q.id, group: q.group, subject: q.subject, topic: q.topic, ok, secs: Math.round(E.qs[i] || 0), mode: 'mock' });
   });
   E.score = score; E.secs = Math.min((Date.now() - E.t0) / 1000, E.mins * 60); E.done = true; E.auto = !!auto; E.omr = false;
@@ -284,16 +299,16 @@ function submitExam(auto) {
 }
 function examResult() {
   const n = E.list.length, p = pct(E.score, n), by = {};
-  E.list.forEach((q, i) => { const t = by[q.topic] ||= { n: 0, ok: 0 }; t.n++; if (E.ans[i] === q.a) t.ok++; });
+  E.list.forEach((q, i) => { const t = by[q.topic] ||= { n: 0, ok: 0 }; t.n++; if (isRight(q, E.ans[i])) t.ok++; });
   const msg = p >= 80 ? 'เยี่ยมมาก! 🎉' : p >= 60 ? 'ดีเลย ไปต่ออีกนิด 💪' : 'ไม่เป็นไร ทบทวนจุดที่พลาดแล้วลองใหม่ 📚';
   setTimeout(() => { const f = document.querySelector('.ring-fg'); if (f) f.style.strokeDashoffset = 2 * Math.PI * 52 * (1 - p / 100); }, 60);
   return `<h1>ผลการสอบ ${E.auto ? '<span class="tag warn">หมดเวลา ส่งอัตโนมัติ</span>' : ''}</h1>
   <div class="card ctr">${ring(0, 170, E.score + '/' + n, p + '%')}<p style="margin:10px 0 2px"><b>${msg}</b></p><div class="mute">ใช้เวลา ${fmt(E.secs)} ${E.mode === 'mock' ? 'จาก ' + E.mins + ' นาที' : ''} · ตอบแล้ว ${Object.keys(E.ans).length}/${n} ข้อ</div>
     <div class="row" style="justify-content:center;margin-top:12px"><button class="pri" data-a="resetE">ทำชุดใหม่</button><a class="btn" href="#/stats">ดูสถิติ</a></div></div>
   <div class="card"><h2>รายหัวข้อ</h2><div class="tbl"><table>${Object.entries(by).map(([t, v]) => `<tr><td>${esc(t)}</td><td>${v.ok}/${v.n}</td><td style="width:40%"><div class="bar ${pct(v.ok, v.n) >= 60 ? 'g' : 'r'}"><i style="width:${pct(v.ok, v.n)}%"></i></div></td></tr>`).join('')}</table></div></div>
-  <div class="card"><h2>ทบทวนทีละข้อ</h2>${E.list.map((q, i) => { const mine = E.ans[i], ok = mine === q.a; return `<div class="rv"><div class="row between"><b>ข้อ ${i + 1}</b><span class="tag ${ok ? 'ok' : 'bad'}">${mine == null ? 'ไม่ได้ตอบ' : ok ? 'ถูก' : 'ผิด'}</span></div>
+  <div class="card"><h2>ทบทวนทีละข้อ</h2>${E.list.map((q, i) => { const mine = E.ans[i], ok = isRight(q, mine); return `<div class="rv"><div class="row between"><b>ข้อ ${i + 1}</b><span class="tag ${ok ? 'ok' : 'bad'}">${mine == null ? 'ไม่ได้ตอบ' : ok ? 'ถูก' : 'ผิด'}</span></div>
     ${q.passage ? `<details><summary>ดูบทอ่าน/ข้อมูล</summary><div class="passage">${nl(q.passage)}</div></details>` : ''}<div style="margin:4px 0">${nl(q.q)}</div>${q.fig ? q.fig : ''}
-    <div class="mute">คุณตอบ: ${mine != null ? chLabel(q, mine) : '(ว่าง)'} · เฉลย: <b style="color:var(--ok)">${chLabel(q, q.a)}</b></div>
+    <div class="mute">คุณตอบ: ${mine != null ? showAns(q, mine) : '(ว่าง)'} · เฉลย: <b style="color:var(--ok)">${rightTxt(q)}</b></div>
     <div class="exp"><div>${nl(q.exp || '')}</div>${whyHtml(q)}${q.tip ? `<div class="tip">💡 ${esc(q.tip)}</div>` : ''}${lessonFor(q) ? `<div style="margin-top:6px"><a href="#/library" data-a="openLesson" data-v="${esc(q.topic)}" onclick="return false">📚 บทเรียน: ${esc(q.topic)}</a></div>` : ''}</div></div>`; }).join('')}</div>`;
 }
 
@@ -346,12 +361,27 @@ function viewTimer() {
 }
 
 /* ====================== library ====================== */
+/* ---------- ข้อมูลทางการจาก mytcas (ทปอ.) ---------- */
+function infoView() {
+  const T = TCAS70, ex = rows => `<div class="tbl"><table><tr><th>วันที่</th><th>เวลา</th><th>รหัส</th><th>วิชา</th></tr>${rows.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</table></div>`;
+  const setBtn = (d, t) => `<button data-a="setExam" data-v="${d}">ตั้งวันนับถอยหลัง: ${t}</button>`;
+  return `<div class="warnbox" style="margin-bottom:12px">📌 ข้อมูลส่วนนี้ดึงจาก <a href="${T.src.u}" target="_blank" rel="noopener">mytcas.com</a> (ระบบกลางของ ทปอ.) ตรวจเมื่อ ${T.checked} — วันสอบและโครงสร้างอาจถูกประกาศแก้ไข ให้เปิดดูต้นฉบับก่อนตัดสินใจเสมอ
+    <div class="row" style="margin-top:6px">${T.cal.map(c => `<a href="${c.u}" target="_blank" rel="noopener">🗓 ${esc(c.t)}</a>`).join(' · ')}</div></div>
+  <div class="card"><h2>${T.title} — รอบการรับสมัครเข้ามหาวิทยาลัย</h2><div class="tbl"><table><tr><th>รอบ</th><th>รูปแบบ</th><th>สมัคร</th><th>ผล</th></tr>${T.rounds.map(r => `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('')}</table></div></div>
+  <div class="card"><h2>TGAT / TPAT — ปฏิทินสอบ</h2><p>${esc(T.tgat.reg)}</p><p class="mute">${esc(T.tgat.print)}</p>${ex(T.tgat.exam)}<p class="mute">${esc(T.tgat.after)} · ${esc(T.tgat.fee)}</p><div class="row">${setBtn(T.dates.tpat3, 'TPAT3/TGAT 30 ม.ค. 70')}</div></div>
+  <div class="card"><h2>A-Level — ปฏิทินสอบ</h2><p>${esc(T.alevel.reg)}</p><p class="mute">${esc(T.alevel.print)}</p>${ex(T.alevel.exam)}<p class="mute">${esc(T.alevel.after)} · ${esc(T.alevel.fee)}</p><div class="warnbox">💡 ${esc(T.alevel.tip)}</div><div class="row" style="margin-top:8px">${setBtn(T.dates.alevel, 'A-Level 13 มี.ค. 70')}</div></div>
+  <h2 style="margin:16px 0 8px">โครงสร้างข้อสอบ (blueprint ทางการ)</h2>
+  ${Object.values(BLUEPRINT).map(b => `<div class="card"><h2>${esc(b.name)}</h2><div class="row"><span class="tag">${esc(b.items)}</span><span class="tag">${b.time}</span><span class="tag">คะแนนเต็ม ${b.score}</span></div>
+    ${b.parts.map(p => `<details><summary>${esc(p[0])}</summary><ul>${p[1].map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>`).join('')}
+    ${b.note ? `<p class="mute">${esc(b.note)}</p>` : ''}<div class="mute">ที่มา: <a href="${b.url}" target="_blank" rel="noopener">${esc(b.name.split(' ')[0] === 'A-Level' ? 'mytcas blueprint' : 'mytcas blueprint')}</a> · ตัวอย่างข้อสอบอยู่ในหน้านั้น</div></div>`).join('')}
+  <div class="card"><h2>ขอบเขตเนื้อหาทางการ</h2><div class="refs"><a href="${OBEC.sci.u}" target="_blank" rel="noopener">🔗 ${esc(OBEC.sci.t)}</a><a href="${OBEC.scimath.u}" target="_blank" rel="noopener">🔗 ${esc(OBEC.scimath.t)}</a></div>
+  <p class="mute">โจทย์ในแอปเขียนใหม่ใช้ 5 ตัวเลือกทุกข้อ (ข้อสอบจริง TGAT1 และ TGAT3 ใช้ 4 ตัวเลือก)</p></div>`;
+}
 function viewLibrary() {
   const tabs = [['lessons', 'บทเรียน'], ['info', 'ข้อมูลการสอบ'], ['sources', 'แหล่งข้อสอบเก่า'], ['records', 'ผลสอบเก่าของฉัน'], ['import', 'นำเข้าโจทย์']];
   let body = '';
-  if (libTab === 'lessons') body = libOpen && LESSONS[libOpen] ? lessonView(libOpen) : lessonList();
-  if (libTab === 'info') body = `<div class="warnbox" style="margin-bottom:12px">⚠ โครงสร้างข้อสอบด้านล่างอ้างอิงแนวข้อสอบ/คู่มือปี 2022 (ตรวจเมื่อ พ.ย. 2026) — ปีที่คุณสอบอาจเปลี่ยน ให้ยืนยันกับ <a href="${SOURCES.tcas.u}" target="_blank" rel="noopener">mytcas.com</a> และ <a href="${SOURCES.niets.u}" target="_blank" rel="noopener">สทศ.</a> เสมอ</div>
-    ${EXAM_INFO.map(e => `<div class="card"><h2>${esc(e.name)}</h2><div class="row"><span class="tag">${e.items}</span><span class="tag">${e.time}</span><span class="tag">คะแนนเต็ม ${e.score}</span></div><ul>${e.parts.map(p => `<li>${esc(p)}</li>`).join('')}</ul><div class="mute">ที่มา: <a href="${e.src.u}" target="_blank" rel="noopener">${esc(e.src.t)}</a></div></div>`).join('')}`;
+  if (libTab === 'lessons') body = libOpen && hasLesson(libOpen) ? lessonView(libOpen) : lessonList();
+  if (libTab === 'info') body = infoView();
   if (libTab === 'sources') body = `<div class="card"><h2>ข้อสอบเก่า/แนวข้อสอบ — ไปอ่านต่อที่ไหน</h2>
     <p class="mute">ข้อสอบจริงมีลิขสิทธิ์ของผู้จัดสอบ จึงไม่คัดลอกมาไว้ในแอปนี้ ใช้ลิงก์ต่อไปนี้เพื่อดูของจริง แล้วบันทึกผลที่แท็บ "ผลสอบเก่าของฉัน" หรือพิมพ์ข้อที่ทำเองเข้าแท็บ "นำเข้าโจทย์"</p>
     <div class="refs">${[SOURCES.tcas, SOURCES.niets, SOURCES.tpat3guide, SOURCES.tgat1guide, SOURCES.tgat3guide, R('Trueplookpanya: แนวข้อสอบ TPAT3 ชุดที่ 1 (ออนไลน์)', 'https://www.trueplookpanya.com/examination2/start-exam/14408'), R('Trueplookpanya: แนวข้อสอบ TPAT3 ชุดที่ 2 (ออนไลน์)', 'https://www.trueplookpanya.com/examination2/start-exam/14410')].map(r => `<a href="${r.u}" target="_blank" rel="noopener">🔗 ${esc(r.t)}</a>`).join('')}</div></div>`;
@@ -366,10 +396,32 @@ function viewLibrary() {
   {"group":"tpat3","subject":"TPAT3","topic":"เชิงกลและฟิสิกส์","q":"โจทย์ตัวอย่าง","c":["ก","ข","ค","ง","จ"],"a":0,"exp":"คำอธิบาย"}
 ]</textarea>
     <div class="row" style="margin-top:8px"><button class="pri" data-a="doImport">นำเข้า</button><span class="mute">นำเข้าแล้ว ${custom.length} ข้อ</span>${custom.length ? '<button data-a="clearImport">ลบที่นำเข้า</button>' : ''}</div></div>`;
-  if (libTab === 'lessons' && libOpen && LESSONS[libOpen]) return body; // โหมดสไลด์: ใช้พื้นที่เต็มจอ
+  if (libTab === 'lessons' && libOpen && hasLesson(libOpen)) return body; // โหมดสไลด์: ใช้พื้นที่เต็มจอ
   return `<h1>คลังความรู้</h1><div class="chips">${tabs.map(([k, v]) => `<button class="chip ${libTab === k ? 'on' : ''}" data-a="ltab" data-v="${k}">${v}</button>`).join('')}</div>${body}`;
 }
+/* ---------- หลักสูตรรายบท (ตามโครงสร้าง blueprint ของ mytcas) ---------- */
+const chapterOf = k => typeof k === 'string' && k.startsWith('ch:') ? COURSE.find(c => c.id === k.slice(3)) : null;
+function lessonMeta(k) {
+  const ch = chapterOf(k); if (ch) { const base = LESSONS[ch.topic]; return { title: ch.title, group: ch.group, topic: ch.topic, refs: (ch.refs || []).concat(base ? base.refs : []).filter((r, i, a) => a.findIndex(x => x.u === r.u) === i), intro: ch.intro || ch.part, ch }; }
+  const l = LESSONS[k]; return { title: l.title, group: l.group, topic: k, refs: l.refs, intro: l.intro, l };
+}
+const hasLesson = k => !!(LESSONS[k] || chapterOf(k));
+function courseTree() {
+  const groups = [['alevel', 'A-Level'], ['tpat3', 'TPAT3'], ['tgat', 'TGAT']];
+  return groups.map(([g, name]) => {
+    const chs = COURSE.filter(c => c.group === g); if (!chs.length) return '';
+    const subs = uniq(chs.map(c => c.subject));
+    return `<h2 style="margin:16px 0 6px">${name}</h2>` + subs.map(s => {
+      const sc = chs.filter(c => c.subject === s), parts = uniq(sc.map(c => c.part));
+      return `<div class="card"><h3 style="margin:0 0 6px">${esc(s)} <span class="mute">· ${sc.length} บท · ${sc.reduce((a, c) => a + c.slides.length, 0)} สไลด์</span></h3>${parts.map((p, pi) => `<details ${pi === 0 && subs.length === 1 ? 'open' : ''}><summary>${esc(p)}</summary><div class="chgrid">${sc.filter(c => c.part === p).map(c => { const nq = allQ().filter(q => q.topic === c.topic).length, sims = c.slides.filter(x => x.type === 'sim').length; return `<button class="lcard" data-a="openLesson" data-v="ch:${c.id}"><b>${esc(c.title)}</b><small>${c.slides.length} สไลด์${sims ? ' · 🎛 ' + sims + ' ซิม' : ''}</small></button>`; }).join('')}</div></details>`).join('')}</div>`;
+    }).join('');
+  }).join('');
+}
 function lessonList() {
+  const topics = lessonListTopics();
+  return `${courseTree()}<h2 style="margin:18px 0 6px">ภาพรวมรายหัวข้อ (สำหรับฝึกโจทย์)</h2>${topics}`;
+}
+function lessonListTopics() {
   const grp = g => Object.entries(LESSONS).filter(([, l]) => l.group === g).map(([k, l]) => {
     const n = allQ().filter(q => q.topic === k).length, st = topicStats().find(t => t.topic === k);
     return `<button class="lcard" data-a="openLesson" data-v="${esc(k)}"><b>${esc(l.title)}</b><small>${n} ข้อฝึก${st ? ' · แม่นยำ ' + pct(st.ok, st.n) + '%' : ''} · ${l.refs.length} แหล่งอ้างอิง${l.slides ? ' · 🎛 มีซิมูเลเตอร์' : ''}</small></button>`;
@@ -378,6 +430,8 @@ function lessonList() {
 }
 /* ---------- บทเรียนแบบสไลด์ (ข้อความ + ภาพ SVG + ซิมูเลเตอร์โต้ตอบ) ---------- */
 function buildSlides(k) {
+  const m = lessonMeta(k);
+  if (m.ch) return [{ type: 'cover', h: m.title, intro: m.ch.intro || '', part: m.ch.part }, ...m.ch.slides, { type: 'end' }];
   const l = LESSONS[k], secs = l.sections.map(s => ({ type: 'text', h: s.h, bullets: s.items }));
   const s = [{ type: 'cover', h: l.title, intro: l.intro }];
   if (l.slides) { s.push(...l.slides); s.push({ type: 'divider', h: 'สรุปสูตรและแนวคิดสำคัญ' }); s.push(...secs); } else s.push(...secs);
@@ -386,13 +440,15 @@ function buildSlides(k) {
   s.push({ type: 'end' }); return s;
 }
 function slideHtml(sl, k) {
-  const l = LESSONS[k], n = allQ().filter(q => q.topic === k).length, fig = sl.svg ? `<div class="slfig">${typeof sl.svg === 'function' ? sl.svg() : sl.svg}</div>` : '';
+  const l = lessonMeta(k), n = allQ().filter(q => q.topic === l.topic).length, fig = sl.svg ? `<div class="slfig">${typeof sl.svg === 'function' ? sl.svg() : sl.svg}</div>` : '';
   const note = sl.note ? `<div class="slnote">💡 ${esc(sl.note)}</div>` : '';
   if (sl.type === 'cover') return `<div class="cover"><div class="big">${l.group === 'tpat3' ? '⚙️' : l.group === 'tgat' ? '🧠' : '🔬'}</div><h1>${esc(sl.h)}</h1><p>${esc(sl.intro)}</p><div class="mute">กด ▶ หรือปัดซ้ายเพื่อเริ่ม · มี ${LS.slides.filter(x => x.type === 'sim').length} ซิมูเลเตอร์ให้ลองปรับค่า</div></div>`;
   if (sl.type === 'divider') return `<div class="cover"><div class="big">📐</div><h1>${esc(sl.h)}</h1></div>`;
   if (sl.type === 'sim') return `<h2>🎛 ${esc(sl.h)}</h2><div id="simhost"></div>${note}`;
-  if (sl.type === 'end') return `<h2>ไปต่อ</h2><div class="row" style="margin:10px 0"><button class="pri" data-a="practiceTopic" data-v="${esc(k)}" ${n ? '' : 'disabled'}>ฝึกหัวข้อนี้ (${n} ข้อ)</button></div><h3>แหล่งที่มา / อ่านต่อ</h3><div class="refs">${l.refs.map(r => `<a href="${r.u}" target="_blank" rel="noopener">🔗 ${esc(r.t)}</a>`).join('')}</div>`;
-  return `<h2>${esc(sl.h)}</h2>${fig}<ul class="bul">${(sl.bullets || []).map((b, i) => `<li style="animation-delay:${.12 + i * .2}s">${esc(b)}</li>`).join('')}</ul>${note}`;
+  if (sl.type === 'end') return `<h2>ไปต่อ</h2><div class="row" style="margin:10px 0"><button class="pri" data-a="practiceTopic" data-v="${esc(l.topic)}" ${n ? '' : 'disabled'}>ฝึกหัวข้อนี้ (${n} ข้อ)</button></div><h3>แหล่งที่มา / อ่านต่อ</h3><div class="refs">${l.refs.map(r => `<a href="${r.u}" target="_blank" rel="noopener">🔗 ${esc(r.t)}</a>`).join('')}</div>`;
+  if (sl.type === 'formula') return `<h2>🧮 ${esc(sl.h)}</h2><div class="ftable">${sl.rows.map((r, i) => `<div class="frow" style="animation-delay:${.1 + i * .12}s"><code>${esc(r[0])}</code><span>${esc(r[1])}</span></div>`).join('')}</div>${note}`;
+  if (sl.type === 'example') return `<h2>✏️ ${esc(sl.h)}</h2><div class="exq">${nl(sl.q)}</div>${fig}<ol class="steps">${sl.steps.map((s, i) => `<li style="animation-delay:${.15 + i * .3}s">${esc(s)}</li>`).join('')}</ol><div class="exans" style="animation-delay:${.2 + sl.steps.length * .3}s">✔ คำตอบ: <b>${esc(sl.ans)}</b></div>${note}`;
+  return `<h2>${sl.cls === 'trap' ? '⚠️ ' : ''}${esc(sl.h)}</h2>${fig}<ul class="bul ${sl.cls || ''}">${(sl.bullets || []).map((b, i) => `<li style="animation-delay:${.12 + i * .2}s">${esc(b)}</li>`).join('')}</ul>${note}`;
 }
 function lessonView(k) {
   if (!LS || LS.k !== k) LS = { k, i: 0, slides: buildSlides(k), sim: null, dir: '' };
@@ -407,6 +463,10 @@ function lessonView(k) {
 /* ====================== actions ====================== */
 const ACT = {
   setDate() { examDate = val('ed'); save(); render(true); },
+  setExam(v) { examDate = v; save(); if ((location.hash || '#/') === '#/') render(true); else alert('ตั้งวันนับถอยหลังเป็น ' + v + ' แล้ว (ดูที่หน้าแรก)'); },
+  themeOpen() { themeSheet(true); }, themeClose() { themeSheet(false); },
+  themePick(v) { setTheme(v); render(true); themeSheet(true); },
+  schemePick(v) { setScheme(v); render(true); themeSheet(true); },
   xmode(v) { X.mode = v; render(true); },
   preset(v) { const p = PRESETS[+v], l = allQ().filter(p.f), mode = location.hash === '#/exam' ? X.mode : 'mock'; beginExam(mode, mode === 'practice' ? shuffle(l) : l, p.t); },
   startExam,
@@ -417,6 +477,12 @@ const ACT = {
     if (E.rev[E.i]) return;
     leave(); E.ans[E.i] = i; E.rev[E.i] = true;
     attempts.push({ ts: Date.now(), qid: q.id, group: q.group, subject: q.subject, topic: q.topic, ok: i === q.a, secs: Math.round(E.qs[E.i] || 0), mode: 'practice' });
+    save(); render(true);
+  },
+  numSubmit() {
+    const q = E.list[E.i], v = val('numans'); if (v === '' || E.rev[E.i]) return;
+    leave(); E.ans[E.i] = v; E.rev[E.i] = true;
+    attempts.push({ ts: Date.now(), qid: q.id, group: q.group, subject: q.subject, topic: q.topic, ok: isRight(q, v), secs: Math.round(E.qs[E.i] || 0), mode: 'practice' });
     save(); render(true);
   },
   next() { goTo(E.i + 1, 'next'); }, prev() { goTo(E.i - 1, 'prev'); },
@@ -474,5 +540,33 @@ document.addEventListener('change', e => {
   };
   rd.readAsText(f);
 });
+/* ====================== ธีมสีมหาวิทยาลัย ====================== */
+function isDark() { const s = store.get('scheme', 'auto'); return s === 'dark' || (s === 'auto' && matchMedia('(prefers-color-scheme:dark)').matches); }
+function applyTheme() {
+  const t = THEMES.find(x => x.id === store.get('theme', 'sixent')) || THEMES[0], r = document.documentElement, sc = store.get('scheme', 'auto'), dark = isDark();
+  if (sc === 'auto') r.removeAttribute('data-scheme'); else r.setAttribute('data-scheme', sc);
+  ['--pri', '--pri2', '--grad', '--onpri'].forEach(p => r.style.removeProperty(p));
+  if (t.id !== 'sixent') { r.style.setProperty('--pri', dark ? t.pd : t.pl); r.style.setProperty('--pri2', `color-mix(in srgb, var(--pri) ${dark ? 24 : 12}%, var(--card))`); r.style.setProperty('--grad', `linear-gradient(135deg,${t.g[0]},${t.g[1]} 55%,${t.g[2]})`); r.style.setProperty('--onpri', dark ? '#10131f' : '#fff'); }
+  const mt = document.querySelector('meta[name=theme-color]'); if (mt) mt.content = t.pl;
+  const sub = document.querySelector('.brand small'); if (sub) sub.textContent = t.s ? 'ติวเข้าวิศวะ · ' + t.s : 'ติวเข้าวิศวะ';
+}
+function setTheme(id) { store.set('theme', id); applyTheme(); }
+function setScheme(s) { store.set('scheme', s); applyTheme(); }
+function themeSheet(open) {
+  let el = $('#themesheet'); if (el) el.remove(); if (!open) return;
+  const cur = store.get('theme', 'sixent'), sc = store.get('scheme', 'auto');
+  const sw = t => `<button class="swatch ${cur === t.id ? 'on' : ''}" data-a="themePick" data-v="${t.id}" style="--s1:${t.g[0]};--s2:${t.g[1]};--s3:${t.g[2]}"><i></i><span><b>${esc(t.s || 'SIXENT')}</b><small>${esc(t.c)}</small></span>${cur === t.id ? '<em>✓</em>' : ''}</button>`;
+  el = document.createElement('div'); el.id = 'themesheet'; el.className = 'omr';
+  el.setAttribute('data-a', 'themeClose');
+  el.innerHTML = `<div><div class="row between"><h2 style="margin:0">🎨 ธีมสีตามมหาวิทยาลัย</h2><button data-a="themeClose">ปิด</button></div>
+    <p class="mute" style="margin:6px 0">เลือกสีของมหาวิทยาลัยวิศวะที่อยากเข้า — แปดเสือวิศวะ</p>
+    <div class="swgrid">${THEMES.filter(t => t.id === 'sixent' || t.e8).map(sw).join('')}</div>
+    <p class="mute" style="margin:10px 0 4px">มหาวิทยาลัยอื่นที่มีคณะวิศวะ</p><div class="swgrid">${THEMES.filter(t => t.id !== 'sixent' && !t.e8).map(sw).join('')}</div>
+    <p class="mute" style="margin:10px 0 4px">โหมดหน้าจอ</p><div class="chips">${[['auto', 'อัตโนมัติ'], ['light', '☀ สว่าง'], ['dark', '🌙 มืด']].map(([k, v]) => `<button class="chip ${sc === k ? 'on' : ''}" data-a="schemePick" data-v="${k}">${v}</button>`).join('')}</div>
+    <p class="mute" style="font-size:12px">ชื่อสีอ้างอิงสีประจำมหาวิทยาลัยจาก Wikipedia เฉดที่แสดงเป็นค่าโดยประมาณ ไม่ใช่รหัสสีทางการ</p></div>`;
+  document.body.appendChild(el);
+}
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change', applyTheme);
+applyTheme();
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => { });
 render();
