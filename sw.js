@@ -1,7 +1,7 @@
 // Service worker: เก็บไฟล์แอปไว้ใช้ออฟไลน์ (เปลี่ยน VERSION เมื่อแก้ไฟล์เพื่อบังคับอัปเดต)
-const VERSION = 'sixent-v8';
+const VERSION = 'sixent-v11';
 const FILES = ['./', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest',
-  'data/themes.js', 'data/thwiki.js', 'data/daily.js', 'data/proofs.js', 'data/meta.js', 'data/tcas.js', 'data/lessons.js', 'data/figs.js', 'data/q_tpat3.js', 'data/q_spatial.js', 'data/q_tgat.js', 'data/q_alevel.js', 'data/slides.js', 'data/q_num.js', 'data/course.js', 'data/course_phy.js', 'data/course_chem.js', 'data/course_math.js', 'data/course_tpat3.js', 'data/course_tgat.js', 'data/course_calc.js', 'data/q_calc.js', 'data/ach.js',
+  'data/themes.js', 'data/thwiki.js', 'data/daily.js', 'data/proofs.js', 'data/meta.js', 'data/tcas.js', 'data/lessons.js', 'data/figs.js', 'data/q_tpat3.js', 'data/q_spatial.js', 'data/q_tgat.js', 'data/q_alevel.js', 'data/slides.js', 'data/q_num.js', 'data/course.js', 'data/course_phy.js', 'data/course_chem.js', 'data/course_math.js', 'data/course_tpat3.js', 'data/course_tgat.js', 'data/course_calc.js', 'data/art.js', 'data/read_figs.js', 'data/read_figs_p2.js', 'data/read_figs_c.js', 'data/read_figs_m.js', 'data/read_figs_t.js', 'data/read_figs_calc.js', 'data/read_kit.js', 'data/read_phy.js', 'data/read_phy2.js', 'data/read_phy3.js', 'data/read_chem.js', 'data/read_math.js', 'data/read_t3.js', 'data/read_tgat.js', 'data/read_calc.js', 'data/q_calc.js', 'data/ach.js',
   'sim/ui.js', 'sim/physics.js', 'sim/math.js', 'sim/science.js', 'sim/spatial.js',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });

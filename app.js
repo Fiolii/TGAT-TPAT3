@@ -9,8 +9,8 @@ const uni = h => String(h ?? '')
   .replace(/[₀-₉₊₋₌₍₎ₐₑₒₓₕₖₗₘₙₚₛₜᵢⱼ]+/g, m => '<sub>' + [...m].map(c => SUBM[c] || c).join('') + '</sub>')
   .replace(/[⁰¹²³⁴-⁹⁺⁻⁼⁽⁾ⁿⁱ]+/g, m => '<sup>' + [...m].map(c => SUPM[c] || c).join('') + '</sup>');
 const rt = s => uni(esc(s).replace(/\\_/g, '\u0001')
-  .replace(/([A-Za-z0-9\u0370-\u03ff\)\]])_\{([^}]+)\}/g, '$1<sub>$2</sub>')
-  .replace(/([A-Za-z0-9\u0370-\u03ff\)\]])_([a-z]+|[0-9]+|[A-Z]{1,2}|[\u0E00-\u0E7F]+)/g, '$1<sub>$2</sub>')
+  .replace(/([A-Za-z0-9\u0370-\u03ff\)\]°%])_\{([^}]+)\}/g, '$1<sub>$2</sub>')
+  .replace(/([A-Za-z0-9\u0370-\u03ff\)\]°%])_([a-z]+|[0-9]+|[A-Z]{1,2}|[\u0E00-\u0E7F]+)/g, '$1<sub>$2</sub>')
   .replace(/\^[{(]([^})]+)[})]/g, '<sup>$1</sup>')
   .replace(/\^(-?[0-9A-Za-z\u0370-\u03ff]+)/g, '<sup>$1</sup>')).replace(/\u0001/g, '_');
 const nl = s => rt(s).replace(/\n/g, '<br>');
@@ -477,6 +477,9 @@ function slideHtml(sl, k) {
   const l = lessonMeta(k), n = allQ().filter(q => q.topic === l.topic).length, fig = sl.svg ? `<div class="slfig">${typeof sl.svg === 'function' ? sl.svg() : sl.svg}</div>` : '';
   const note = sl.note ? `<div class="slnote">💡 ${rt(sl.note)}</div>` : '';
   if (sl.type === 'cover') return `<div class="cover"><div class="big">${l.group === 'tpat3' ? '⚙️' : l.group === 'tgat' ? '🧠' : '🔬'}</div><h1>${rt(sl.h)}</h1><p>${rt(sl.intro)}</p><div class="mute">กด ▶ หรือปัดซ้ายเพื่อเริ่ม · มี ${LS.slides.filter(x => x.type === 'sim').length} ซิมูเลเตอร์ให้ลองปรับค่า</div></div>`;
+  if (sl.type === 'read') return readHtml(sl);
+  if (sl.type === 'board') return boardHtml(sl);
+  if (sl.type === 'danger') return dangerHtml(sl);
   if (sl.type === 'divider') return `<div class="cover"><div class="big">📐</div><h1>${rt(sl.h)}</h1></div>`;
   if (sl.type === 'sim') return `<h2>🎛 ${rt(sl.h)}</h2><div id="simhost"></div>${note}`;
   if (sl.type === 'end') return `<h2>ไปต่อ</h2><div class="row" style="margin:10px 0"><button class="pri" data-a="practiceTopic" data-v="${esc(l.topic)}" ${n ? '' : 'disabled'}>ฝึกหัวข้อนี้ (${n} ข้อ)</button></div>${refsHtml(l.refs)}`;
@@ -491,13 +494,13 @@ function lessonView(k) {
   const dots = n <= 22 ? LS.slides.map((s, i) => `<i class="d ${i === LS.i ? 'on' : ''} ${s.type === 'sim' ? 'sm' : ''}" data-a="slideGo" data-v="${i}"></i>`).join('') : '';
   return `<div class="row between"><button data-a="lessonBack">← รายการบทเรียน</button><span class="mute">${LS.i + 1} / ${n}</span></div>
   <div class="deck"><div class="prog"><i style="width:${(LS.i + 1) / n * 100}%"></i></div>
-  <article class="slide ${dir}">${slideHtml(sl, k)}</article>
+  <article class="slide ${['read', 'board', 'danger'].includes(sl.type) ? 'read rd-' + sl.type + ' ' : ''}${dir}">${slideHtml(sl, k)}</article>
   <div class="deckfoot"><button data-a="slidePrev" ${LS.i === 0 ? 'disabled' : ''} aria-label="สไลด์ก่อนหน้า">◀</button><div class="dots">${dots}</div><button class="pri" data-a="slideNext" ${LS.i === n - 1 ? 'disabled' : ''} aria-label="สไลด์ถัดไป">▶</button></div></div>`;
 }
 
 /* ====================== actions ====================== */
 const ACT = {
-  ...ADMIN_ACT, ...ACH_ACT,
+  ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT,
   setDate() { examDate = val('ed'); save(); render(true); },
   setExam(v) { examDate = v; save(); if ((location.hash || '#/') === '#/') render(true); else alert('ตั้งวันนับถอยหลังเป็น ' + v + ' แล้ว (ดูที่หน้าแรก)'); },
   themeOpen() { themeSheet(true); }, themeClose() { themeSheet(false); },
@@ -549,9 +552,9 @@ const ACT = {
   nickEdit() { const n = prompt('ชื่อ/ชื่อเล่นที่จะปักบนอกเสื้อช็อป (ไม่เกิน 8 ตัวอักษร)', store.get('nick', 'น้องวิศวะ')); if (n !== null && n.trim()) { store.set('nick', n.trim().slice(0, 8)); render(true); } },
   openLesson(v) { if (String(v).startsWith('ch:')) markRead(String(v).slice(3)); killSim(); LS = null; libTab = 'lessons'; libOpen = v; if (location.hash !== '#/library') location.hash = '#/library'; else render(); },
   lessonBack() { killSim(); libOpen = ''; LS = null; render(); },
-  slideNext() { if (LS && LS.i < LS.slides.length - 1) { LS.i++; LS.dir = 'next'; render(true); } },
-  slidePrev() { if (LS && LS.i > 0) { LS.i--; LS.dir = 'prev'; render(true); } },
-  slideGo(v) { if (LS) { LS.dir = +v > LS.i ? 'next' : 'prev'; LS.i = +v; render(true); } },
+  slideNext() { if (LS && LS.i < LS.slides.length - 1) { LS.i++; LS.dir = 'next'; render(true); window.scrollTo(0, 0); } },
+  slidePrev() { if (LS && LS.i > 0) { LS.i--; LS.dir = 'prev'; render(true); window.scrollTo(0, 0); } },
+  slideGo(v) { if (LS) { LS.dir = +v > LS.i ? 'next' : 'prev'; LS.i = +v; render(true); window.scrollTo(0, 0); } },
   addRec() { const p = +val('rp'), t = +val('rt'); if (!val('ry') || !t) return; records.push({ y: val('ry'), s: val('rs'), p, t, n: val('rn') }); save(); render(true); },
   delRec(v) { records.splice(+v, 1); save(); render(true); },
   doImport() {
