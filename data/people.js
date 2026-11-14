@@ -138,7 +138,19 @@ function personSvg(id) {
   if (k === 'robe') collar = `<path d="M66 145 L85 180 L104 145z" fill="#f2e8d8"/><path d="M66 145 L85 180 L104 145" fill="none" stroke="${dk}" stroke-width="2"/>`;
   if (k === 'dress') collar = `<path d="M60 150 Q85 140 110 150 L106 166 Q85 160 64 166z" fill="#f6f2ea" stroke="#d9d4c8"/><circle cx="85" cy="166" r="3" fill="#9c7a4a"/>`;
   if (k === 'wrap') collar = `<path d="M66 145 L96 206 M104 145 L74 206" fill="none" stroke="#e8e8ea" stroke-width="6"/>`;
+  // ชุดสำหรับภาพบุคคลสำคัญของมหาวิทยาลัย: ราชปะแตน / เครื่องแบบ / เสื้อเชิ้ต / ครุย
+  if (k === 'raj') { body = `<path d="M26,210 Q26,150 85,142 Q144,150 144,210z" fill="#f3efe6"/>`; collar = `<rect x="68" y="140" width="34" height="14" rx="5" fill="#f3efe6" stroke="${dk}"/>` + [162, 176, 190].map(y => `<circle cx="85" cy="${y}" r="3" fill="#d9a93a" stroke="#a87a1c" stroke-width=".8"/>`).join('') + `<path d="M85 154V206" stroke="${dk}" stroke-width="1.4"/><circle cx="112" cy="170" r="5" fill="#c8283a" stroke="#d9a93a" stroke-width="1.5"/>`; }
+  if (k === 'uniform') collar = `<path d="M62 146 L85 168 L108 146 L102 142 L85 156 L68 142z" fill="#e9e4d4"/><rect x="40" y="152" width="20" height="7" rx="2" fill="#d9a93a" transform="rotate(-14 50 155)"/><rect x="110" y="152" width="20" height="7" rx="2" fill="#d9a93a" transform="rotate(14 120 155)"/><g fill="#c8283a" stroke="#d9a93a" stroke-width="1"><rect x="98" y="172" width="6" height="9"/><rect x="106" y="172" width="6" height="9"/><rect x="114" y="172" width="6" height="9"/></g>`;
+  if (k === 'shirt') collar = `<path d="M64 143 L85 170 L106 143 L98 140 L85 156 L72 140z" fill="#fbfbf8" stroke="#d9d4c8"/><path d="M85 170V210" stroke="#d9d4c8" stroke-width="1.5"/>`;
+  if (k === 'academic') collar = `<path d="M66 144 L58 210 M104 144 L112 210" stroke="${a.tc || '#d9a93a'}" stroke-width="9" fill="none"/><path d="M68 143 L85 160 L102 143" fill="#f6f2ea" stroke="#d9d4c8"/>`;
   const arm = `<g class="tch-arm"><path d="M122,158 Q150,150 152,112" style="fill:none;stroke:${cloth === '#efe6d0' ? '#e3d6b8' : cloth};stroke-width:15;stroke-linecap:round"/><circle cx="152" cy="108" r="9" style="fill:${skin}"/><line x1="152" y1="108" x2="160" y2="28" style="stroke:#b07a3c;stroke-width:4;stroke-linecap:round"/></g>`;
   const neck = `<rect x="73" y="124" width="24" height="26" rx="8" fill="${skin}" style="filter:brightness(.93)"/>`;
   return `<svg class="tchsvg" viewBox="0 0 170 210" role="img" aria-label="${esc(P.n)} กำลังสอน">${arm}${back}${body}${collar}${neck}${ears}${head}${front}${hat}${brow}${eyes}${glasses}${nose}${blush}${beard}${stache}${mouth}</svg>`;
+}
+
+/* ภาพครึ่งตัวสำหรับ "ทำเนียบบุคคลสำคัญ" ของแต่ละมหาวิทยาลัย — ใช้ตัวการ์ตูนเดียวกับครู แต่ไม่มีแขนและไม้ชี้ (ภาพวาดตามจินตนาการ ไม่ใช่ภาพเหมือนจริง) */
+function personBust(P) {
+  PEOPLE._tmp = { n: P.n, a: P.a };
+  const s = personSvg('_tmp'); delete PEOPLE._tmp;
+  return s.replace(/<g class="tch-arm">.*?<\/g>/, '').replace('class="tchsvg"', 'class="bust"').replace('viewBox="0 0 170 210"', 'viewBox="14 18 142 168"').replace(' กำลังสอน', '');
 }

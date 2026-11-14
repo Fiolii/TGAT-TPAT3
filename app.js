@@ -128,7 +128,7 @@ setInterval(tick, 500);
 let E = null;      // exam state
 const X = { mode: 'practice', group: '', subject: '', topic: '', src: 'all', n: 10, shuffle: true };
 let libTab = 'lessons', libOpen = '';
-const routes = { '': viewHome, exam: viewExam, stats: viewStats, timer: viewTimer, library: viewLibrary };
+const routes = { '': viewHome, exam: viewExam, stats: viewStats, timer: viewTimer, library: viewLibrary, me: viewMe };
 function render(keepScroll) {
   const r = (location.hash.replace(/^#\/?/, '') || '').split('/')[0];
   document.querySelectorAll('[data-r]').forEach(a => a.classList.toggle('on', a.dataset.r === r));
@@ -314,6 +314,7 @@ function submitExam(auto) {
   });
   E.score = score; E.secs = Math.min((Date.now() - E.t0) / 1000, E.mins * 60); E.done = true; E.auto = !!auto; E.omr = false;
   if (mock) mocks.push({ ts: Date.now(), set: E.label, score, total: n, secs: Math.round(E.secs) });
+  E.coin = typeof coinAward === 'function' ? coinAward(E) : null;
   save(); render();
   if (pct(score, n) >= 70) setTimeout(confetti, 400);
 }
@@ -325,6 +326,7 @@ function examResult() {
   return `<h1>ผลการสอบ ${E.auto ? '<span class="tag warn">หมดเวลา ส่งอัตโนมัติ</span>' : ''}</h1>
   <div class="card ctr">${ring(0, 170, E.score + '/' + n, p + '%')}<p style="margin:10px 0 2px"><b>${msg}</b></p>${E.daily ? `<p class="mute" style="margin:2px 0">ภารกิจรายวัน: ทำแล้ว ${Object.keys(getDaily().results).length}/${getDaily().ids.length} ข้อ${missionStreak() ? ' · 🔥 ติดต่อกัน ' + missionStreak() + ' วัน' : ''}</p>` : ''}${quoteHtml(quoteOfDay(E.score))}<div class="mute">ใช้เวลา ${fmt(E.secs)} ${E.mode === 'mock' ? 'จาก ' + E.mins + ' นาที' : ''} · ตอบแล้ว ${Object.keys(E.ans).length}/${n} ข้อ</div>
     <div class="row" style="justify-content:center;margin-top:12px"><button class="pri" data-a="resetE">ทำชุดใหม่</button><a class="btn" href="#/stats">ดูสถิติ</a></div></div>
+  ${E.coin ? coinCard(E.coin) : ''}
   <div class="card"><h2>รายหัวข้อ</h2><div class="tbl"><table>${Object.entries(by).map(([t, v]) => `<tr><td>${esc(t)}</td><td>${v.ok}/${v.n}</td><td style="width:40%"><div class="bar ${pct(v.ok, v.n) >= 60 ? 'g' : 'r'}"><i style="width:${pct(v.ok, v.n)}%"></i></div></td></tr>`).join('')}</table></div></div>
   <div class="card"><h2>ทบทวนทีละข้อ</h2>${E.list.map((q, i) => { const mine = E.ans[i], ok = isRight(q, mine); return `<div class="rv"><div class="row between"><b>ข้อ ${i + 1}</b><span class="tag ${ok ? 'ok' : 'bad'}">${mine == null ? 'ไม่ได้ตอบ' : ok ? 'ถูก' : 'ผิด'}</span></div>
     ${q.passage ? `<details><summary>ดูบทอ่าน/ข้อมูล</summary><div class="passage">${nl(q.passage)}</div></details>` : ''}<div style="margin:4px 0">${nl(q.q)}</div>${q.fig ? q.fig : ''}
@@ -503,7 +505,7 @@ function lessonView(k) {
 
 /* ====================== actions ====================== */
 const ACT = {
-  ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT,
+  ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT, ...CHAR_ACT,
   setDate() { examDate = val('ed'); save(); render(true); },
   setExam(v) { examDate = v; save(); if ((location.hash || '#/') === '#/') render(true); else alert('ตั้งวันนับถอยหลังเป็น ' + v + ' แล้ว (ดูที่หน้าแรก)'); },
   themeOpen() { uniPage(null); themeSheet(true); }, themeClose() { themeSheet(false); },
@@ -576,7 +578,7 @@ const ACT = {
   },
   clearImport() { if (confirm('ลบโจทย์ที่นำเข้าทั้งหมด?')) { custom = []; save(); render(true); } },
   exportData() {
-    const blob = new Blob([JSON.stringify({ v: 2, attempts, studies, mocks, records, custom, marks, examDate, goalMin }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ v: 2, attempts, studies, mocks, records, custom, marks, examDate, goalMin, av: store.get('av', {}), own: store.get('own', {}), coins: store.get('coins', null), coinBonus: store.get('coinBonus', 0) }, null, 2)], { type: 'application/json' });
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'sixent-data.json'; a.click();
   },
   resetData() { if (confirm('ล้างข้อมูลสถิติและบันทึกทั้งหมด? ย้อนกลับไม่ได้')) { attempts = []; studies = []; mocks = []; records = []; custom = []; marks = []; examDate = ''; save(); render(true); } },
@@ -590,6 +592,7 @@ document.addEventListener('change', e => {
       const d = JSON.parse(rd.result); if (!confirm('นำเข้าจะแทนที่ข้อมูลปัจจุบันบนเครื่องนี้ ต้องการต่อไหม?')) return;
       const arr = k => Array.isArray(d[k]) ? d[k] : [];
       attempts = arr('attempts'); studies = arr('studies'); mocks = arr('mocks'); records = arr('records'); custom = arr('custom').filter(q => q && q.q && Array.isArray(q.c)).map(q => ({ ...q, fig: undefined })); marks = arr('marks'); examDate = d.examDate || ''; goalMin = d.goalMin || 60;
+      if (d.av && typeof d.av === 'object') store.set('av', d.av); if (d.own && typeof d.own === 'object') store.set('own', d.own); if (d.coins && typeof d.coins === 'object') store.set('coins', d.coins); if (typeof d.coinBonus === 'number') store.set('coinBonus', d.coinBonus);
       save(); render(true);
     } catch { alert('ไฟล์ไม่ถูกต้อง'); }
   };

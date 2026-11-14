@@ -114,10 +114,12 @@ function shirtSvgBase(name) {
 }
 function shirtCard() {
   const si = shirtInfo(), nm = store.get('nick', 'น้องวิศวะ'), pct_ = si.next ? Math.min(100, Math.round((si.xp - TITLES[TITLES.findIndex(t => t[1] === si.title)][0]) / (si.next[0] - TITLES[TITLES.findIndex(t => t[1] === si.title)][0]) * 100)) : 100;
-  return `<div class="card shirtcard"><button class="shirtbtn" data-a="nickEdit" aria-label="แก้ชื่อบนเสื้อช็อป" title="แตะเพื่อแก้ชื่อบนอก">${shirtSvg(nm)}</button>
-    <div class="shirtinfo"><div class="mute">เสื้อช็อป${(THEMES.find(t => t.id === curThemeId()) || {}).s ? ' · ' + esc(THEMES.find(t => t.id === curThemeId()).s) : 'ของฉัน'}</div><b style="font-size:19px">${esc(nm)}</b> <span class="tag">${si.title}</span>
+  const av = typeof avatarSvg === 'function';
+  return `<div class="card shirtcard">${av ? `<a class="avmini" href="#/me" data-a="avOpen" data-v="dress" aria-label="ตัวละครของฉัน — แตะเพื่อแต่งตัว">${avatarSvg({}, { view: 'half' })}</a>` : `<button class="shirtbtn" data-a="nickEdit" aria-label="แก้ชื่อบนเสื้อช็อป" title="แตะเพื่อแก้ชื่อบนอก">${shirtSvg(nm)}</button>`}
+    <div class="shirtinfo"><div class="mute">เสื้อช็อป${(THEMES.find(t => t.id === curThemeId()) || {}).s ? ' · ' + esc(THEMES.find(t => t.id === curThemeId()).s) : 'ของฉัน'}</div><b style="font-size:19px">${esc(nm)}</b>${av ? ' <button class="nickbtn" data-a="nickEdit" aria-label="แก้ชื่อบนเสื้อช็อป">✎</button>' : ''} <span class="tag">${si.title}</span>${av ? ' ' + coinChip() : ''}
     ${curThemeId() !== 'sixent' ? `<div class="unimotto">“${esc(uniOf(curThemeId()).motto)}”</div>` : ''}
     <div class="bar" style="margin:8px 0 4px"><i style="width:${pct_}%"></i></div><div class="mute" style="font-size:12px">${si.next ? 'อีก ' + (si.next[0] - si.xp) + ' แต้ม (ข้อที่ทำ + เวลาอ่าน) → ' + si.next[1] : 'ระดับสูงสุดแล้ว 🎓'}</div>
+    ${av ? `<div class="row mini"><a class="btn" href="#/me" data-a="avOpen" data-v="dress">👕 แต่งตัว</a><a class="btn" href="#/me" data-a="avOpen" data-v="shop">🛍 ร้านค้า</a></div>` : ''}
     <div class="patches">${si.patches.length ? si.patches.map(p => `<span title="${esc(p[1])}">${p[0]}</span>`).join('') : '<span class="mute" style="font-size:12px">ทำโจทย์เพื่อสะสมแพทช์ติดเสื้อ</span>'}</div></div></div>`;
 }
 let logoTaps = 0, logoTimer = 0;
@@ -141,6 +143,9 @@ function adminSheet(open) {
     <div class="chips">${TITLES.map((t, i) => `<button class="chip ${si.title === t[1] ? 'on' : ''}" data-a="adminLevel" data-v="${i}">${t[1]}</button>`).join('')}</div>
     <p class="mute" style="margin:10px 0 4px">ปรับแต้ม</p>
     <div class="chips"><button class="chip" data-a="adminXp" data-v="-50">−50</button><button class="chip" data-a="adminXp" data-v="50">+50</button><button class="chip" data-a="adminXp" data-v="200">+200</button><button class="chip" data-a="adminXp" data-v="0">รีเซ็ตโบนัส</button></div>
+    <p class="mute" style="margin:10px 0 4px">เหรียญและเทศกาล (ตอนนี้ ${typeof coinBal === 'function' ? coinBal() : 0} เหรียญ)</p>
+    <div class="chips"><button class="chip" data-a="adminCoin" data-v="100">+100 🪙</button><button class="chip" data-a="adminCoin" data-v="1000">+1000 🪙</button><button class="chip" data-a="adminCoin" data-v="0">รีเซ็ตโบนัส</button></div>
+    <div class="chips"><button class="chip ${store.get('fakeNow', 0) ? '' : 'on'}" data-a="adminSeason" data-v="">วันที่จริง</button>${typeof SEASONS !== 'undefined' ? SEASONS.map(s => `<button class="chip" data-a="adminSeason" data-v="${s.id}">${s.ic} ${s.n}</button>`).join('') : ''}</div>
     <p class="mute" style="margin:10px 0 4px">แพทช์และภารกิจ</p>
     <div class="chips"><button class="chip ${store.get('allPatches', false) ? 'on' : ''}" data-a="adminPatches">🧷 ปลดล็อกแพทช์ทั้งหมด</button><button class="chip" data-a="adminMission" data-v="done">ทำภารกิจวันนี้ให้ครบ (${done}/${d.ids.length})</button><button class="chip" data-a="adminMission" data-v="reset">รีเซ็ตภารกิจวันนี้</button></div>
     <p class="mute" style="margin:10px 0 4px">อันตราย</p>
@@ -154,6 +159,8 @@ const ADMIN_ACT = {
   adminLock() { adminOk = false; adminSheet(false); toast('ออกจากโหมดแอดมินแล้ว'); },
   adminLevel(v) { store.set('xpBonus', TITLES[+v][0] - xpBase()); render(true); adminSheet(true); if (+v > 0) confetti(); },
   adminXp(v) { store.set('xpBonus', +v === 0 ? 0 : store.get('xpBonus', 0) + +v); render(true); adminSheet(true); },
+  adminCoin(v) { store.set('coinBonus', +v === 0 ? 0 : store.get('coinBonus', 0) + +v); render(true); adminSheet(true); },
+  adminSeason(v) { if (!v) store.set('fakeNow', 0); else { const s = SEASONS.find(x => x.id === v), y = new Date().getFullYear(); store.set('fakeNow', new Date(y, s.from[0] - 1, s.from[1] + 3, 12).getTime()); } render(true); adminSheet(true); toast(v ? 'จำลองวันที่ช่วงเทศกาลแล้ว (ของลิมิเต็ดเปิดขาย)' : 'กลับไปใช้วันที่จริง'); },
   adminPatches() { store.set('allPatches', !store.get('allPatches', false)); render(true); adminSheet(true); },
   adminMission(v) { const d = getDaily(); d.results = {}; if (v === 'done') d.ids.forEach(id => d.results[id] = true); store.set('daily', d); render(true); adminSheet(true); },
   adminWipe() { if (!confirm('ลบข้อมูลทั้งหมดของแอปในเครื่องนี้ (สถิติ, ภารกิจ, ธีม, ชื่อเสื้อ)? ย้อนกลับไม่ได้')) return; Object.keys(localStorage).filter(k => k.startsWith('sx_')).forEach(k => localStorage.removeItem(k)); location.reload(); },

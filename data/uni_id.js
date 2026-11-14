@@ -53,9 +53,10 @@ function uniProbe(id) {
 }
 
 /* ---------- เสื้อช็อปแบบวาดเอง ตามอัตลักษณ์ของแต่ละมหาวิทยาลัย ---------- */
-function uniShirt(name) {
-  const id = curThemeId(), u = uniOf(id), S = u.shirt, nm = esc(String(name || 'น้องวิศวะ').slice(0, 8)), sid = ++UEC;
-  if (UNIIMG.shirt[id]) return `<div class="shirtimg"><img src="${UNIIMG.shirt[id]}" alt="เสื้อช็อป ${esc(id)}"><span class="shirtnm">${nm}</span></div>`;
+function uniShirt(name, uid, opts) {
+  opts = opts || {};
+  const id = uid || curThemeId(), u = uniOf(id), S = Object.assign({}, u.shirt, opts.gold ? { t1: '#f6d36b', t2: '#f6d36b', ring: '#f6d36b', btn: '#f0cd6a', stitch: 'rgba(246,211,107,.8)' } : {}), nm = esc(String(name || 'น้องวิศวะ').slice(0, 8)), sid = ++UEC;
+  if (!opts.paper && UNIIMG.shirt[id]) return `<div class="shirtimg"><img src="${UNIIMG.shirt[id]}" alt="เสื้อช็อป ${esc(id)}"><span class="shirtnm">${nm}</span></div>`;
   /* เสื้อช็อปวิศวะทรงเชิ้ตคอเปิด (คอแคมป์) — สี ตำแหน่งปัก กระเป๋า และสีด้ายอ้างอิงจากรูปเสื้อจริงของแต่ละมหาวิทยาลัย (ภาพที่วาดเอง ไม่ใช่รูปถ่าย) */
   const base = S.base || 'var(--pri)', hx = /^#[0-9a-f]{6}$/i.test(S.base || '') ? parseInt(S.base.slice(1), 16) : 0x4f46e5;
   const lum = (0.299 * (hx >> 16) + 0.587 * ((hx >> 8) & 255) + 0.114 * (hx & 255)) / 255, dk = lum < 0.42;
@@ -76,13 +77,14 @@ function uniShirt(name) {
   const chestEmb = S.emb === 'chest' ? emb(43, 47, 12, 24)
     : S.emb === 'cmu' ? `<circle cx="43" cy="55" r="7" fill="#141b34" stroke="#c9d3ea" stroke-width=".8"/><circle cx="43" cy="55" r="5.600" fill="none" stroke="#c9d3ea" stroke-width=".3" stroke-dasharray="1 .7"/>${tx(43, 56.600, 'CMU', 4.400, '#e8edf7', 8.500)}` : '';
   const sleeve = S.sleeve ? `<g transform="rotate(-22 12 42)"><circle cx="12" cy="42" r="4.800" fill="rgba(0,0,0,.22)"/>${uniEmblem(id, 8, { at: [8, 38] })}</g>` : '';
+  const goldTrim = `<g fill="none" stroke="#f6d36b" stroke-linejoin="round"><path d="M31 14.500L46 5L64 33L60 46ZM89 14.500L74 5L56 33L60 46Z" stroke-width="1.200"/><path d="M4 50L24 60M116 50L96 60" stroke-width="2"/><path d="M60 46V118" stroke-width=".9" stroke-dasharray="2 1.500"/></g><g fill="#fff3c4">${[[20, 30], [100, 34], [44, 100], [84, 104], [60, 8]].map(p => `<path d="M${p[0]} ${p[1] - 3}L${p[0] + 1} ${p[1] - 1}L${p[0] + 3} ${p[1]}L${p[0] + 1} ${p[1] + 1}L${p[0]} ${p[1] + 3}L${p[0] - 1} ${p[1] + 1}L${p[0] - 3} ${p[1]}L${p[0] - 1} ${p[1] - 1}Z"/>`).join('')}</g>`;
   const sheen = dk ? '.035' : '.1';
   return `<svg class="shirt" viewBox="0 0 120 130" role="img" aria-label="เสื้อช็อปของ ${nm} (${esc(u.symbol || 'SIXENT')})">
     <defs><linearGradient id="sh${sid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".36"/></linearGradient>
       <linearGradient id="sv${sid}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".26"/><stop offset=".22" stop-color="#000" stop-opacity="0"/><stop offset=".78" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient>
       <pattern id="sw${sid}" width="3" height="3" patternUnits="userSpaceOnUse"><path d="M0 3L3 0" stroke="rgba(255,255,255,${sheen})" stroke-width=".6"/><path d="M0 0L3 3" stroke="rgba(0,0,0,.05)" stroke-width=".5"/></pattern>
       <filter id="sb${sid}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.500"/></filter></defs>
-    <ellipse cx="60" cy="125" rx="40" ry="3.500" fill="rgba(0,0,0,.16)"/>
+    ${opts.paper ? '' : '<ellipse cx="60" cy="125" rx="40" ry="3.500" fill="rgba(0,0,0,.16)"/>'}
     <path d="${bodyP}" fill="${base}" stroke="rgba(0,0,0,.34)" stroke-width="1.500" stroke-linejoin="round"/>
     <path d="${bodyP}" fill="url(#sw${sid})"/><path d="${bodyP}" fill="url(#sv${sid})"/><path d="${bodyP}" fill="url(#sh${sid})"/>
     <g filter="url(#sb${sid})"><path d="M30 50L22 62L10 57L20 38z" fill="rgba(0,0,0,.2)"/><path d="M90 50L98 62L110 57L100 38z" fill="rgba(0,0,0,.24)"/>
@@ -95,7 +97,7 @@ function uniShirt(name) {
     <path d="M31 14.500L46 5L64 33L60 46Z M89 14.500L74 5L56 33L60 46Z" fill="rgba(255,255,255,${dk ? '.09' : '.12'})"/>
     <path d="M35 15L60 41M85 15L60 41" fill="none" stroke="${st}" stroke-width=".5" stroke-dasharray="1.200 .8"/>
     <path d="M60 44V120" stroke="rgba(0,0,0,.28)" stroke-width="1"/>${[56, 69, 82, 95, 108].map(y => `<circle cx="60" cy="${y}" r="2.100" fill="${btn}" stroke="rgba(0,0,0,.4)" stroke-width=".5"/><circle cx="59.300" cy="${y - .7}" r=".6" fill="rgba(255,255,255,.55)"/>`).join('')}
-    ${low(S.low)}${pocket}${chestEmb}${sleeve}
+    ${low(S.low)}${pocket}${chestEmb}${sleeve}${opts.gold ? goldTrim : ''}
     <rect x="31" y="${nmY}" width="23" height="8.500" rx="2" fill="#fff" stroke="rgba(0,0,0,.25)"/><text x="42.500" y="${nmY + 6.200}" text-anchor="middle" font-size="5.400" font-weight="700" fill="#222">${nm}</text></svg>`;
 }
 
