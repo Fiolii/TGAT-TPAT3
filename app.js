@@ -138,6 +138,7 @@ function mountSim() {
 }
 window.addEventListener('hashchange', () => render());
 document.addEventListener('click', e => {
+  if (e.target.closest('.logo')) easterEgg(); // แตะโลโก้ 5 ครั้งติด มีของเล็ก ๆ
   const b = e.target.closest('[data-a]'); if (!b || b.disabled) return;
   if (b.classList.contains('omr') && e.target !== b) return; // คลิกในแผ่นกระดาษคำตอบไม่ปิด
   const fn = ACT[b.dataset.a]; if (fn) fn(b.dataset.v, b);
@@ -184,6 +185,8 @@ function viewHome() {
   const th = THEMES.find(x => x.id === store.get('theme', 'sixent')) || THEMES[0];
   return `<div class="card hero"><svg class="gearmark" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="10" stroke-dasharray="9.95"/><circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/></svg><h1>${th.s ? 'สู่วิศวะ ' + esc(th.s) + ' ⚙️' : 'พร้อมติวหรือยัง? 🚀'}</h1><p>เปิดข้อสอบทีละหน้าเหมือนสนามจริง ทบทวนจุดอ่อน และจับเวลาการอ่าน</p>
     <div class="row"><a class="btn w" href="#/exam">เริ่มทำข้อสอบ</a><a class="btn" href="#/timer">เริ่มจับเวลา</a></div></div>
+  ${dailyCard()}
+  <div class="grid2">${shirtCard()}<div class="card" style="display:grid;align-content:center"><div class="mute" style="margin-bottom:6px">คำคมประจำวัน</div>${quoteHtml()}</div></div>
   <div class="grid2">
     <div class="card"><h2>เป้าหมายวันนี้</h2><div class="row" style="gap:18px">${ring(mins / goalMin, 120, mins + ' น.', 'จาก ' + goalMin)}
       <div><div class="mute">streak</div><b style="font-size:24px">🔥 ${streak()} วัน</b><div style="margin-top:8px"><label><span>เป้าหมาย (นาที/วัน)</span><input type="number" min="5" value="${goalMin}" data-change="goal" style="width:90px"></label></div></div></div></div>
@@ -301,10 +304,10 @@ function submitExam(auto) {
 function examResult() {
   const n = E.list.length, p = pct(E.score, n), by = {};
   E.list.forEach((q, i) => { const t = by[q.topic] ||= { n: 0, ok: 0 }; t.n++; if (isRight(q, E.ans[i])) t.ok++; });
-  const msg = p >= 80 ? 'เยี่ยมมาก! 🎉' : p >= 60 ? 'ดีเลย ไปต่ออีกนิด 💪' : 'ไม่เป็นไร ทบทวนจุดที่พลาดแล้วลองใหม่ 📚';
+  const msg = p >= 80 ? 'เยี่ยมมาก! เสื้อช็อปตัวนี้คู่ควรแล้ว 🎉' : p >= 60 ? 'ดีเลย ค่า error เริ่มเข้าพิกัดเผื่อแล้ว 💪' : 'ไม่เป็นไร นี่คือต้นแบบรุ่นที่ 1 — ทบทวนจุดที่พลาดแล้วลองใหม่ 📚';
   setTimeout(() => { const f = document.querySelector('.ring-fg'); if (f) f.style.strokeDashoffset = 2 * Math.PI * 52 * (1 - p / 100); }, 60);
   return `<h1>ผลการสอบ ${E.auto ? '<span class="tag warn">หมดเวลา ส่งอัตโนมัติ</span>' : ''}</h1>
-  <div class="card ctr">${ring(0, 170, E.score + '/' + n, p + '%')}<p style="margin:10px 0 2px"><b>${msg}</b></p><div class="mute">ใช้เวลา ${fmt(E.secs)} ${E.mode === 'mock' ? 'จาก ' + E.mins + ' นาที' : ''} · ตอบแล้ว ${Object.keys(E.ans).length}/${n} ข้อ</div>
+  <div class="card ctr">${ring(0, 170, E.score + '/' + n, p + '%')}<p style="margin:10px 0 2px"><b>${msg}</b></p>${E.daily ? `<p class="mute" style="margin:2px 0">ภารกิจรายวัน: ทำแล้ว ${Object.keys(getDaily().results).length}/${getDaily().ids.length} ข้อ${missionStreak() ? ' · 🔥 ติดต่อกัน ' + missionStreak() + ' วัน' : ''}</p>` : ''}${quoteHtml(quoteOfDay(E.score))}<div class="mute">ใช้เวลา ${fmt(E.secs)} ${E.mode === 'mock' ? 'จาก ' + E.mins + ' นาที' : ''} · ตอบแล้ว ${Object.keys(E.ans).length}/${n} ข้อ</div>
     <div class="row" style="justify-content:center;margin-top:12px"><button class="pri" data-a="resetE">ทำชุดใหม่</button><a class="btn" href="#/stats">ดูสถิติ</a></div></div>
   <div class="card"><h2>รายหัวข้อ</h2><div class="tbl"><table>${Object.entries(by).map(([t, v]) => `<tr><td>${esc(t)}</td><td>${v.ok}/${v.n}</td><td style="width:40%"><div class="bar ${pct(v.ok, v.n) >= 60 ? 'g' : 'r'}"><i style="width:${pct(v.ok, v.n)}%"></i></div></td></tr>`).join('')}</table></div></div>
   <div class="card"><h2>ทบทวนทีละข้อ</h2>${E.list.map((q, i) => { const mine = E.ans[i], ok = isRight(q, mine); return `<div class="rv"><div class="row between"><b>ข้อ ${i + 1}</b><span class="tag ${ok ? 'ok' : 'bad'}">${mine == null ? 'ไม่ได้ตอบ' : ok ? 'ถูก' : 'ผิด'}</span></div>
@@ -407,6 +410,22 @@ function lessonMeta(k) {
   const l = LESSONS[k]; return { title: l.title, group: l.group, topic: k, refs: l.refs, intro: l.intro, l };
 }
 const hasLesson = k => !!(LESSONS[k] || chapterOf(k));
+/* ---------- แหล่งอ้างอิง: ภาษาไทยขึ้นก่อน ภาษาอังกฤษไว้อ่านเพิ่ม ---------- */
+const isThaiUrl = u => /\.th(\/|$)|\/\/(www\.)?mytcas\.com|trueplookpanya\.com|th\.wikipedia\.org|th\.khanacademy\.org|phet\.colorado\.edu\/th\//.test(u);
+function thaiAlt(r) {
+  let m = r.u.match(/en\.wikipedia\.org\/wiki\/(.+)$/);
+  if (m) { const th = typeof THWIKI !== 'undefined' && THWIKI[decodeURIComponent(m[1])]; if (th) return { t: 'วิกิพีเดียไทย: ' + th, u: 'https://th.wikipedia.org/wiki/' + encodeURIComponent(th.replace(/ /g, '_')) }; }
+  if (/phet\.colorado\.edu\/en\//.test(r.u)) return { t: r.t.replace(/^PhET:/, 'PhET (หน้าภาษาไทย):'), u: r.u.replace('/en/', '/th/') };
+  return null;
+}
+const THAI_BASE = [R('สสวท. Learning Space — สื่อการเรียนรู้ภาษาไทย', 'https://learningspace.ipst.ac.th/'), R('Khan Academy ภาษาไทย (วิดีโอพากย์/คำบรรยายไทย)', 'https://th.khanacademy.org/'), R('ทรูปลูกปัญญา — บทความและแนวข้อสอบภาษาไทย', 'https://www.trueplookpanya.com/')];
+function refsHtml(refs) {
+  const th = [], en = [], seen = new Set(), add = (arr, r) => { if (!seen.has(r.u)) { seen.add(r.u); arr.push(r); } };
+  refs.forEach(r => { const alt = thaiAlt(r); if (alt) add(th, alt); if (isThaiUrl(r.u)) add(th, r); else add(en, r); });
+  THAI_BASE.forEach(r => add(th, r));
+  const a = r => `<a href="${r.u}" target="_blank" rel="noopener">🔗 ${esc(r.t)}</a>`;
+  return `<h3>🇹🇭 แหล่งภาษาไทย</h3><div class="refs">${th.map(a).join('')}</div>${en.length ? `<h3>🌐 ภาษาอังกฤษ (ถ้าอยากอ่านเพิ่ม)</h3><div class="refs">${en.map(a).join('')}</div>` : ''}`;
+}
 function courseTree() {
   const groups = [['alevel', 'A-Level'], ['tpat3', 'TPAT3'], ['tgat', 'TGAT']];
   return groups.map(([g, name]) => {
@@ -446,7 +465,8 @@ function slideHtml(sl, k) {
   if (sl.type === 'cover') return `<div class="cover"><div class="big">${l.group === 'tpat3' ? '⚙️' : l.group === 'tgat' ? '🧠' : '🔬'}</div><h1>${esc(sl.h)}</h1><p>${esc(sl.intro)}</p><div class="mute">กด ▶ หรือปัดซ้ายเพื่อเริ่ม · มี ${LS.slides.filter(x => x.type === 'sim').length} ซิมูเลเตอร์ให้ลองปรับค่า</div></div>`;
   if (sl.type === 'divider') return `<div class="cover"><div class="big">📐</div><h1>${esc(sl.h)}</h1></div>`;
   if (sl.type === 'sim') return `<h2>🎛 ${esc(sl.h)}</h2><div id="simhost"></div>${note}`;
-  if (sl.type === 'end') return `<h2>ไปต่อ</h2><div class="row" style="margin:10px 0"><button class="pri" data-a="practiceTopic" data-v="${esc(l.topic)}" ${n ? '' : 'disabled'}>ฝึกหัวข้อนี้ (${n} ข้อ)</button></div><h3>แหล่งที่มา / อ่านต่อ</h3><div class="refs">${l.refs.map(r => `<a href="${r.u}" target="_blank" rel="noopener">🔗 ${esc(r.t)}</a>`).join('')}</div>`;
+  if (sl.type === 'end') return `<h2>ไปต่อ</h2><div class="row" style="margin:10px 0"><button class="pri" data-a="practiceTopic" data-v="${esc(l.topic)}" ${n ? '' : 'disabled'}>ฝึกหัวข้อนี้ (${n} ข้อ)</button></div>${refsHtml(l.refs)}`;
+  if (sl.type === 'proof') return `<h2>🧪 ที่มาของสูตร: ${esc(sl.h)}</h2><div class="proofbadge">ส่วนเสริมสำหรับคนที่อยากรู้ที่มา — ข้ามได้ ไม่กระทบการทำข้อสอบ</div><ol class="steps proof">${sl.steps.map((s, i) => `<li style="animation-delay:${.15 + i * .3}s">${esc(s)}</li>`).join('')}</ol>${sl.concl ? `<div class="exans" style="animation-delay:${.2 + sl.steps.length * .3}s">∴ <b>${esc(sl.concl)}</b></div>` : ''}${note}`;
   if (sl.type === 'formula') return `<h2>🧮 ${esc(sl.h)}</h2><div class="ftable">${sl.rows.map((r, i) => `<div class="frow" style="animation-delay:${.1 + i * .12}s"><code>${esc(r[0])}</code><span>${esc(r[1])}</span></div>`).join('')}</div>${note}`;
   if (sl.type === 'example') return `<h2>✏️ ${esc(sl.h)}</h2><div class="exq">${nl(sl.q)}</div>${fig}<ol class="steps">${sl.steps.map((s, i) => `<li style="animation-delay:${.15 + i * .3}s">${esc(s)}</li>`).join('')}</ol><div class="exans" style="animation-delay:${.2 + sl.steps.length * .3}s">✔ คำตอบ: <b>${esc(sl.ans)}</b></div>${note}`;
   return `<h2>${sl.cls === 'trap' ? '⚠️ ' : ''}${esc(sl.h)}</h2>${fig}<ul class="bul ${sl.cls || ''}">${(sl.bullets || []).map((b, i) => `<li style="animation-delay:${.12 + i * .2}s">${esc(b)}</li>`).join('')}</ul>${note}`;
@@ -478,12 +498,14 @@ const ACT = {
     if (E.rev[E.i]) return;
     leave(); E.ans[E.i] = i; E.rev[E.i] = true;
     attempts.push({ ts: Date.now(), qid: q.id, group: q.group, subject: q.subject, topic: q.topic, ok: i === q.a, secs: Math.round(E.qs[E.i] || 0), mode: 'practice' });
+    if (E.daily) dailyRecord(q.id, i === q.a);
     save(); render(true);
   },
   numSubmit() {
     const q = E.list[E.i], v = val('numans'); if (v === '' || E.rev[E.i]) return;
     leave(); E.ans[E.i] = v; E.rev[E.i] = true;
     attempts.push({ ts: Date.now(), qid: q.id, group: q.group, subject: q.subject, topic: q.topic, ok: isRight(q, v), secs: Math.round(E.qs[E.i] || 0), mode: 'practice' });
+    if (E.daily) dailyRecord(q.id, isRight(q, v));
     save(); render(true);
   },
   next() { goTo(E.i + 1, 'next'); }, prev() { goTo(E.i - 1, 'prev'); },
@@ -502,7 +524,15 @@ const ACT = {
   tpreset(v) { const [f, b] = v.split(',').map(Number); T.focusMin = f; T.breakMin = b; if (!T.running) { T.phase = 'focus'; T.remain = f * 60; } render(true); },
   tstart: tStart, tpause: tPause, treset() { tReset(false); }, tstop() { tReset(true); },
   ltab(v) { libTab = v; if (v !== 'lessons') libOpen = ''; render(true); },
-  openLesson(v) { killSim(); LS = null; libTab = 'lessons'; libOpen = v; if (location.hash !== '#/library') location.hash = '#/library'; else render(); },
+  dailyStart() {
+    const d = getDaily(), rest = d.ids.filter(id => !(id in d.results)).map(dqById).filter(Boolean);
+    if (!rest.length) { toast('ภารกิจวันนี้ครบแล้ว 🎉 พรุ่งนี้มีชุดใหม่ — หรือกด "ทำข้อสอบ" เพื่อฝึกเพิ่ม'); return; }
+    location.hash = '#/exam'; E = null; beginExam('practice', rest, 'ภารกิจวันนี้'); E.daily = true;
+  },
+  dailyRead() { const d = getDaily(); if (d.chapter) ACT.openLesson('ch:' + d.chapter); },
+  dailyGoalSet(v) { store.set('dailyGoal', +v); render(true); },
+  nickEdit() { const n = prompt('ชื่อ/ชื่อเล่นที่จะปักบนอกเสื้อช็อป (ไม่เกิน 8 ตัวอักษร)', store.get('nick', 'น้องวิศวะ')); if (n !== null && n.trim()) { store.set('nick', n.trim().slice(0, 8)); render(true); } },
+  openLesson(v) { if (String(v).startsWith('ch:')) markRead(String(v).slice(3)); killSim(); LS = null; libTab = 'lessons'; libOpen = v; if (location.hash !== '#/library') location.hash = '#/library'; else render(); },
   lessonBack() { killSim(); libOpen = ''; LS = null; render(); },
   slideNext() { if (LS && LS.i < LS.slides.length - 1) { LS.i++; LS.dir = 'next'; render(true); } },
   slidePrev() { if (LS && LS.i > 0) { LS.i--; LS.dir = 'prev'; render(true); } },

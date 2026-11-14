@@ -246,3 +246,24 @@ details{border-top:1px solid var(--line);padding:8px 0}summary{cursor:pointer;fo
 .exans{margin-top:10px;background:var(--okbg);color:var(--ink);border:1px solid var(--ok);border-radius:12px;padding:9px 14px;font-size:16px;opacity:0;animation:fadeUp .5s ease forwards}
 .bul.trap li{background:var(--warnbg)}.bul.trap li::before{background:var(--warn)}
 .chgrid{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));margin:8px 0}
+
+/* ---------- ภารกิจรายวัน / เสื้อช็อป / คำคม / พิสูจน์สูตร ---------- */
+.daily{border-left:5px solid var(--pri)}
+.mstep{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px dashed var(--line)}
+.mstep i{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-style:normal;font-weight:800;font-size:14px;color:#fff}
+.mstep.ok i{background:var(--ok);border-color:var(--ok)}
+.mstep span{flex:1;font-size:14.5px}.mstep.ok span{color:var(--mute);text-decoration:line-through;text-decoration-thickness:1px}
+.quote{position:relative;font-size:15.5px;font-style:italic;line-height:1.7;padding:2px 4px 2px 26px}
+.quote .qm{position:absolute;left:0;top:-8px;font-size:38px;color:var(--pri);opacity:.6;font-style:normal;line-height:1}
+.quote small{display:block;color:var(--mute);font-size:12px;font-style:normal;margin-top:4px}
+.shirtcard{display:flex;gap:14px;align-items:center;margin:0}
+.shirtbtn{flex:none;width:96px;height:104px;padding:0;border:0;background:transparent}
+.shirt{width:100%;height:100%;filter:drop-shadow(0 4px 6px rgba(0,0,0,.25));transition:transform .25s}
+.shirtbtn:hover .shirt{transform:rotate(-3deg) scale(1.05)}
+.shirtinfo{flex:1;min-width:0}
+.patches{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;font-size:20px}
+#toast{position:fixed;left:50%;bottom:90px;transform:translate(-50%,20px);max-width:88vw;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:14px;z-index:60;opacity:0;pointer-events:none;transition:.3s;font-size:14px;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.proofbadge{display:inline-block;background:var(--warnbg);border:1px dashed var(--warn);border-radius:999px;padding:3px 14px;font-size:12.5px;margin:0 0 10px}
+.steps.proof li::before{background:var(--warn);color:#1b1b1b}
+.steps.proof li{border-left:3px solid var(--warn);font-family:inherit}
