@@ -61,13 +61,17 @@ const ypPlan = () => { const d = todayKey(); return { date: d, items: planOf(d) 
 const ypPlanSave = p => planSet(p.date, p.items);
 function ypPrevPlan() { const m = plansAll(), t = todayKey(), ks = Object.keys(m).filter(k => k < t && m[k].length).sort(); return ks.length ? { date: ks[ks.length - 1], items: m[ks[ks.length - 1]] } : null; }
 const ypDone = (it, by) => !!it.d || (it.m > 0 && Math.floor((by[it.s] || 0) / 60) >= it.m);
-function yptPlanner() {
-  const p = ypPlan(), by = ypBy('day'), n = p.items.length, ok = p.items.filter(i => ypDone(i, by)).length, prev = ypPrevPlan();
-  return `<div class="card plc"><div class="row between"><h2 style="margin:0">📋 แพลนเนอร์วันนี้</h2><span class="tag ${n && ok === n ? 'ok' : ''}">${ok}/${n}</span></div>
-    ${n ? `<div class="bar" style="margin:8px 0"><i style="width:${pct(ok, n)}%"></i></div>` : '<p class="mute" style="margin:6px 0">วางแผนว่าวันนี้จะอ่านอะไร เช่น “ฟิสิกส์ บทแรง 40 นาที” แล้วกด ▶ เพื่อเริ่มจับเวลาตามวิชานั้นได้เลย ติ๊กครบเองเมื่ออ่านถึงเป้า</p>'}
+// เนื้อในแพลนเนอร์ (ใช้ทั้งในการ์ดแพลนเนอร์เดิมและการ์ด "วันนี้ต้องทำ")
+function yptPlanBody(p, by) {
+  p = p || ypPlan(); by = by || ypBy('day'); const n = p.items.length, ok = p.items.filter(i => ypDone(i, by)).length, prev = ypPrevPlan();
+  return `${n ? `<div class="bar" style="margin:8px 0"><i style="width:${pct(ok, n)}%"></i></div>` : '<p class="mute" style="margin:6px 0">วางแผนว่าวันนี้จะอ่านอะไร เช่น “ฟิสิกส์ บทแรง 40 นาที” แล้วกด ▶ เพื่อเริ่มจับเวลาตามวิชานั้นได้เลย ติ๊กครบเองเมื่ออ่านถึงเป้า</p>'}
     ${p.items.map(it => { const dn = ypDone(it, by), st = Math.floor((by[it.s] || 0) / 60); return `<div class="plrow ${dn ? 'done' : ''}"><button class="plck" data-a="plTog" data-v="${it.id}" aria-label="${dn ? 'ยกเลิกติ๊ก' : 'ติ๊กว่าทำแล้ว'}">${dn ? '✓' : ''}</button><div class="plt"><span>${esc(it.t)}</span><small><i class="ypdot" style="background:${ypCol(it.s)}"></i>${esc(it.s)}${it.m ? ` · อ่านแล้ว ${st}/${it.m} น.` : ''}</small></div><button class="chip" data-a="plGo" data-v="${it.id}" aria-label="เริ่มจับเวลาวิชานี้">▶</button><button class="chip" data-a="plDel" data-v="${it.id}" aria-label="ลบรายการ" style="opacity:.7">✕</button></div>`; }).join('')}
     <div class="row pladd"><input id="plTxt" maxlength="40" placeholder="เพิ่มสิ่งที่จะทำวันนี้" autocomplete="off" style="flex:1 1 150px;min-width:0"><select id="plSub" aria-label="วิชา">${ypSubs().map(s => `<option ${ypSubKey() === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select><input id="plMin" type="number" min="0" max="600" placeholder="นาที" style="width:74px"><button class="pri" data-a="plAdd">เพิ่ม</button></div>
-    ${!n && prev && prev.items.length ? '<div class="row" style="margin-top:6px"><button class="chip" data-a="plCopy">↺ คัดลอกแผนของเมื่อวาน</button></div>' : ''}</div>`;
+    ${!n && prev && prev.items.length ? '<div class="row" style="margin-top:6px"><button class="chip" data-a="plCopy">↺ คัดลอกแผนของเมื่อวาน</button></div>' : ''}`;
+}
+function yptPlanner() {
+  const p = ypPlan(), by = ypBy('day'), n = p.items.length, ok = p.items.filter(i => ypDone(i, by)).length;
+  return `<div class="card plc"><div class="row between"><h2 style="margin:0">📋 แพลนเนอร์วันนี้</h2><span class="tag ${n && ok === n ? 'ok' : ''}">${ok}/${n}</span></div>${yptPlanBody(p, by)}</div>`;
 }
 
 /* ---------- อันดับเวลาอ่าน (เพื่อน / กลุ่ม) ---------- */
@@ -124,7 +128,7 @@ function ypPaint() {
 }
 setInterval(() => {
   if (typeof T === 'undefined' || typeof store === 'undefined') return;
-  if (location.hash === '#/timer' && document.visibilityState === 'visible') {
+  if (/^#\/(timer|stats|rank)$/.test(location.hash) && document.visibilityState === 'visible') {
     ypPaint();
     if (socEnabled()) { if (!YP.gload || Date.now() - YP.gload > 60000) ypLoadGroups(true); if (YP.scope !== 'friends' && (!YP.board[YP.scope] || Date.now() - YP.board[YP.scope].at > 9000)) ypLoadBoard(YP.scope); }
   }

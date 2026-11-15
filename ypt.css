@@ -41,5 +41,10 @@
 .calstat{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 12px}.calstat .stat{padding:10px 8px;text-align:center}.calstat .stat b{font-size:17px;display:block}.calstat .stat span{font-size:11.5px}
 .calsum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}.calsum>div{padding:9px 6px;border-radius:14px;border:1px solid var(--line);text-align:center}.calsum b{display:block;font-size:17px}.calsum span{font-size:11.5px;color:var(--mute)}
 .calup{display:flex;width:100%;gap:10px;align-items:center;justify-content:flex-start;text-align:left;padding:8px 10px;margin:4px 0;min-height:0;border-radius:12px}.calup b{flex:none;min-width:58px;color:var(--pri)}.calup span{min-width:0;overflow:hidden;text-overflow:ellipsis}
-@media (max-width:560px){.calc{padding:3px 4px 2px;border-radius:10px}.calc b{font-size:12.5px}.calc small{font-size:9px}.calstat .stat b{font-size:15px}.tabbar a{font-size:10px!important}}
-.dnav a{white-space:nowrap}@media (max-width:1000px){.dnav a{padding:8px 9px;gap:5px;font-size:13px}}
+@media (max-width:560px){.calc{padding:3px 4px 2px;border-radius:10px}.calc b{font-size:12.5px}.calc small{font-size:9px}.calstat .stat b{font-size:15px}}
+/* แถบบนจอคอม: ไม่ให้ข้อความตัดบรรทัด ปรับขนาดตามความกว้างหน้าจอ */
+.brand{flex:none}.brand small{white-space:nowrap}.dnav{flex-wrap:nowrap;min-width:0}.dnav a{white-space:nowrap;flex:none}.top .themebtn{flex:none}
+@media (min-width:860px){.top{max-width:1240px;gap:12px}}
+@media (max-width:1400px){.brand small{display:none}}
+@media (max-width:1180px){.dnav a{padding:8px 11px;gap:6px;font-size:13.5px}.top .themebtn{padding:6px 10px;min-height:38px}}
+@media (max-width:1060px){.dnav a:not(.on) span{display:none}.dnav a{padding:8px 12px}}

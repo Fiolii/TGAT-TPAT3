@@ -59,11 +59,12 @@ const ICON = {
   stats: 'M4 20V10M10 20V4M16 20v-8M22 20H2',
   timer: 'M12 8v5l3 2M9 2h6M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16z',
   book: 'M4 5a2 2 0 0 1 2-2h14v15H6a2 2 0 0 0-2 2zM4 20a2 2 0 0 0 2 2h14',
+  user: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z',
   cal: 'M4 6h16v15H4zM4 10h16M8 3v4M16 3v4M8 14h2M12 14h2M16 14h.01M8 17.500h2M12 17.500h2',
 };
 const ico = n => `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${ICON[n]}"/></svg>`;
-const NAV = [['', 'หน้าแรก', 'home'], ['exam', 'ทำข้อสอบ', 'exam'], ['stats', 'สถิติ', 'stats'], ['timer', 'จับเวลา', 'timer'], ['cal', 'ปฏิทิน', 'cal'], ['library', 'คลังความรู้', 'book']];
-$('#dnav').innerHTML = NAV.map(([r, t, i]) => `<a href="#/${r}" data-r="${r}">${ico(i)}${t}</a>`).join('');
+const NAV = [['', 'วันนี้', 'home'], ['exam', 'ฝึก', 'exam'], ['stats', 'ความก้าวหน้า', 'stats'], ['me', 'ฉัน', 'user']];   // 4 แท็บ (รายละเอียดการรวมหน้าอยู่ใน data/hub.js)
+$('#dnav').innerHTML = NAV.map(([r, t, i]) => `<a href="#/${r}" data-r="${r}" title="${t}">${ico(i)}<span>${t}</span></a>`).join('');
 $('#tabbar').innerHTML = NAV.map(([r, t, i]) => `<a href="#/${r}" data-r="${r}">${ico(i)}<span>${t}</span></a>`).join('');
 
 // นาที/ข้อ ตาม blueprint ของ mytcas: TPAT3 70 ข้อ/180 นาที, TGAT1 60/60, TGAT2 80/60, TGAT3 60/60, A-Level 90 นาที (Math1/ฟิสิกส์ 30 ข้อ, เคมี 35, ชีวะ 40)
@@ -129,16 +130,17 @@ setInterval(tick, 500);
 let E = null;      // exam state
 const X = { mode: 'practice', group: '', subject: '', topic: '', src: 'all', n: 10, shuffle: true };
 let libTab = 'lessons', libOpen = '';
-const routes = { '': viewHome, exam: viewExam, stats: viewStats, timer: viewTimer, cal: viewCal, library: viewLibrary, me: viewMe };
+const routes = { '': viewToday, exam: viewPractice, stats: viewProgress, timer: viewFocus, cal: viewCalHub, rank: viewRank, library: viewLibHub, me: viewMe };
 function render(keepScroll) {
   const r = (location.hash.replace(/^#\/?/, '') || '').split('/')[0];
-  document.querySelectorAll('[data-r]').forEach(a => a.classList.toggle('on', a.dataset.r === r));
+  document.querySelectorAll('[data-r]').forEach(a => a.classList.toggle('on', a.dataset.r === hubPrimary(r)));
   document.body.classList.toggle('in-exam', r === 'exam' && !!E && !E.done);
   killSim();
-  $('#app').innerHTML = `<div class="${r === 'exam' && E && !E.done ? '' : 'view'}">${(routes[r] || viewHome)()}</div>`;
+  $('#app').innerHTML = `<div class="${r === 'exam' && E && !E.done ? '' : 'view'}">${(routes[r] || viewToday)()}</div>`;
   mountSim();
   achAfterRender(r);
   if (typeof socKick === 'function') socKick();
+  if (typeof hubAfterRender === 'function') hubAfterRender();
   if (!keepScroll) window.scrollTo(0, 0);
   tick();
 }
@@ -191,35 +193,7 @@ function ring(p, size, label, sub) {
   const r = 52, c = 2 * Math.PI * r, off = c * (1 - Math.min(1, p));
   return `<div class="ringwrap"><svg width="${size}" height="${size}" viewBox="0 0 120 120" style="transform:rotate(-90deg)"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs><circle class="ring-bg" cx="60" cy="60" r="${r}" fill="none" stroke-width="10"/><circle class="ring-fg" cx="60" cy="60" r="${r}" fill="none" stroke-width="10" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"/></svg><div class="ringtxt"><b>${label}</b><span class="mute">${sub}</span></div></div>`;
 }
-function viewHome() {
-  const total = attempts.length, ok = attempts.filter(a => a.ok).length, mins = Math.round(todaySecs() / 60);
-  let cd = '-', cdsub = 'ยังไม่ตั้งวันสอบ';
-  if (examDate) { const d = Math.ceil((new Date(examDate + 'T00:00:00') - Date.now()) / 864e5); cd = d >= 0 ? d : '✓'; cdsub = d >= 0 ? 'วันก่อนสอบ' : 'สอบแล้ว'; }
-  const weak = weakTopics().slice(0, 3);
-  const th = THEMES.find(x => x.id === store.get('theme', 'sixent')) || THEMES[0];
-  const un = uniOf(th.id);
-  return `<div class="card hero uni-${th.id}">${dressHero()}${th.id === 'sixent' ? '<svg class="gearmark" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="10" stroke-dasharray="9.95"/><circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/></svg>' : `<div class="heroicon" aria-hidden="true">${uniLogoHtml(th.id, 74)}</div>`}<h1>${th.s ? 'สู่วิศวะ ' + esc(th.s) : 'พร้อมติวหรือยัง? 🚀'}</h1>${th.s ? `<div class="unimotto herom">“${esc(un.motto)}”</div>` : ''}<p>เปิดข้อสอบทีละหน้าเหมือนสนามจริง ทบทวนจุดอ่อน และจับเวลาการอ่าน</p>
-    <div class="row"><a class="btn w" href="#/exam">เริ่มทำข้อสอบ</a><a class="btn" href="#/timer">เริ่มจับเวลา</a></div></div>
-  ${uniCard()}
-  ${branchCard()}
-  ${dqCard()}
-  ${dailyCard()}
-  <div id="frstrip">${typeof friendStrip === 'function' ? friendStrip(false) : ''}</div>
-  ${achCard()}
-  <div class="grid2">${shirtCard()}<div class="card" style="display:grid;align-content:center"><div class="mute" style="margin-bottom:6px">คำคมประจำวัน</div>${quoteHtml()}</div></div>
-  <div class="grid2">
-    <div class="card"><h2>เป้าหมายวันนี้</h2><div class="row" style="gap:18px">${ring(mins / goalMin, 120, mins + ' น.', 'จาก ' + goalMin)}
-      <div><div class="mute">streak</div><b style="font-size:24px">🔥 ${streak()} วัน</b><div style="margin-top:8px"><label><span>เป้าหมาย (นาที/วัน)</span><input type="number" min="5" value="${goalMin}" data-change="goal" style="width:90px"></label></div></div></div></div>
-    <div class="card"><h2>ภาพรวม</h2><div class="grid" style="grid-template-columns:1fr 1fr">
-      <div><b style="font-size:26px">${total ? pct(ok, total) + '%' : '-'}</b><div class="mute">แม่นยำ (${total} ข้อ)</div></div>
-      <div><b style="font-size:26px">${cd}</b><div class="mute">${cdsub}</div></div></div>
-      <div class="row" style="margin-top:10px"><input type="date" id="ed" value="${esc(examDate)}"><button data-a="setDate">ตั้งวันสอบ</button></div>
-      <div class="row" style="margin-top:6px"><button class="chip" data-a="setExam" data-v="${TCAS70.dates.tpat3}">TPAT3/TGAT 30 ม.ค. 70</button><button class="chip" data-a="setExam" data-v="${TCAS70.dates.alevel}">A-Level 13 มี.ค. 70</button></div></div>
-  </div>
-  <div class="card"><h2>แนะนำให้ทบทวน</h2>${weak.length ? weak.map(t => `<div class="row between" style="padding:6px 0"><span>${esc(t.topic)} <span class="mute">แม่นยำ ${pct(t.ok, t.n)}% · ${t.n} ข้อ</span></span><span><button data-a="practiceTopic" data-v="${esc(t.topic)}">ฝึก</button> ${LESSONS[t.topic] ? `<button data-a="openLesson" data-v="${esc(t.topic)}">อ่านบทเรียน</button>` : ''}</span></div>`).join('') : '<span class="mute">ยังไม่มีข้อมูลเพียงพอ — ทำโจทย์ให้ได้อย่างน้อย 3 ข้อต่อหัวข้อ แล้วระบบจะชี้จุดอ่อนให้</span>'}</div>
-  <div class="card"><h2>ชุดข้อสอบ</h2><div class="presets">${PRESETS.map((p, i) => `<button class="preset" data-a="preset" data-v="${i}"><b>${p.t}</b><small>${allQ().filter(p.f).length} ข้อ · ≈ ${mockMinutes(allQ().filter(p.f))} นาที</small></button>`).join('')}</div></div>
-  <div class="row" style="justify-content:center;margin:6px 0 2px"><button class="chip" data-a="adminOpen" style="opacity:.55;min-height:32px;padding:4px 12px;font-size:12.5px">🔧 แอดมิน</button></div>`;
-}
+const viewHome = () => viewToday();   // หน้าแรกเดิมถูกแตกเป็นการ์ดใน data/hub.js
 
 /* ====================== exam setup ====================== */
 const PRESETS = [
@@ -384,7 +358,6 @@ function viewTimer() {
   ${yptSubjects()}
   ${pomo ? `<label><span>โฟกัส (นาที)</span><input id="tf" type="number" min="1" value="${T.focusMin}" style="width:90px" data-change="tcfg"></label><label><span>พัก (นาที)</span><input id="tb" type="number" min="1" value="${T.breakMin}" style="width:90px" data-change="tcfg"></label>` : ''}
   <p class="mute">เวลาที่อ่านตั้งแต่ 1 นาทีขึ้นไปจะบันทึกลงสถิติ นาฬิกายังเดินต่อแม้เปลี่ยนหน้า (แต่ต้องเปิดแอปค้างไว้)</p></div>
-  ${yptStudyCard()}${yptPlanner()}${yptRank()}
   <div class="card"><h2>บันทึกล่าสุด</h2>${studies.slice(-6).reverse().map(s => `<div class="row between" style="padding:4px 0"><span>${new Date(s.ts).toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' })} · ${esc(s.subject)}</span><b>${Math.round(s.secs / 60)} นาที</b></div>`).join('') || '<span class="mute">ยังไม่มี</span>'}</div>`;
 }
 
@@ -511,7 +484,7 @@ function lessonView(k) {
 
 /* ====================== actions ====================== */
 const ACT = {
-  ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT, ...CHAR_ACT, ...SOC_ACT, ...BRANCH_ACT, ...YPT_ACT, ...CAL_ACT, ...DQ_ACT,
+  ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT, ...CHAR_ACT, ...SOC_ACT, ...BRANCH_ACT, ...YPT_ACT, ...CAL_ACT, ...DQ_ACT, ...HUB_ACT,
   setDate() { examDate = val('ed'); save(); render(true); },
   setExam(v) { examDate = v; save(); if ((location.hash || '#/') === '#/') render(true); else alert('ตั้งวันนับถอยหลังเป็น ' + v + ' แล้ว (ดูที่หน้าแรก)'); },
   themeOpen() { uniPage(null); themeSheet(true); }, themeClose() { themeSheet(false); },

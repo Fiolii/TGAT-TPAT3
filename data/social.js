@@ -98,7 +98,7 @@ async function socPush(force) {
   try { await socRpc('set_presence', args); PRES.sig = sig; PRES.pt = Date.now(); } catch { /* ลองใหม่รอบหน้า */ }
   finally { PRES.busy = false; }
 }
-const socWatching = () => { const h = location.hash; return h === '' || h === '#' || h === '#/' || h === '#/timer' || (h === '#/me' && ME.tab === 'friends'); };
+const socWatching = () => { const h = location.hash; return h === '' || h === '#' || h === '#/' || h === '#/timer' || h === '#/rank' || (h === '#/me' && ME.tab === 'friends'); };
 async function socPoll(force) {
   if (!socEnabled() || PRES.polling || document.visibilityState !== 'visible') return;
   if (!force && (!socWatching() || Date.now() - PRES.lastPoll < 6000)) return;

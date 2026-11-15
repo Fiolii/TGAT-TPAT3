@@ -28,10 +28,6 @@ function dressApply() {
   let L = document.getElementById('thscene');
   if (!L) { L = document.createElement('div'); L.id = 'thscene'; L.setAttribute('aria-hidden', 'true'); document.body.prepend(L); }
   if (sig !== dressSig) { dressSig = sig; const still = fx === 'still'; L.innerHTML = fx === 'off' ? '' : `<div class="ths-u">${dressUni(id, 'xMidYMax meet', still)}</div><div class="ths-b">${brScene(br, still)}</div>`; }
-  // ปุ่มสาขาบนแถบบน
-  let bb = document.getElementById('brbtn'); const top = document.getElementById('top');
-  if (!bb && top) { bb = document.createElement('button'); bb.id = 'brbtn'; bb.className = 'themebtn'; bb.setAttribute('data-a', 'branchOpen'); bb.setAttribute('aria-label', 'ธีมสาขาวิศวะ'); const tb = top.querySelector('.themebtn[data-a=themeOpen]'); top.insertBefore(bb, tb || null); }
-  if (bb) { bb.innerHTML = brIcon(br, 22, br ? br.c[0] : 'currentColor'); bb.title = br ? 'สาขา: วิศวกรรม' + br.n : 'เลือกสาขาวิศวะ'; }
 }
 
 /* ฮีโร่หน้าแรก: ซ้อนฉากของมหาวิทยาลัย + สาขา */
