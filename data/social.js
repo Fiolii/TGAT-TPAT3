@@ -94,7 +94,8 @@ async function socPush(force) {
   const vis = document.visibilityState === 'visible', live = vis || T.running, a = live ? socActivity() : { k: 'idle', l: '', s: 0 }, sig = a.k + '|' + a.l;
   if (!force && sig === PRES.sig && !(live && Date.now() - PRES.pt > 19000)) return;
   PRES.busy = true;
-  try { await socRpc('set_presence', { p_act: a.k, p_label: a.l, p_secs: a.s }); PRES.sig = sig; PRES.pt = Date.now(); } catch { /* ลองใหม่รอบหน้า */ }
+  const tot = typeof ypTotals === 'function' ? ypTotals() : null, args = { p_act: a.k, p_label: a.l, p_secs: a.s }; if (tot) Object.assign(args, { p_day: dayKey(Date.now()), p_today: tot.day, p_week: tot.week, p_month: tot.month });
+  try { await socRpc('set_presence', args); PRES.sig = sig; PRES.pt = Date.now(); } catch { /* ลองใหม่รอบหน้า */ }
   finally { PRES.busy = false; }
 }
 const socWatching = () => { const h = location.hash; return h === '' || h === '#' || h === '#/' || h === '#/timer' || (h === '#/me' && ME.tab === 'friends'); };
@@ -104,7 +105,7 @@ async function socPoll(force) {
   PRES.polling = true;
   try {
     const rows = (await socRpc('friend_status')) || [], old = PRES.st, now = Date.now(); PRES.st = {};
-    rows.forEach(r => { PRES.st[r.id] = { act: PACT[r.act] || r.act === 'idle' ? r.act : 'off', label: plain(r.act_label), secs: Math.max(0, +r.act_secs || 0), seen: r.seen_secs == null ? null : Math.max(0, +r.seen_secs || 0), at: now }; });
+    rows.forEach(r => { PRES.st[r.id] = { act: PACT[r.act] || r.act === 'idle' ? r.act : 'off', label: plain(r.act_label), secs: Math.max(0, +r.act_secs || 0), seen: r.seen_secs == null ? null : Math.max(0, +r.seen_secs || 0), at: now, st: r.st_today == null ? null : { day: +r.st_today || 0, week: +r.st_week || 0, month: +r.st_month || 0 } }; });
     PRES.lastPoll = now;
     if (!SOC.flast || rows.length !== SOC.friends.length || rows.some(r => !SOC.friends.some(f => f.id === r.id)) || now - SOC.flast > 180000) await socLoadFriends(true);
     if (!PRES.first && !(E && !E.done && location.hash.startsWith('#/exam'))) rows.forEach(r => {
@@ -175,14 +176,15 @@ function friendsTab() {
   if (!socOn()) return `<div class="card"><h2>👥 เพื่อน</h2><p>ระบบเพื่อนยังไม่เปิดให้ใช้งาน — กำลังเตรียมเซิร์ฟเวอร์อยู่ เร็ว ๆ นี้จะเพิ่มเพื่อนด้วยโค้ดและดูตัวละครของกันและกันได้</p></div>`;
   if (!socEnabled()) return `<div class="card"><h2>👥 เพิ่มเพื่อนและดูตัวละครเพื่อน</h2>
     <p>เปิดใช้งานแล้วคุณจะได้ <b>โค้ดเพื่อน 6 ตัวอักษร</b> ให้เพื่อนกรอกเพื่อเป็นเพื่อนกัน และดูตัวละคร ชั้นปี และแต้มของกันได้</p>
-    <ul class="coinparts"><li><span>ข้อมูลที่ส่งขึ้นเซิร์ฟเวอร์</span><b style="color:var(--ink)">ชื่อเล่น · มหาวิทยาลัยที่เลือก · ลุคตัวละคร · แต้มและชั้นปี · สถานะว่ากำลังจับเวลา/อ่านบทเรียนไหน/ทำข้อสอบอยู่ (ปิดได้)</b></li><li><span>ไม่ส่ง</span><b style="color:var(--ink)">ชื่อจริง · อีเมล · ผลสอบ · สถิติโจทย์</b></li></ul>
+    <ul class="coinparts"><li><span>ข้อมูลที่ส่งขึ้นเซิร์ฟเวอร์</span><b style="color:var(--ink)">ชื่อเล่น · มหาวิทยาลัยที่เลือก · ลุคตัวละคร · แต้มและชั้นปี · สถานะว่ากำลังจับเวลา/อ่านบทเรียนไหน/ทำข้อสอบอยู่ · เวลาอ่านรวมต่อวัน/สัปดาห์/เดือน (ปิดสถานะได้)</b></li><li><span>ไม่ส่ง</span><b style="color:var(--ink)">ชื่อจริง · อีเมล · ผลสอบ · สถิติโจทย์</b></li></ul>
     <p class="mute" style="font-size:13px">ใช้บัญชีแบบไม่ระบุตัวตน (ไม่ต้องสมัคร) ใครมีโค้ดของคุณจะเห็นข้อมูลข้างต้นของคุณได้ จึงอย่าใส่ชื่อจริงเป็นชื่อเล่น และสร้างโค้ดใหม่หรือลบข้อมูลออนไลน์ได้ทุกเมื่อ ถ้าล้างข้อมูลเบราว์เซอร์ บัญชีนี้จะเข้าไม่ได้อีก</p>
     <button class="pri" data-a="socEnable">เปิดใช้งานระบบเพื่อน</button></div>`;
   const code = SOC.me && SOC.me.code;
   return `<div class="card socme"><div class="mute">โค้ดเพื่อนของฉัน</div><div class="socode" aria-live="polite">${code ? esc(code) : (SOC.err ? '—' : 'กำลังสร้าง…')}</div>
     <div class="row" style="gap:8px;flex-wrap:wrap"><button data-a="socCopy" ${code ? '' : 'disabled'}>📋 คัดลอกโค้ด</button><button data-a="socShare" ${code ? '' : 'disabled'}>🔗 แชร์ลิงก์</button><button data-a="socRotate" ${code ? '' : 'disabled'}>🔄 สร้างโค้ดใหม่</button></div>
     ${SOC.err ? `<div class="socerr">⚠️ ${esc(SOC.err)}</div>` : SOC.last ? `<div class="mute" style="font-size:12px">ซิงก์โปรไฟล์ล่าสุด ${socAgo(SOC.last)}</div>` : ''}</div>
-  <div class="card"><div class="row between" style="gap:10px;flex-wrap:nowrap"><div style="min-width:0"><b>${socSt().pr === undefined ? '🆕 ' : ''}${socSt().pr ? '👁' : '🙈'} แสดงสถานะ "กำลังทำอะไรอยู่"</b><div class="mute" style="font-size:13px">เพื่อนจะเห็นว่าคุณกำลังจับเวลา อ่านบทเรียน (เห็นชื่อบท) หรือทำข้อสอบ — ไม่เห็นคะแนนหรือคำตอบ ${socSt().pr ? 'ตอนนี้: เปิดอยู่' : 'ตอนนี้: ปิดอยู่'}</div></div><button class="${socSt().pr ? '' : 'pri'}" data-a="socPres">${socSt().pr ? 'ปิด' : 'เปิด'}</button></div></div>
+  <div class="card"><div class="row between" style="gap:10px;flex-wrap:nowrap"><div style="min-width:0"><b>${socSt().pr === undefined ? '🆕 ' : ''}${socSt().pr ? '👁' : '🙈'} แสดงสถานะ "กำลังทำอะไรอยู่"</b><div class="mute" style="font-size:13px">เพื่อนจะเห็นว่าคุณกำลังจับเวลา อ่านบทเรียน (เห็นชื่อบท) หรือทำข้อสอบ และเห็นเวลาอ่านรวมของคุณในอันดับ — ไม่เห็นคะแนน คำตอบ หรือรายวิชา ${socSt().pr ? 'ตอนนี้: เปิดอยู่' : 'ตอนนี้: ปิดอยู่'}</div></div><button class="${socSt().pr ? '' : 'pri'}" data-a="socPres">${socSt().pr ? 'ปิด' : 'เปิด'}</button></div></div>
+  ${typeof yptGroupCard === 'function' ? yptGroupCard() : ''}
   <div class="card"><h2>เพิ่มเพื่อน</h2><div class="row" style="flex-wrap:nowrap;gap:8px"><input id="socCode" maxlength="6" placeholder="กรอกโค้ด 6 ตัว" autocomplete="off" autocapitalize="characters" spellcheck="false" style="flex:1;min-width:0;text-transform:uppercase;letter-spacing:.2em;font-weight:700"><button class="pri" data-a="socAdd">เพิ่ม</button></div></div>
   <div class="row between" style="margin:6px 2px"><h2 style="margin:0">เพื่อนของฉัน ${SOC.friends.length ? `<span class="tag">${SOC.friends.length}</span>` : ''}</h2><button class="chip" data-a="socRefresh">${SOC.loading ? 'กำลังโหลด…' : '↻ รีเฟรช'}</button></div>
   ${SOC.friends.length ? `<div class="frgrid">${SOC.friends.map(friendCard).join('')}</div>` : `<div class="card"><p class="mute" style="margin:0">${SOC.loading ? 'กำลังโหลดรายชื่อเพื่อน…' : 'ยังไม่มีเพื่อน — แชร์โค้ดของคุณให้เพื่อน หรือกรอกโค้ดของเพื่อนด้านบน'}</p></div>`}
@@ -199,8 +201,8 @@ function socSheet(f) {
 }
 const SOC_ACT = {
   async socEnable() {
-    if (!confirm('เปิดระบบเพื่อน?\nจะสร้างบัญชีแบบไม่ระบุตัวตน และอัปโหลดชื่อเล่น มหาวิทยาลัย ลุคตัวละคร แต้ม ชั้นปี\nและสถานะว่ากำลังจับเวลา/อ่านบทไหน/ทำข้อสอบอยู่ ให้เพื่อนที่มีโค้ดของคุณเห็น (ปิดสถานะได้ภายหลัง)')) return;
-    const st = socSt(); st.on = true; st.pr = true; store.set('soc', st); SOC.err = ''; SOC.sent = ''; render(true); await socLoadFriends(); socPush(true);
+    if (!confirm('เปิดระบบเพื่อน?\nจะสร้างบัญชีแบบไม่ระบุตัวตน และอัปโหลดชื่อเล่น มหาวิทยาลัย ลุคตัวละคร แต้ม ชั้นปี\nสถานะว่ากำลังจับเวลา/อ่านบทไหน/ทำข้อสอบอยู่ และเวลาอ่านรวมต่อวัน/สัปดาห์/เดือน ให้เพื่อนที่มีโค้ดของคุณและสมาชิกกลุ่มเห็น (ปิดสถานะได้ภายหลัง)')) return;
+    const st = socSt(); st.on = true; st.pr = true; store.set('soc', st); SOC.err = ''; SOC.sent = ''; render(true); await socLoadFriends(); socPush(true); if (typeof ypLoadGroups === 'function') ypLoadGroups(true);
     const pend = store.get('socPending', ''); if (pend) { store.set('socPending', ''); setTimeout(() => { const i = document.getElementById('socCode'); if (i) i.value = pend; }, 300); }
   },
   async socOff() {

@@ -1,0 +1,80 @@
+/* ตกแต่งทุกหน้าตามธีมมหาวิทยาลัย + ธีมสาขา (โหลดหลัง hist_skins.css ซึ่งมี keyframes ของฉาก) — ตรรกะอยู่ใน data/dress.js */
+
+/* ---------- ฉากพื้นหลังที่ขยับ (ใช้ฉากเดียวกับหน้าประวัติ แต่โปร่งและเบา) ---------- */
+#thscene{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;opacity:.17;--ths-o:.17}
+:root[data-scheme="dark"] #thscene{opacity:.27}
+@media (prefers-color-scheme:dark){:root:not([data-scheme="light"]) #thscene{opacity:.27}}
+#thscene>div{position:absolute;inset:0}
+#thscene svg{width:100%;height:100%;display:block}
+html[data-fx="off"] #thscene{display:none}
+html[data-fx="still"] #thscene *,html[data-fx="still"] .hero-sc *,html[data-fx="still"] .brscene *{animation:none!important}
+@media (prefers-reduced-motion:reduce){#thscene *,.hero-sc *,.brscene *{animation:none!important}}
+
+/* ---------- ฮีโร่หน้าแรก ---------- */
+.hero>.hero-sc{position:absolute;inset:0;z-index:0;opacity:.45;pointer-events:none;mix-blend-mode:screen;overflow:hidden}
+.hero>.hero-sc svg{position:absolute;inset:0;width:100%;height:100%}
+.hero>:not(.hero-sc):not(.hero-br):not(.gearmark):not(.heroicon){position:relative;z-index:1}
+.hero-br{position:absolute;right:14px;top:12px;z-index:2;display:inline-flex;gap:5px;align-items:center;padding:4px 11px;border-radius:999px;background:rgba(0,0,0,.3);color:#fff;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.4);backdrop-filter:blur(6px)}
+@keyframes ukSpin2{to{transform:rotate(360deg)}}
+.tring .twm{position:absolute;inset:0;display:grid;place-items:center;opacity:.13;pointer-events:none;animation:ukSpin2 90s linear infinite}
+html[data-fx="still"] .twm{animation:none}
+.tring .ct{z-index:1}
+
+/* ---------- หัวข้อ: ฟอนต์/ลายคั่นตามธีมมหาวิทยาลัย ---------- */
+.view>h1,.view>.card>h2,.view h2{font-family:var(--th-ff,inherit)}
+.view>h1::after{content:"";display:var(--th-orn-d,none);height:22px;width:min(260px,70%);margin:2px 0 0;background:var(--pri);opacity:.88;-webkit-mask:var(--th-orn) left center/contain no-repeat;mask:var(--th-orn) left center/contain no-repeat}
+/* ไอคอนสาขาหน้าหัวข้อ */
+.view>h1::before,.view>.card>h2::before{content:"";display:var(--br-glyph-d,none);width:.95em;height:.95em;margin-right:.35em;vertical-align:-.1em;background:var(--br1,var(--pri));-webkit-mask:var(--br-glyph) center/contain no-repeat;mask:var(--br-glyph) center/contain no-repeat}
+body[class*="br-"] .bar i{background:linear-gradient(90deg,var(--pri),var(--br1))}
+body[class*="br-"] .tag{border-color:color-mix(in srgb,var(--br1) 45%,transparent)}
+
+/* ---------- ประดับใต้แถบบน ---------- */
+.top::after{content:"";position:absolute;left:26px;right:26px;bottom:-4px;height:var(--th-sh,0);background:var(--th-strip,none);pointer-events:none;opacity:.9}
+/* ---------- การ์ด: รูปทรงและลายขอบ ---------- */
+body[class*="th-"] :is(.card,.stat,.preset,.lcard,.achcard):not(.hero){border-radius:var(--th-r,22px);box-shadow:var(--gl-shadow),var(--th-inset,0 0 0 0 transparent)}
+body[class*="th-"] .sheet{border-top:4px solid var(--pri)}
+
+/* ===== จุฬาฯ ===== */
+.th-chula{--th-r:26px 26px 12px 12px;--th-inset:inset 0 3px 0 #c9962f;--th-sh:3px;--th-strip:linear-gradient(90deg,transparent,#c9962f 20%,#d81b7a 50%,#c9962f 80%,transparent)}
+/* ===== เกษตร ===== */
+.th-ku{--th-r:8px 26px 8px 26px;--th-inset:inset 4px 0 0 #4cd08a;--th-sh:7px;--th-strip:radial-gradient(circle at 50% 100%,#4cd08a 0 5px,transparent 5.600px) 0 0/12px 7px repeat-x}
+/* ===== มอ. ===== */
+.th-psu{--th-r:22px 22px 22px 6px;--th-inset:inset 0 -4px 0 #0b7f8c;--th-sh:8px;--th-strip:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='8' viewBox='0 0 40 8'%3E%3Cpath d='M0 4q5-5 10 0t10 0 10 0 10 0' fill='none' stroke='%230b7f8c' stroke-width='2'/%3E%3C/svg%3E") repeat-x}
+/* ===== มข. ===== */
+.th-kku{--th-r:4px;--th-inset:inset 7px 0 0 #9b2d30,inset 10px 0 0 #e8a62a;--th-sh:10px;--th-strip:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='10' viewBox='0 0 20 10'%3E%3Cpath d='M10 1l9 4-9 4-9-4z' fill='%239b2d30'/%3E%3Cpath d='M10 3l5 2-5 2-5-2z' fill='%23e8a62a'/%3E%3C/svg%3E") repeat-x}
+/* ===== มช. ===== */
+.th-cmu{--th-r:4px 4px 24px 24px;--th-inset:inset 0 3px 0 #6e3da8,inset 0 6px 0 #d9a43a;--th-sh:9px;--th-strip:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='9' viewBox='0 0 20 9'%3E%3Cpath d='M0 8l5-6 5 6 5-6 5 6' fill='none' stroke='%236e3da8' stroke-width='2'/%3E%3C/svg%3E") repeat-x}
+/* ===== มจธ. ===== */
+.th-kmutt{--th-r:6px;--th-inset:inset 0 0 0 1px rgba(245,158,11,.35);--th-sh:2px;--th-strip:repeating-linear-gradient(90deg,#f59e0b 0 12px,transparent 12px 18px)}
+.th-kmutt :is(.card,.stat,.preset,.lcard,.achcard):not(.hero){border-style:dashed;border-color:rgba(245,158,11,.5)}
+/* ===== สจล. ===== */
+.th-kmitl{--th-r:0 16px 0 16px;--th-inset:inset 3px 0 0 #e8590c;--th-sh:8px;--th-strip:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='8' viewBox='0 0 50 8'%3E%3Cpath d='M0 5H14l4-3h14l4 3h14' fill='none' stroke='%23e8590c' stroke-width='1.600'/%3E%3Ccircle cx='40' cy='5' r='2' fill='%23e8590c'/%3E%3C/svg%3E") repeat-x}
+/* ===== มจพ. ===== */
+.th-kmutnb{--th-r:2px 2px 14px 2px;--th-inset:inset 6px 0 0 #ff5a1f;--th-sh:6px;--th-strip:repeating-linear-gradient(135deg,#ff5a1f 0 5px,#101012 5px 10px)}
+/* ===== ธรรมศาสตร์ ===== */
+.th-tu{--th-r:2px;--th-inset:inset 0 3px 0 #c8102e;--th-sh:6px;--th-strip:linear-gradient(#c8102e,#c8102e) 0 0/100% 3px no-repeat,linear-gradient(#c8102e,#c8102e) 0 5px/100% 1px no-repeat}
+/* ===== มหิดล ===== */
+.th-mu{--th-r:20px;--th-inset:inset 0 3px 0 #d83a22;--th-sh:12px;--th-strip:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='12' viewBox='0 0 44 12'%3E%3Cpath d='M0 7h16l3-5 4 9 3-4h18' fill='none' stroke='%23d83a22' stroke-width='1.600' stroke-linejoin='round'/%3E%3C/svg%3E") repeat-x}
+
+/* ---------- การ์ด/หน้าต่างธีมสาขา ---------- */
+.brcard.on{border-left:4px solid var(--br1)}
+.brico{flex:none;width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:color-mix(in srgb,var(--br1) 16%,transparent)}
+.brinfo{position:relative;overflow:hidden;border-radius:18px;padding:14px;border:1px solid color-mix(in srgb,var(--br1) 45%,transparent);background:color-mix(in srgb,var(--br1) 8%,var(--card));margin:8px 0}
+.brscene{position:absolute;inset:0;opacity:.24;pointer-events:none}.brscene svg{width:100%;height:100%;display:block}
+.brinfob{position:relative}.brh{display:flex;gap:8px;align-items:center;font-size:17px}.brinfob p{margin:6px 0;font-size:13.5px;line-height:1.7}
+.brsw i{background:color-mix(in srgb,var(--s1) 14%,transparent)!important;border-radius:12px!important;width:42px!important;height:42px!important}
+.swatch.look{box-shadow:0 0 0 2px var(--s1)}
+.brpick{width:100%}.brpick em{font-size:20px;top:12px}
+
+/* ---------- เคลื่อนไหวของฉากสาขา ---------- */
+.uk-w6{--p:60px;animation:ukW 3s linear infinite}.uk-w6b{--p:40px;animation-duration:2.2s}
+@keyframes ukPiston{0%,100%{transform:translateY(0)}50%{transform:translateY(-26px)}}.uk-piston{animation:ukPiston 1.4s ease-in-out infinite}
+@keyframes ukBin{from{transform:translateY(-120px)}to{transform:translateY(340px)}}.uk-bin{animation:ukBin 9s linear infinite}
+@keyframes ukFall{0%{transform:translate(0,-30px) rotate(0)}25%{transform:translate(18px,70px) rotate(60deg)}50%{transform:translate(-14px,150px) rotate(130deg)}75%{transform:translate(16px,240px) rotate(210deg)}100%{transform:translate(0,340px) rotate(280deg);opacity:.2}}.uk-fall{animation:ukFall 11s linear infinite}
+@keyframes ukRocket{0%,100%{transform:translateY(0)}50%{transform:translateY(-70px)}}.uk-rocket{animation:ukRocket 5s ease-in-out infinite}
+@keyframes ukShoot{0%{transform:translate(0,0);opacity:0}10%{opacity:1}60%{opacity:.8}100%{transform:translate(-160px,60px);opacity:0}}.uk-shoot{animation:ukShoot 7.800s ease-in infinite}
+@keyframes ukArm1{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(24deg)}}.uk-arm1{animation:ukArm1 4s ease-in-out infinite}
+@keyframes ukArm2{0%,100%{transform:rotate(18deg)}50%{transform:rotate(-30deg)}}.uk-arm2{animation:ukArm2 3s ease-in-out infinite}
+@keyframes ukClaw{0%,100%{transform:rotate(0)}50%{transform:rotate(14deg)}}.uk-claw{animation:ukClaw 1.200s ease-in-out infinite}
+@keyframes ukRock{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(10deg)}}.uk-rock{animation:ukRock 3s ease-in-out infinite}
+@keyframes ukDrip{0%{transform:translateY(0);opacity:0}20%{opacity:1}100%{transform:translateY(26px);opacity:0}}.uk-drip{animation:ukDrip 2.700s ease-in infinite}

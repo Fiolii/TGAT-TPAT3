@@ -1,0 +1,388 @@
+/* หน้าตาเฉพาะตัวของหน้าประวัติแต่ละมหาวิทยาลัย (โหลดหลัง hist.css) — ภาพ/เนื้อหาอยู่ใน data/uni_skin.js
+   โครง: ส่วน CORE ใช้ตัวแปร --sk-* ร่วมกัน → แต่ละมหาวิทยาลัย (.uk-รหัส) กำหนดสี ฟอนต์ ฮีโร่ หัวบท การ์ดบุคคล และเส้นเวลาของตัวเอง */
+
+/* ===================== CORE ===================== */
+.has-skin{--card:var(--sk-card);--ink:var(--sk-ink);--mute:var(--sk-mute);--line:var(--sk-line);--pri:var(--sk-a);--pri2:color-mix(in srgb,var(--sk-a) 11%,var(--sk-card));--onpri:var(--sk-on);--gold:var(--sk-hi);--gold2:var(--sk-a2);--goldt:linear-gradient(180deg,var(--sk-hi),var(--sk-a2))}
+.has-skin>div{background:var(--sk-bg);color:var(--sk-ink);-webkit-backdrop-filter:none;backdrop-filter:none}
+.has-skin .unibody{background:var(--sk-bg);font-family:'Noto Sans Thai',system-ui,sans-serif}
+.has-skin .unitop{background:var(--sk-top);color:var(--sk-top-ink);border-bottom:1px solid color-mix(in srgb,var(--sk-hi) 60%,transparent)}
+.has-skin .unitop b{color:var(--sk-top-ink);font-family:var(--sk-ff)}
+.has-skin .unitop button{background:color-mix(in srgb,var(--sk-top-ink) 12%,transparent);color:var(--sk-top-ink);border:1px solid color-mix(in srgb,var(--sk-top-ink) 35%,transparent)}
+.has-skin .unitop .pri{background:var(--sk-a);color:var(--sk-on);border-color:transparent}
+.has-skin .uninav{background:color-mix(in srgb,var(--sk-bg) 92%,transparent);border-bottom:1px solid var(--sk-line)}
+.has-skin .uninav .chip{background:var(--sk-card);color:var(--sk-ink);border:1px solid var(--sk-line)}
+.has-skin .uninav .chip:hover{border-color:var(--sk-a);color:var(--sk-a)}
+
+/* ฮีโร่ */
+.has-skin .uh{color:var(--sk-hero-ink);background:var(--sk-bg);padding:38px 18px 32px;min-height:430px;display:flex;align-items:center}
+.has-skin .uh::before,.has-skin .uh::after{display:none}
+.has-skin .uh-sc{position:absolute;inset:0;z-index:-1;overflow:hidden}.has-skin .uh-svg{width:100%;height:100%;display:block}
+.has-skin .uh-frame{position:relative;z-index:1;width:100%;max-width:600px;margin:0 auto;text-align:center}
+.has-skin .uh-emb{animation:none;--emb:112px}.has-skin .uh-emb>svg,.has-skin .uh-emb>img{width:var(--emb);height:var(--emb)}
+.has-skin .uh-kick{color:var(--sk-kick,var(--sk-a2));font:600 12.5px/1.4 var(--sk-ff);letter-spacing:.3em;text-transform:uppercase}
+.has-skin .uh h2{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--sk-h2);filter:none;font-family:var(--sk-ff);font-weight:700;text-shadow:var(--sk-h2sh,none)}
+.has-skin .uh-en{opacity:.9}
+.has-skin .orn{color:var(--sk-hi)}
+.has-skin .uh .orn{color:var(--sk-orn,var(--sk-hi))}
+.has-skin .uh-q{font-family:var(--sk-ff);color:var(--sk-hero-ink)}.has-skin .uh-q span{color:var(--sk-hi)}
+.has-skin .uh-stats>div{background:var(--sk-chip);border:1px solid var(--sk-chip-bd);box-shadow:none;color:var(--sk-hero-ink)}
+.has-skin .uh-stats b{background:none;-webkit-text-fill-color:currentColor;color:var(--sk-stat);font-family:var(--sk-ff)}
+.has-skin .uh-me{background:var(--sk-chip);border:1px solid var(--sk-chip-bd);color:var(--sk-hero-ink);backdrop-filter:blur(6px);text-align:left;position:relative;z-index:1}
+.has-skin .uh-met b{color:var(--sk-stat)}.has-skin .uh-met button{background:var(--sk-card);color:var(--sk-ink);border:1px solid var(--sk-line)}
+.has-skin .uh-met .pri{background:var(--sk-a);color:var(--sk-on);border-color:transparent}
+.has-skin .uh{flex-wrap:wrap;align-content:center;justify-content:center;gap:16px}
+.has-skin .uh .uh-me{flex:1 1 100%;max-width:520px;margin:0 auto}
+/* เลย์เอาต์ชิดซ้าย: ตราอยู่ขวา ข้อความอยู่ซ้าย */
+.has-skin .uh.lay-l{justify-content:flex-start}
+.has-skin .uh.lay-l .uh-frame{margin:0;text-align:left;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:18px;align-items:start;max-width:660px}
+.has-skin .uh.lay-l .uh-emb{grid-column:2;grid-row:1/5;--emb:104px}
+.has-skin .uh.lay-l .uh-kick,.has-skin .uh.lay-l h2,.has-skin .uh.lay-l .uh-en,.has-skin .uh.lay-l .orn{grid-column:1}
+.has-skin .uh.lay-l .uh-q,.has-skin .uh.lay-l .uh-stats{grid-column:1/-1}
+.has-skin .uh.lay-l .orn{margin-left:0;margin-right:auto}.has-skin .uh.lay-l .uh-stats{justify-content:flex-start}.has-skin .uh.lay-l .uh-q{margin-left:0}
+@media (max-width:560px){.has-skin .uh{min-height:0;padding:28px 14px 24px}.has-skin .uh.lay-l .uh-emb{--emb:72px}}
+
+/* หัวบท */
+.has-skin .chp .chn{font-family:var(--sk-ff);color:var(--sk-a2);letter-spacing:.18em}
+.has-skin .unibody .chp h3{font-family:var(--sk-ff);color:var(--sk-ink)}
+.has-skin .chp .orn{color:var(--sk-hi)}.has-skin .chp .orn *{filter:none}
+.has-skin .uniprose.lead{font-family:var(--sk-ff);background:var(--sk-card);border:1px solid var(--sk-line);color:var(--sk-ink)}
+.has-skin .uniprose.lead::before{color:var(--sk-hi)}
+.has-skin .unibody h4{color:var(--sk-a2);font-family:var(--sk-ff)}
+.has-skin .unis{background:var(--sk-card);border-color:var(--sk-line)}
+.has-skin .unis .n{background:var(--sk-a);color:var(--sk-on);font-family:var(--sk-ff);box-shadow:none}
+.has-skin .unifact,.has-skin .unibody details{background:var(--sk-card);border-color:var(--sk-line)}.has-skin .unibody details[open]{background:var(--pri2)}
+.has-skin .unifact i,.has-skin .unipeople i{background:var(--pri2);color:var(--sk-a)}
+.has-skin .unichips span{background:var(--pri2);color:var(--sk-ink)}.has-skin .unichips.big span{border-color:var(--sk-line)}.has-skin .unichips.big span.hl{background:var(--sk-a);color:var(--sk-on);border-color:var(--sk-a)}
+.has-skin .engban{background:var(--sk-eng);border:1px solid var(--sk-hi);box-shadow:none;color:var(--sk-eng-ink)}
+.has-skin .engyear{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35)}
+.has-skin .engyear b{background:none;-webkit-text-fill-color:currentColor;color:var(--sk-eng-ink);font-family:var(--sk-ff)}.has-skin .engyear small,.has-skin .engkick{color:var(--sk-eng-ink);opacity:.9}.has-skin .engtag{color:var(--sk-eng-ink)}
+.has-skin .unifl .uic,.has-skin .unipeople i{color:var(--sk-a)}
+.has-skin .uniend .btn{background:var(--sk-card);color:var(--sk-ink);border:1px solid var(--sk-line)}
+/* การ์ดบุคคล */
+.has-skin .lg{background:var(--sk-card);border:1px solid var(--sk-line);box-shadow:0 14px 26px -18px rgba(0,0,0,.5)}
+.has-skin .lgin{background:var(--sk-lgbg)}.has-skin .lg-r .lgin,.has-skin .lg-o .lgin{background:var(--sk-lgbg)}
+.has-skin .lgframe{background:conic-gradient(from 210deg,var(--sk-hi),var(--sk-a2),var(--sk-hi),var(--sk-a2),var(--sk-hi))}.has-skin .lgframe::before{border-color:color-mix(in srgb,var(--sk-hi) 60%,transparent)}
+.has-skin .lgtag{background:var(--sk-a);color:var(--sk-on);border:0}
+.has-skin .lg h5{font-family:var(--sk-ff);color:var(--sk-ink)}.has-skin .lgyr{color:var(--sk-a2);border-color:color-mix(in srgb,var(--sk-a2) 50%,transparent)}
+.has-skin .lgmore summary{color:var(--sk-a);background:var(--pri2)}
+.has-skin .lg-r .lgin svg path[fill^="url"],.has-skin .lg-o .lgin svg path{filter:none}
+/* เส้นเวลา (พื้นฐาน; แต่ละมหาวิทยาลัยแปลงต่อ) */
+.has-skin .untl2::before{background:linear-gradient(180deg,var(--sk-hi),var(--sk-a2),color-mix(in srgb,var(--sk-a2) 15%,transparent))}
+.has-skin .untl2 li::before{background:var(--sk-hi);border-color:var(--sk-bg);box-shadow:0 0 0 2px var(--sk-a2)}
+.has-skin .tly,:root[data-scheme=dark] .has-skin .tly{font-family:var(--sk-ff);background:none;-webkit-text-fill-color:currentColor;color:var(--sk-a2);filter:none}
+.has-skin .tlt{background:var(--sk-card);border:1px solid var(--sk-line);box-shadow:none;color:var(--sk-ink)}
+@media (prefers-color-scheme:dark){:root:not([data-scheme=light]) .has-skin .tly{background:none;-webkit-text-fill-color:currentColor;color:var(--sk-a2)}}
+
+/* ===================== ภาพเคลื่อนไหวของฉาก ===================== */
+@keyframes ukSpin{to{transform:rotate(360deg)}}@keyframes ukRain{from{transform:translate(0,-30px);opacity:0}15%{opacity:1}to{transform:translate(-40px,380px);opacity:.1}}
+@keyframes ukW{to{transform:translateX(calc(-1*var(--p,70px)))}}@keyframes ukMist{from{transform:translateX(-70px)}to{transform:translateX(70px)}}
+@keyframes ukPulse{from{stroke-dashoffset:0}to{stroke-dashoffset:-420}}@keyframes ukDna{to{transform:translateY(64px)}}@keyframes ukEcg{from{stroke-dashoffset:22}to{stroke-dashoffset:-100}}
+.uk-spin{animation:ukSpin 46s linear infinite}.uk-rev{animation-direction:reverse;animation-duration:34s}.uk-slow{animation-duration:180s}
+.uk-rain{animation:ukRain 1.8s linear infinite}
+.uk-w1{--p:70px;animation:ukW 9s linear infinite}.uk-w2{--p:90px;animation:ukW 7s linear infinite}.uk-w3{--p:110px;animation:ukW 5.500s linear infinite}
+.uk-mist{animation:ukMist 24s ease-in-out infinite alternate}.uk-mist2{animation-duration:32s;animation-direction:alternate-reverse}
+.uk-pulse{stroke-dasharray:14 420;animation:ukPulse 3.400s linear infinite}
+.uk-dna{animation:ukDna 4s linear infinite}
+.uk-ecg{stroke-dasharray:22 100;animation:ukEcg 3.200s linear infinite}
+@media (prefers-reduced-motion:reduce){.uk-spin,.uk-rain,.uk-w1,.uk-w2,.uk-w3,.uk-mist,.uk-pulse,.uk-dna,.uk-ecg{animation:none}}
+
+/* การ์ดบุคคลที่ตัดรูปทรงด้วย clip-path: ตัดเฉพาะกรอบกับรูป ไม่ตัดป้ายชื่อที่ห้อยอยู่ด้านล่าง */
+.uk-kku .lgframe,.uk-cmu .lgframe,.uk-kmutt .lgframe,.uk-kmitl .lgframe,.uk-kmutnb .lgframe{background:none;border-radius:0}
+.uk-kku .lgframe::before,.uk-cmu .lgframe::before,.uk-kmutt .lgframe::before,.uk-kmitl .lgframe::before,.uk-kmutnb .lgframe::before{content:"";display:block;position:absolute;inset:0;border:0;border-radius:0;background:var(--lgfill);clip-path:var(--lgshape)}
+.uk-kku .lgin,.uk-cmu .lgin,.uk-kmutt .lgin,.uk-kmitl .lgin,.uk-kmutnb .lgin{position:absolute;inset:5px;width:auto;height:auto;border-radius:0;clip-path:var(--lgshape)}
+
+/* =====================================================================
+   จุฬาฯ — ราชสำนัก: ซุ้มโค้งทอง ลายกนก ชมพูบนผ้าไหมสีงาช้าง
+   ===================================================================== */
+.uk-chula{--sk-bg:#fffaf3;--sk-card:#fff;--sk-ink:#3b1a2c;--sk-mute:#8a6477;--sk-line:#efd6dc;--sk-a:#d81b7a;--sk-a2:#a8125f;--sk-hi:#c9962f;--sk-on:#fff;--sk-ff:'Trirong','Noto Serif Thai',serif;--sk-top:linear-gradient(180deg,#fff3f7,#ffe2ec);--sk-top-ink:#7a1148;--sk-hero-ink:#4a1330;--sk-h2:#a8125f;--sk-chip:rgba(255,255,255,.78);--sk-chip-bd:#e6c27a;--sk-stat:#a8125f;--sk-eng:linear-gradient(135deg,#d81b7a,#8f0f52);--sk-eng-ink:#fff;--sk-lgbg:radial-gradient(90% 70% at 50% 28%,#fff,#f8c9da);--sk-orn:#b8862a}
+.uk-chula .uh{padding-bottom:96px}
+.uk-chula .uh-kick{letter-spacing:.42em}
+.uk-chula .uh-emb{filter:drop-shadow(0 8px 14px rgba(168,18,95,.35))}
+.uk-chula .uh h2{font-size:clamp(24px,6.4vw,36px)}
+.uk-chula .chn{display:inline-block;padding:3px 20px;border:1px solid var(--sk-hi);border-radius:999px;background:linear-gradient(#fff,#ffeaf2);letter-spacing:.14em}
+.uk-chula .uniprose.lead{border:1px solid var(--sk-hi);box-shadow:inset 0 0 0 4px #fff,inset 0 0 0 5px #e6c27a;background:#fffdf9}
+.uk-chula .unis{border-top:3px solid var(--sk-hi);border-radius:28px 28px 14px 14px}.uk-chula .unis .n{border-radius:50% 50% 50% 6px}
+.uk-chula .lgframe,.uk-chula .lgframe::before,.uk-chula .lgin{border-radius:72px 72px 12px 12px/96px 96px 12px 12px}
+.uk-chula .untl2 li::before{border-radius:3px;transform:rotate(45deg);background:var(--sk-a)}
+.uk-chula .tlt{border-radius:4px 16px 4px 16px;border-color:#e6c27a}
+
+/* =====================================================================
+   เกษตรศาสตร์ — ผืนดิน สายฝน: เขียวเข้มยามค่ำ ใบไม้ ลำต้นเลื้อย
+   ===================================================================== */
+.uk-ku{--sk-bg:#0f2118;--sk-card:#17301f;--sk-ink:#e6f4e0;--sk-mute:#9bbba5;--sk-line:#264a31;--sk-a:#4cd08a;--sk-a2:#e0b84a;--sk-hi:#f2d46a;--sk-on:#08170f;--sk-ff:'Pridi','Noto Serif Thai',serif;--sk-top:#0a1a10;--sk-top-ink:#cfeecf;--sk-hero-ink:#f3ffe9;--sk-h2:#f2d46a;--sk-kick:#7fe3a0;--sk-chip:rgba(8,23,15,.55);--sk-chip-bd:rgba(127,227,160,.4);--sk-stat:#f2d46a;--sk-eng:linear-gradient(135deg,#1c5a33,#0e3a20);--sk-eng-ink:#e6f4e0;--sk-lgbg:radial-gradient(90% 70% at 50% 28%,#2d6b3e,#0c2415);--sk-h2sh:0 2px 12px rgba(0,0,0,.6)}
+.uk-ku .uh h2{font-size:clamp(25px,6.8vw,40px)}
+.uk-ku .uh-emb{padding:10px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.22),rgba(255,255,255,0) 70%);--emb:92px}
+.uk-ku .chp{text-align:left;padding-left:34px;position:relative}.uk-ku .chp .orn{margin-left:0}
+.uk-ku .chp::before{content:"";position:absolute;left:4px;top:6px;bottom:6px;width:4px;border-radius:4px;background:linear-gradient(180deg,var(--sk-a),transparent)}
+.uk-ku .chn::before{content:"";display:inline-block;width:10px;height:15px;border-radius:0 100% 0 100%;background:var(--sk-a);margin-right:9px;vertical-align:-2px;transform:rotate(-22deg)}
+.uk-ku .unis{border-left:4px solid var(--sk-a);border-radius:4px 24px 4px 24px}.uk-ku .unis .n{border-radius:0 100% 0 100%}
+.uk-ku .lgframe,.uk-ku .lgframe::before,.uk-ku .lgin{border-radius:6px 78px 6px 78px}
+.uk-ku .untl2::before{width:3px;background:linear-gradient(180deg,var(--sk-a),#2a7a46)}
+.uk-ku .untl2 li::before{width:20px;height:12px;border-radius:0 100% 0 100%;border:0;background:var(--sk-a);box-shadow:none;left:-29px;top:10px;transform:rotate(-30deg)}
+.uk-ku .untl2 li:nth-child(even)::before{transform:rotate(-30deg) scaleX(-1)}
+.uk-ku .tlt{border-radius:4px 18px 4px 18px}
+.uk-ku .engban{background:linear-gradient(135deg,#1c5a33,#0e3a20),var(--sk-eng)}
+
+/* =====================================================================
+   สงขลานครินทร์ — ทะเลใต้: น้ำเงิน-เทอร์ควอยซ์ คลื่น เรือและประภาคาร
+   ===================================================================== */
+.uk-psu{--sk-bg:#f2f8fc;--sk-card:#fff;--sk-ink:#0f2a4a;--sk-mute:#5b7590;--sk-line:#d5e5f2;--sk-a:#1e4e9c;--sk-a2:#0b7f8c;--sk-hi:#e8b43a;--sk-on:#fff;--sk-ff:'Prompt','Noto Sans Thai',sans-serif;--sk-top:linear-gradient(90deg,#0a2a5c,#0f5f98);--sk-top-ink:#e8f6ff;--sk-hero-ink:#fff;--sk-h2:#fff;--sk-kick:#ffe9a8;--sk-chip:rgba(255,255,255,.14);--sk-chip-bd:rgba(255,255,255,.4);--sk-stat:#ffe9a8;--sk-eng:linear-gradient(135deg,#0a3f78,#1aa3a8);--sk-eng-ink:#fff;--sk-lgbg:radial-gradient(90% 70% at 50% 28%,#bfe6ff,#2a7fb5);--sk-orn:#bfe6ff;--sk-h2sh:0 3px 14px rgba(0,20,60,.55)}
+.uk-psu .uh h2{font-size:clamp(24px,6.2vw,35px);letter-spacing:.01em}
+.uk-psu .chn::before{content:"";display:inline-block;width:9px;height:9px;border:2.500px solid var(--sk-a2);border-radius:50%;margin-right:8px;vertical-align:-1px}
+.uk-psu .chp h3::after{content:"";display:block;height:9px;width:132px;margin:7px auto 0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='9' viewBox='0 0 44 9'%3E%3Cpath d='M0 5q5.500-6 11 0t11 0 11 0 11 0' fill='none' stroke='%230b7f8c' stroke-width='1.800'/%3E%3C/svg%3E") repeat-x}
+.uk-psu .uniprose.lead{border-radius:22px;border-left:5px solid var(--sk-a2)}
+.uk-psu .unis{border-radius:18px;border-bottom:3px solid var(--sk-a2)}.uk-psu .unis .n{background:var(--sk-a2)}
+.uk-psu .lgframe{width:150px;height:150px;border-radius:50%;background:conic-gradient(#e3edf5,#7e92a8,#f3f7fa,#6a7e94,#e3edf5)}
+.uk-psu .lgframe::before{inset:-7px;border-radius:50%;border:3px dotted rgba(10,63,120,.35)}.uk-psu .lgin{border-radius:50%}
+.uk-psu .lg-p .lgin svg{transform:scale(1.18);transform-origin:50% 40%}
+.uk-psu .untl2::before{width:4px;border-radius:4px;background:repeating-linear-gradient(180deg,#1aa3a8 0 9px,#1e4e9c 9px 18px)}
+.uk-psu .untl2 li::before{border:3px solid #fff;background:radial-gradient(circle,#fff 0 24%,#e0452d 26% 56%,#fff 58%);box-shadow:0 0 0 2px var(--sk-a);animation:ukBob 3s ease-in-out infinite}
+@keyframes ukBob{50%{transform:translateY(-3px)}}
+.uk-psu .tlt{border-radius:16px 16px 16px 4px}
+.uk-psu .engban{border-radius:22px}
+
+/* =====================================================================
+   ขอนแก่น — ผ้าไหมขิตอีสาน: แดงดินกับครามบนผ้าฝ้ายสีครีม แถบลายขิต
+   ===================================================================== */
+.uk-kku{--sk-bg:#fbf3e8;--sk-card:#fffaf2;--sk-ink:#3a1514;--sk-mute:#876656;--sk-line:#ecd9bf;--sk-a:#9b2d30;--sk-a2:#2b3368;--sk-hi:#e8a62a;--sk-on:#fff;--sk-ff:'Mitr','Noto Sans Thai',sans-serif;--sk-top:#4b1417;--sk-top-ink:#f6e2b8;--sk-hero-ink:#fbe9c4;--sk-h2:#f2c14e;--sk-kick:#e8a62a;--sk-chip:rgba(75,20,23,.7);--sk-chip-bd:#e8a62a;--sk-stat:#f2c14e;--sk-eng:linear-gradient(135deg,#4b1417,#2b3368);--sk-eng-ink:#fbe9c4;--sk-lgbg:radial-gradient(90% 70% at 50% 28%,#f2d39a,#9b2d30);--sk-orn:#e8a62a}
+.uk-kku .uh-frame{background:rgba(58,14,17,.62);border:1px solid #e8a62a;box-shadow:inset 0 0 0 4px rgba(58,14,17,.9),inset 0 0 0 5px rgba(232,166,42,.5);padding:24px 16px 20px;border-radius:2px;backdrop-filter:blur(2px)}
+.uk-kku .uh h2{font-size:clamp(23px,6vw,33px);font-weight:600}
+.uk-kku .chp{padding-top:22px;position:relative}
+.uk-kku .chp::before{content:"";position:absolute;left:0;right:0;top:0;height:14px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='14' viewBox='0 0 28 14'%3E%3Cpath d='M14 1l12 6-12 6L2 7z' fill='%239b2d30'/%3E%3Cpath d='M14 4l6 3-6 3-6-3z' fill='%23e8a62a'/%3E%3C/svg%3E") repeat-x center}
+.uk-kku .chn{color:var(--sk-a);font-weight:500}
+.uk-kku .uniprose.lead{border-radius:0;border:2px solid var(--sk-a);box-shadow:inset 0 0 0 3px var(--sk-card),inset 0 0 0 4px var(--sk-hi)}
+.uk-kku .unis{border:0;border-radius:0;background:linear-gradient(90deg,var(--sk-a2) 0 7px,var(--sk-hi) 7px 10px,var(--sk-a) 10px 17px,var(--sk-card) 17px);padding-left:54px;box-shadow:0 8px 16px -12px rgba(0,0,0,.4)}
+.uk-kku .unis .n{left:24px;border-radius:2px;transform:rotate(45deg) scale(.82);background:var(--sk-a2)}.uk-kku .unis .n{color:#fff}
+.uk-kku{--lgfill:linear-gradient(135deg,#2b3368,#e8a62a 50%,#9b2d30);--lgshape:polygon(0 12px,12px 12px,12px 0,calc(100% - 12px) 0,calc(100% - 12px) 12px,100% 12px,100% calc(100% - 12px),calc(100% - 12px) calc(100% - 12px),calc(100% - 12px) 100%,12px 100%,12px calc(100% - 12px),0 calc(100% - 12px))}
+.uk-kku .untl2{padding-left:0}.uk-kku .untl2::before{display:none}
+.uk-kku .untl2 li,.uk-kku .untl2 li:nth-child(even){width:auto;margin:0 0 10px;padding:10px 12px 10px 24px;text-align:left;background:var(--sk-card);position:relative;box-shadow:0 8px 14px -12px rgba(0,0,0,.35)}
+.uk-kku .untl2 li::before,.uk-kku .untl2 li:nth-child(even)::before{left:0;right:auto;top:0;bottom:0;width:14px;height:auto;border:0;border-radius:0;box-shadow:none;background:repeating-linear-gradient(180deg,var(--sk-a) 0 8px,var(--sk-hi) 8px 12px,var(--sk-a2) 12px 20px)}
+.uk-kku .tlt{border:0;padding:0;background:none}
+
+/* =====================================================================
+   เชียงใหม่ — ล้านนาเหนือม่านหมอก: ม่วงดอกรัก ยอดดอย หน้าบันวัด
+   ===================================================================== */
+.uk-cmu{--sk-bg:#f6f1fb;--sk-card:#fff;--sk-ink:#2a1747;--sk-mute:#7a6a94;--sk-line:#e1d6f0;--sk-a:#6e3da8;--sk-a2:#4b2590;--sk-hi:#d9a43a;--sk-on:#fff;--sk-ff:'Maitree','Noto Serif Thai',serif;--sk-top:#1b0f3a;--sk-top-ink:#efe6ff;--sk-hero-ink:#f6efff;--sk-h2:#fff3cf;--sk-kick:#f2c14e;--sk-chip:rgba(27,15,58,.5);--sk-chip-bd:rgba(242,193,78,.5);--sk-stat:#f2c14e;--sk-eng:linear-gradient(135deg,#4b2590,#25104f);--sk-eng-ink:#fff;--sk-lgbg:radial-gradient(90% 70% at 50% 28%,#f1e4ff,#7a4cc0);--sk-h2sh:0 3px 14px rgba(10,0,40,.6)}
+.uk-cmu .uh{padding-bottom:60px}.uk-cmu .uh h2{font-size:clamp(24px,6.4vw,36px)}
+.uk-cmu .chp .chn{display:inline-block;padding:2px 14px;border-bottom:2px solid var(--sk-hi);letter-spacing:.2em}
+.uk-cmu .uniprose.lead{border-radius:4px 4px 26px 26px;border:1px solid var(--sk-line);border-top:4px solid var(--sk-a)}
+.uk-cmu .unis{border-radius:2px 2px 16px 16px;border-top:3px solid var(--sk-a)}.uk-cmu .unis .n{clip-path:polygon(50% 0,100% 100%,0 100%);border-radius:0;width:30px;height:28px;padding-top:7px;font-size:12px}
+.uk-cmu{--lgfill:conic-gradient(from 200deg,#f2c14e,#b8862a,#f2c14e,#8a6414,#f2c14e);--lgshape:polygon(50% 0,100% 15%,100% 100%,0 100%,0 15%)}
+.uk-cmu .untl2::before{width:0;background:none;border-left:3px dotted var(--sk-a);left:6px}
+.uk-cmu .untl2 li::before{width:0;height:0;border:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:17px solid var(--sk-a);border-radius:0;background:none;box-shadow:none;left:-24px;top:7px;filter:drop-shadow(0 2px 3px rgba(60,20,120,.4))}
+.uk-cmu .tlt{border-radius:4px 4px 16px 16px}
+@media (min-width:760px){.uk-cmu .untl2::before{left:50%;border-left:3px dotted var(--sk-a);margin-left:-1.500px}.uk-cmu .untl2 li::before{right:-11px;left:auto}.uk-cmu .untl2 li:nth-child(even)::before{left:-11px;right:auto}}
+
+/* =====================================================================
+   มจธ. — แบบแปลนวิศวกรรม: น้ำตาลเข้ม เส้นกริดสีอำพัน เกียร์และมิติ
+   ===================================================================== */
+.uk-kmutt{--sk-bg:#1a1612;--sk-card:#25201a;--sk-ink:#f6ead2;--sk-mute:#bba98a;--sk-line:#3b3226;--sk-a:#f59e0b;--sk-a2:#fbbf24;--sk-hi:#fde047;--sk-on:#1a1612;--sk-ff:'Bai Jamjuree','Noto Sans Thai',sans-serif;--sk-top:#14110d;--sk-top-ink:#fde047;--sk-hero-ink:#fdf3d6;--sk-h2:#fde047;--sk-kick:#f59e0b;--sk-chip:rgba(245,158,11,.1);--sk-chip-bd:rgba(245,158,11,.55);--sk-stat:#fde047;--sk-eng:linear-gradient(135deg,#3a2c14,#1a1612);--sk-eng-ink:#fdf3d6;--sk-lgbg:radial-gradient(90% 70% at 50% 28%,#4b3a1c,#17130e);--sk-h2sh:0 2px 0 rgba(0,0,0,.5)}
+.uk-kmutt .uh h2{font-size:clamp(24px,6.2vw,36px);font-weight:700}.uk-kmutt .uh-kick{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.2em}
+.uk-kmutt .uh-emb{border:1px dashed rgba(253,224,71,.6);padding:10px;position:relative}.uk-kmutt .uh-emb::before,.uk-kmutt .uh-emb::after{content:"";position:absolute;width:12px;height:12px;border:2px solid #fde047}.uk-kmutt .uh-emb::before{left:-3px;top:-3px;border-right:0;border-bottom:0}.uk-kmutt .uh-emb::after{right:-3px;bottom:-3px;border-left:0;border-top:0}
+.uk-tb{position:absolute;right:12px;bottom:10px;z-index:1;display:flex;border:1px solid rgba(253,224,71,.6);font:600 10px/1 ui-monospace,Menlo,Consolas,monospace;color:#fde047}.uk-tb span{padding:5px 9px;border-left:1px solid rgba(253,224,71,.6)}.uk-tb span:first-child{border-left:0}
+.uk-kmutt .chp{text-align:left;border-left:3px solid var(--sk-a);padding-left:14px}.uk-kmutt .chp .orn{margin-left:0}
+.uk-kmutt .chn{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--sk-a);letter-spacing:.2em}
+.uk-kmutt .uniprose.lead,.uk-kmutt .unis,.uk-kmutt .tlt,.uk-kmutt .unifact{border-radius:2px;border:1px dashed color-mix(in srgb,var(--sk-a) 55%,transparent)}
+.uk-kmutt .unis .n{border-radius:50%;background:none;border:2px solid var(--sk-a);color:var(--sk-a)}
+.uk-kmutt{--lgfill:linear-gradient(135deg,#f59e0b,#fde047);--lgshape:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%)}
+.uk-kmutt .untl2::before{width:0;background:none;border-left:2px dashed var(--sk-a)}
+.uk-kmutt .untl2 li::before{width:22px;height:22px;border:0;border-radius:50%;left:-26px;top:5px;box-shadow:none;background:radial-gradient(circle,var(--sk-bg) 0 30%,transparent 32%),repeating-conic-gradient(var(--sk-a) 0 16deg,transparent 16deg 32deg);animation:ukSpin 12s linear infinite}
+@media (min-width:760px){.uk-kmutt .untl2::before{left:50%}.uk-kmutt .untl2 li::before{right:-11px;left:auto}.uk-kmutt .untl2 li:nth-child(even)::before{left:-11px;right:auto}}
+.uk-kmutt .engban{border-radius:2px;border:1px dashed var(--sk-a)}
+@media (prefers-reduced-motion:reduce){.uk-kmutt .untl2 li::before{animation:none}}
+
+/* =====================================================================
+   สจล. — แผงวงจร: ขาวสะอาด เส้นทองแดงสีส้ม มุมตัดเฉียงแบบชิป
+   ===================================================================== */
+.uk-kmitl{--sk-bg:#fbfcfe;--sk-card:#fff;--sk-ink:#14233b;--sk-mute:#5d6f88;--sk-line:#e3e9f2;--sk-a:#e8590c;--sk-a2:#c2410c;--sk-hi:#ff8a3d;--sk-on:#fff;--sk-ff:'Chakra Petch','Noto Sans Thai',sans-serif;--sk-top:#fff;--sk-top-ink:#14233b;--sk-hero-ink:#14233b;--sk-h2:#14233b;--sk-kick:#e8590c;--sk-chip:rgba(255,255,255,.85);--sk-chip-bd:#ffb98a;--sk-stat:#e8590c;--sk-eng:linear-gradient(135deg,#14233b,#22385c);--sk-eng-ink:#fff;--sk-lgbg:radial-gradient(90% 70% at 50% 28%,#fff1e6,#ffb98a)}
+.uk-kmitl .unitop{border-bottom:2px solid var(--sk-a)}
+.uk-kmitl .uh h2{font-size:clamp(24px,6.2vw,36px);font-weight:700}.uk-kmitl .uh-kick{font-family:ui-monospace,Menlo,Consolas,monospace}
+.uk-kmitl .uh-sc::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.93) 0,rgba(255,255,255,.8) 52%,rgba(255,255,255,.1) 100%)}
+.uk-term{position:absolute;left:14px;top:12px;z-index:1;font:500 11.5px/1 ui-monospace,Menlo,Consolas,monospace;color:#c2410c;background:rgba(255,255,255,.85);border:1px solid #ffb98a;padding:6px 10px}.uk-term b{color:#14233b}.uk-term i{display:inline-block;width:7px;height:12px;background:#e8590c;margin-left:4px;vertical-align:-2px;animation:ukBlink 1s steps(2) infinite}@keyframes ukBlink{50%{opacity:0}}
+.uk-kmitl .uh-emb{background:#fff;border:2px solid var(--sk-a);padding:8px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px))}
+.uk-kmitl .chp{text-align:left}.uk-kmitl .chp .orn{margin-left:0}
+.uk-kmitl .chn{display:inline-block;background:var(--sk-a);color:#fff;padding:3px 16px 3px 12px;font:700 12.5px var(--sk-ff);letter-spacing:.14em;clip-path:polygon(0 0,calc(100% - 9px) 0,100% 9px,100% 100%,9px 100%,0 calc(100% - 9px))}
+.uk-kmitl .uniprose.lead,.uk-kmitl .unis,.uk-kmitl .tlt,.uk-kmitl .unifact{border-radius:0;border:1px solid #ffc9a3;border-left:4px solid var(--sk-a)}
+.uk-kmitl .unis .n{border-radius:0;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));font-family:ui-monospace,Menlo,Consolas,monospace}
+.uk-kmitl{--lgfill:var(--sk-a);--lgshape:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px))}.uk-kmitl .lgframe{width:150px;height:164px}
+.uk-kmitl .untl2::before{width:2px;background:var(--sk-a);opacity:.7}
+.uk-kmitl .untl2 li::before{width:14px;height:14px;border-radius:2px;border:3px solid #fff;background:var(--sk-a);box-shadow:0 0 0 2px var(--sk-a)}
+.uk-kmitl .tly{display:inline-block;background:var(--sk-a);-webkit-text-fill-color:#fff;color:#fff;padding:1px 10px;clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,0 100%);font:700 16px var(--sk-ff);margin-bottom:5px}
+:root[data-scheme=dark] .uk-kmitl .tly,.uk-kmitl .tly{background:var(--sk-a);-webkit-text-fill-color:#fff;color:#fff}
+.uk-kmitl .engban{border-radius:0;clip-path:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,0 100%)}
+
+/* =====================================================================
+   มจพ. — เหล็กกล้า: ดำ-ส้มแดง ลายเชฟรอน ตัวอักษรหนา เลขกลวง
+   ===================================================================== */
+.uk-kmutnb{--sk-bg:#101012;--sk-card:#1a1a1f;--sk-ink:#f4f1ee;--sk-mute:#a9a5a0;--sk-line:#2e2e35;--sk-a:#ff5a1f;--sk-a2:#ff8a3d;--sk-hi:#ff5a1f;--sk-on:#101012;--sk-ff:'Kanit','Noto Sans Thai',sans-serif;--sk-top:#000;--sk-top-ink:#ff7a2a;--sk-hero-ink:#fff;--sk-h2:#fff;--sk-kick:#ff5a1f;--sk-chip:rgba(0,0,0,.55);--sk-chip-bd:#ff5a1f;--sk-stat:#ff7a2a;--sk-eng:linear-gradient(135deg,#1f1f25,#0a0a0c);--sk-eng-ink:#fff;--sk-lgbg:radial-gradient(90% 70% at 50% 28%,#4a2a20,#0f0f12)}
+.uk-kmutnb .uh{min-height:460px;align-items:flex-end;padding-bottom:36px}
+.uk-kmutnb .uh h2{font-size:clamp(28px,8.4vw,46px);font-weight:800;line-height:1.1;letter-spacing:-.01em}.uk-kmutnb .uh-kick{font-weight:800;letter-spacing:.34em;color:#ff5a1f}
+.uk-est{position:absolute;right:-6px;top:6px;z-index:0;font:800 clamp(96px,24vw,160px)/1 var(--sk-ff);color:transparent;-webkit-text-stroke:2px rgba(255,90,31,.55);pointer-events:none}
+.uk-kmutnb .uh-emb{filter:drop-shadow(0 0 0 #000) drop-shadow(0 8px 0 rgba(255,90,31,.35))}
+.uk-kmutnb .uh-stats>div{border-radius:0;border-width:0 0 0 4px;background:rgba(0,0,0,.6);text-align:left}
+.uk-kmutnb .chp{text-align:left;position:relative;padding:6px 0 2px;margin-top:26px}.uk-kmutnb .chp .orn{margin-left:0}
+.uk-kmutnb .chp::before{content:attr(data-no);position:absolute;right:0;top:-18px;font:800 82px/1 var(--sk-ff);color:transparent;-webkit-text-stroke:2px rgba(255,90,31,.4);pointer-events:none}
+.uk-kmutnb .chn{display:inline-block;background:var(--sk-a);color:#000;padding:2px 14px;transform:skewX(-14deg);font-weight:800;letter-spacing:.1em}
+.uk-kmutnb .unibody .chp h3{font-weight:800;text-transform:uppercase;font-size:clamp(21px,5.4vw,29px);position:relative}
+.uk-kmutnb .uniprose.lead{border-radius:0;border:0;border-left:6px solid var(--sk-a);background:var(--sk-card)}.uk-kmutnb .uniprose.lead::before{display:none}
+.uk-kmutnb .unis{border:0;border-radius:0;border-left:6px solid var(--sk-a);clip-path:polygon(0 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%)}.uk-kmutnb .unis .n{border-radius:0;transform:skewX(-14deg)}
+.uk-kmutnb{--lgfill:linear-gradient(135deg,#ff5a1f,#ff8a3d);--lgshape:polygon(16% 0,100% 0,84% 100%,0 100%)}
+.uk-kmutnb .lg{border-radius:0;border-top:4px solid var(--sk-a)}
+.uk-kmutnb .lgtag{border-radius:0;transform:translateX(-50%) skewX(-14deg);color:#000}
+.uk-kmutnb .untl2{padding:0}.uk-kmutnb .untl2::before{display:none}
+.uk-kmutnb .untl2 li,.uk-kmutnb .untl2 li:nth-child(even){width:auto;margin:0 0 10px;padding:10px 14px 10px 14px;text-align:left;background:var(--sk-card);border-left:6px solid var(--sk-a);clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%)}
+.uk-kmutnb .untl2 li::before,.uk-kmutnb .untl2 li:nth-child(even)::before{content:"▶▶";position:absolute;left:auto;right:16px;top:10px;width:auto;height:auto;background:none;border:0;box-shadow:none;color:var(--sk-a);font:800 12px var(--sk-ff);letter-spacing:-2px;border-radius:0}
+.uk-kmutnb .tly{font-size:26px;font-weight:800;color:var(--sk-a)}.uk-kmutnb .tlt{border:0;padding:0;background:none}
+.uk-kmutnb .engban{border-radius:0;border:0;border-left:8px solid var(--sk-a)}
+
+/* =====================================================================
+   ธรรมศาสตร์ — หนังสือพิมพ์/แถลงการณ์: กระดาษสีเก่า เส้นคู่ แดงของธรรมจักร มาตรา
+   ===================================================================== */
+.uk-tu{--sk-bg:#f6efe0;--sk-card:#fbf6ea;--sk-ink:#1c1410;--sk-mute:#6b5a48;--sk-line:#d8cbb0;--sk-a:#c8102e;--sk-a2:#a8091f;--sk-hi:#e0a800;--sk-on:#fff;--sk-ff:'Taviraj','Noto Serif Thai',serif;--sk-top:#1c1410;--sk-top-ink:#f6efe0;--sk-hero-ink:#1c1410;--sk-h2:#1c1410;--sk-kick:#c8102e;--sk-chip:transparent;--sk-chip-bd:#1c1410;--sk-stat:#c8102e;--sk-eng:#1c1410;--sk-eng-ink:#f6efe0;--sk-lgbg:radial-gradient(90% 70% at 50% 28%,#f1e4c4,#c9b27c);--sk-orn:#1c1410}
+.uk-tu .uh{padding-bottom:150px;padding-top:56px;align-items:flex-start}
+.uk-mast{position:absolute;left:14px;right:14px;top:12px;z-index:1;display:flex;justify-content:center;align-items:center;gap:12px;font:600 11px/1 var(--sk-ff);letter-spacing:.2em;border-top:3px double #1c1410;border-bottom:1px solid #1c1410;padding:7px 0}.uk-mast i{width:5px;height:5px;background:#c8102e;transform:rotate(45deg)}
+.uk-tu .uh h2{font-size:clamp(26px,7vw,40px);font-weight:700;letter-spacing:-.01em}
+.uk-tu .uh-kick{font-weight:700}
+.uk-tu .uh-emb{background:#f6efe0;border:2px solid #1c1410;padding:8px;box-shadow:4px 4px 0 #c8102e;border-radius:50%}
+.uk-tu .uh-me{background:#f6efe0;border:2px solid #1c1410;border-radius:0;box-shadow:4px 4px 0 #c8102e;backdrop-filter:none}
+.uk-tu .uh-stats>div{border-radius:0;border-width:2px 0}.uk-tu .uh-stats{gap:0}.uk-tu .uh-stats>div{border-right:1px solid #1c1410;min-width:104px}.uk-tu .uh-stats>div:last-child{border-right:0}
+.uk-tu .chp{text-align:left;border-top:3px double var(--sk-ink);border-bottom:1px solid var(--sk-ink);padding:8px 0 8px}.uk-tu .chp .orn{display:none}
+.uk-tu .chn{color:var(--sk-a);font-weight:700;letter-spacing:.14em}
+.uk-tu .unibody .chp h3{font-size:clamp(21px,5.6vw,30px);font-weight:700}
+.uk-tu .uniprose.lead{border-radius:0;border:0;border-top:1px solid var(--sk-ink);border-bottom:1px solid var(--sk-ink);background:none;padding:14px 4px}
+.uk-tu .uniprose.lead::first-letter{float:left;font:700 3.2em/.9 var(--sk-ff);color:var(--sk-a);padding:4px 8px 0 0}.uk-tu .uniprose.lead::before{display:none}
+.uk-tu .unis{border-radius:0;border:0;border-top:2px solid var(--sk-ink);background:none;box-shadow:none}.uk-tu .unis .n{background:var(--sk-a);border-radius:0}
+.uk-tu .lg{border-radius:2px;box-shadow:0 10px 18px -12px rgba(0,0,0,.5)}.uk-tu .lg:nth-child(odd){transform:rotate(-1.2deg)}.uk-tu .lg:nth-child(even){transform:rotate(1deg)}
+.uk-tu .lgframe{width:140px;height:168px;border-radius:0;background:#fff;padding:6px;box-shadow:0 4px 10px rgba(0,0,0,.3)}.uk-tu .lgframe::before{display:none}.uk-tu .lgin{border-radius:0;filter:sepia(.55) contrast(1.05)}
+.uk-tu .lgtag{background:#1c1410;border-radius:0;letter-spacing:.1em}
+.uk-tu .untl2{padding:0}.uk-tu .untl2::before{display:none}
+.uk-tu .untl2 li,.uk-tu .untl2 li:nth-child(even){width:auto;margin:0;padding:12px 0 12px 108px;text-align:left;border-bottom:1px solid var(--sk-line);position:relative;min-height:56px}
+.uk-tu .untl2 li::before,.uk-tu .untl2 li:nth-child(even)::before{display:none}
+.uk-tu .tly,:root[data-scheme=dark] .uk-tu .tly{position:absolute;left:0;top:10px;width:96px;text-align:center;background:var(--sk-a);-webkit-text-fill-color:#fff;color:#fff;padding:4px 0;font:700 15px var(--sk-ff);white-space:nowrap}
+.uk-tu .tlt{border:0;padding:0;background:none;border-radius:0}
+.uk-tu .engban{border-radius:0;border:0;border-top:4px solid var(--sk-a);border-bottom:4px solid var(--sk-a)}
+
+/* =====================================================================
+   มหิดล — เวชศาสตร์และชีวิต: น้ำเงินกรมท่า-ขาว เกลียวดีเอ็นเอ คลื่นหัวใจ แฟ้มรายงาน
+   ===================================================================== */
+.uk-mu{--sk-bg:#f5f8fd;--sk-card:#fff;--sk-ink:#0f2147;--sk-mute:#5a6b8c;--sk-line:#dbe4f3;--sk-a:#12307a;--sk-a2:#d83a22;--sk-hi:#e0452d;--sk-on:#fff;--sk-ff:'IBM Plex Sans Thai','Noto Sans Thai',sans-serif;--sk-top:#0a1b4a;--sk-top-ink:#e5eeff;--sk-hero-ink:#fff;--sk-h2:#fff;--sk-kick:#ff8f7e;--sk-chip:rgba(255,255,255,.1);--sk-chip-bd:rgba(255,255,255,.35);--sk-stat:#ff9f90;--sk-eng:linear-gradient(135deg,#12307a,#0a1b4a);--sk-eng-ink:#fff;--sk-lgbg:radial-gradient(90% 70% at 50% 28%,#dbe8ff,#4a6fd0);--sk-orn:#ff8f7e;--sk-h2sh:0 2px 12px rgba(0,10,40,.5)}
+.uk-mu .uh h2{font-size:clamp(24px,6.2vw,36px);font-weight:700}.uk-mu .uh-kick{font-weight:600;letter-spacing:.24em}
+.uk-chart{position:absolute;left:14px;top:12px;z-index:1;display:flex;flex-wrap:wrap;gap:6px;font:500 11px/1 var(--sk-ff);color:#dbe8ff}.uk-chart span{padding:5px 10px;border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(0,0,0,.2)}.uk-chart .ok{color:#7ff0b0;border-color:rgba(127,240,176,.5)}
+.uk-mu .uh{padding-top:60px}
+.uk-mu .uh-emb{background:#fff;border-radius:18px;padding:10px;box-shadow:0 10px 22px rgba(0,0,0,.35);position:relative}.uk-mu .uh-emb::before{content:"";position:absolute;top:-7px;left:50%;width:34px;height:7px;border-radius:6px;background:#ff7a68;transform:translateX(-50%)}
+.uk-mu .chp{text-align:left}.uk-mu .chp .orn{margin-left:0;width:200px}
+.uk-mu .chn{display:inline-block;background:var(--sk-a2);color:#fff;padding:2px 12px;border-radius:999px;font-weight:600;letter-spacing:.08em;font-size:12px}
+.uk-mu .uniprose.lead{border-radius:14px;border:1px solid var(--sk-line);border-left:5px solid var(--sk-a2)}
+.uk-mu .unis{border-radius:14px;border-top:3px solid var(--sk-a)}.uk-mu .unis .n{background:var(--sk-a2)}
+.uk-mu .lg{border-radius:18px;border:3px solid var(--sk-a);overflow:visible;padding-top:22px}.uk-mu .lg::before{content:"";position:absolute;top:-8px;left:50%;width:38px;height:10px;border-radius:6px;background:var(--sk-a);transform:translateX(-50%)}
+.uk-mu .lgframe{width:132px;height:132px;border-radius:50%;background:conic-gradient(var(--sk-a),#4a6fd0,var(--sk-a2),var(--sk-a))}.uk-mu .lgframe::before{inset:-6px;border-radius:50%;border:2px solid rgba(224,69,45,.35);animation:ukRing 2.4s ease-out infinite}.uk-mu .lgin{border-radius:50%}
+@keyframes ukRing{from{transform:scale(.94);opacity:.9}to{transform:scale(1.12);opacity:0}}
+.uk-mu .untl2::before{width:0;background:none;border-left:3px dotted var(--sk-a2);left:6px}
+.uk-mu .untl2 li::before{background:var(--sk-a2);border:3px solid #fff;box-shadow:0 0 0 3px rgba(216,58,34,.3);animation:ukBeat 1.6s ease-in-out infinite}
+@keyframes ukBeat{0%,100%{transform:scale(1)}15%{transform:scale(1.28)}30%{transform:scale(1)}45%{transform:scale(1.18)}}
+.uk-mu .tlt{border-radius:14px}
+.uk-mu .engban{border-radius:18px}
+@media (min-width:760px){.uk-mu .untl2::before{left:50%;margin-left:-1.500px}}
+@media (prefers-reduced-motion:reduce){.uk-mu .lgframe::before,.uk-mu .untl2 li::before,.uk-psu .untl2 li::before{animation:none}}
+
+/* =====================================================================
+   ทุกมหาวิทยาลัยมีฉาก/ตรา/ลายคั่น/เส้นเวลาที่ขยับ — ปิดเองเมื่อผู้ใช้ตั้งค่า "ลดการเคลื่อนไหว"
+   ===================================================================== */
+@keyframes ukTw{0%,100%{opacity:.25;transform:scale(.7)}50%{opacity:1;transform:scale(1.15)}}
+.uk-tw{animation:ukTw 3s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 50%}
+@keyframes ukPg{0%,100%{opacity:.55;transform:scale(.92)}50%{opacity:1;transform:scale(1.08)}}
+.uk-pg{animation:ukPg 5s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 50%}
+@keyframes ukPg2{0%,100%{opacity:.68}50%{opacity:1}}.uk-pg2{animation:ukPg2 3.6s ease-in-out infinite}
+@keyframes ukSway{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.uk-sb{transform-box:fill-box;transform-origin:50% 100%}.uk-sway{animation:ukSway 3.2s ease-in-out infinite}
+@keyframes ukMarch{to{stroke-dashoffset:-14}}
+.uh-svg .uk-march{stroke-dasharray:2 5;animation:ukMarch 1.8s linear infinite}.uk-ku .uh-svg .uk-march{stroke-dasharray:8 6;animation-duration:2.4s}.uh-svg .uk-march.uk-rv{animation-direction:reverse}
+@keyframes ukDraw{0%{stroke-dashoffset:500}35%,70%{stroke-dashoffset:0}100%{stroke-dashoffset:-500}}
+.uk-kan path{stroke-dasharray:500;animation:ukDraw 8s ease-in-out infinite}.uk-kan path:nth-child(2){animation-delay:-1s}.uk-kan path:nth-child(3){animation-delay:-2s}.uk-kan path:nth-child(4){animation-delay:-3s}.uk-kan path:nth-child(5){animation-delay:-4s}
+@keyframes ukBreath{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.uk-breath{animation:ukBreath 6s ease-in-out infinite}.uk-b2{animation-duration:8s;animation-delay:-2s}.uk-b3{animation-duration:10s;animation-delay:-4s}
+@keyframes ukFly{0%,100%{transform:translate(0,0);opacity:.15}25%{transform:translate(14px,-12px);opacity:1}50%{transform:translate(-6px,-24px);opacity:.3}75%{transform:translate(-16px,-8px);opacity:1}}
+.uk-fly{animation:ukFly 7s ease-in-out infinite;filter:drop-shadow(0 0 3px #f4f79a)}
+@keyframes ukRise{0%{transform:translate(0,0);opacity:0}12%{opacity:.95}50%{transform:translate(10px,-140px)}100%{transform:translate(-6px,-300px);opacity:0}}
+.uk-rise{animation:ukRise 9s linear infinite}
+@keyframes ukBeam{0%,100%{opacity:.1;transform:scaleY(.35)}50%{opacity:.85;transform:scaleY(1)}}.uk-beam{animation:ukBeam 6s ease-in-out infinite}
+@keyframes ukBoatX{from{transform:translateX(0)}to{transform:translateX(250px)}}.uk-boatx{animation:ukBoatX 38s linear infinite alternate}
+@keyframes ukBoatBob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(3px) rotate(3deg)}}.uk-bob{animation:ukBoatBob 3.4s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes ukSlide{to{transform:translateX(124px)}}.uk-slide62{animation:ukSlide 4s linear infinite}
+@keyframes ukScan{from{transform:translateX(0)}to{transform:translateX(520px)}}.uk-scan{animation:ukScan 6s linear infinite}
+@keyframes ukBlk{0%,100%{opacity:1}50%{opacity:.2}}.uk-blink{animation:ukBlk 2.2s ease-in-out infinite}
+.uk-w4{--p:100px;animation:ukW 8s linear infinite}.uk-w5{--p:80px;animation:ukW 6s linear infinite}
+@keyframes ukRingS{from{transform:scale(.6);opacity:.9}to{transform:scale(3.2);opacity:0}}.uk-ring{transform-box:fill-box;transform-origin:50% 50%;animation:ukRingS 3.6s ease-out infinite}
+@keyframes ukCross{from{transform:translateX(-40px)}to{transform:translateX(440px)}}.uk-cross{animation:ukCross 30s linear infinite}
+@keyframes ukFlap{0%,100%{transform:scaleY(1)}50%{transform:scaleY(-.6)}}.uk-flap{animation:ukFlap .7s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+
+/* ---- ฮีโร่: ข้อความไล่ขึ้นทีละบรรทัด ตราลอย/เรืองแสง ลายคั่นกะพริบ ป้ายสถิติมีแสงวิ่งผ่าน ปุ่มสวมเสื้อเต้น ---- */
+@keyframes ukUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes ukFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes ukOrn{0%,100%{opacity:.62;transform:scaleX(.94)}50%{opacity:1;transform:scaleX(1.05)}}
+@keyframes ukShine{0%,55%{transform:translateX(-130%)}100%{transform:translateX(130%)}}
+@keyframes ukBtn{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--sk-a) 50%,transparent)}60%{box-shadow:0 0 0 9px transparent}}
+@keyframes ukFloatS{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.has-skin .uh-frame>*{animation:ukUp .8s cubic-bezier(.2,.8,.2,1) both}
+.has-skin .uh-frame>:nth-child(2){animation-delay:.1s}.has-skin .uh-frame>:nth-child(3){animation-delay:.18s}.has-skin .uh-frame>:nth-child(4){animation-delay:.26s}.has-skin .uh-frame>:nth-child(5){animation-delay:.34s}.has-skin .uh-frame>:nth-child(6){animation-delay:.42s}.has-skin .uh-frame>:nth-child(7){animation-delay:.5s}
+.has-skin .uh-frame>.orn{animation:ukUp .8s cubic-bezier(.2,.8,.2,1) .3s both,ukOrn 4s ease-in-out 1.2s infinite}
+.has-skin .chp .orn{animation:ukOrn 5s ease-in-out infinite}
+.has-skin .uh-emb{animation:ukUp .8s cubic-bezier(.2,.8,.2,1) both,ukFloat 5.5s ease-in-out .8s infinite}
+.has-skin .uh-stats>div{position:relative;overflow:hidden}
+.has-skin .uh-stats>div::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,transparent 38%,rgba(255,255,255,.4) 50%,transparent 62%);transform:translateX(-130%);animation:ukShine 5.5s ease-in-out infinite}
+.has-skin .uh-stats>div:nth-child(2)::after{animation-delay:.6s}.has-skin .uh-stats>div:nth-child(3)::after{animation-delay:1.2s}
+.uk-chula .uh-stats>div::after{background:linear-gradient(110deg,transparent 38%,rgba(216,27,122,.2) 50%,transparent 62%)}.uk-kmitl .uh-stats>div::after{background:linear-gradient(110deg,transparent 38%,rgba(232,89,12,.2) 50%,transparent 62%)}.uk-tu .uh-stats>div::after{background:linear-gradient(110deg,transparent 38%,rgba(200,16,46,.16) 50%,transparent 62%)}
+.has-skin .uh-met .pri{animation:ukBtn 2.8s ease-in-out infinite}
+.has-skin .uh-meav svg{animation:ukFloat 4s ease-in-out infinite}
+.has-skin .lgin svg{animation:ukFloatS 6s ease-in-out infinite}.has-skin .lg:nth-child(2n) .lgin svg{animation-delay:-2s}.has-skin .lg:nth-child(3n) .lgin svg{animation-delay:-4s}
+
+/* ตราของแต่ละมหาวิทยาลัยขยับต่างกัน */
+@keyframes ukGlowPink{0%,100%{filter:drop-shadow(0 8px 14px rgba(168,18,95,.3))}50%{filter:drop-shadow(0 10px 26px rgba(216,27,122,.7))}}
+@keyframes ukSwayE{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(4deg) translateY(-6px)}}
+@keyframes ukBobE{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(7px) rotate(3deg)}}
+@keyframes ukGlowGold{0%,100%{transform:scale(1);filter:drop-shadow(0 0 4px rgba(242,193,78,.4))}50%{transform:scale(1.05);filter:drop-shadow(0 0 20px rgba(242,193,78,.95))}}
+@keyframes ukGlowViolet{0%,100%{transform:translateY(0);filter:drop-shadow(0 0 4px rgba(190,150,255,.4))}50%{transform:translateY(-9px);filter:drop-shadow(0 0 20px rgba(190,150,255,.9))}}
+@keyframes ukStamp{0%,86%,100%{transform:scale(1) rotate(0)}91%{transform:scale(1.09) rotate(-2deg)}96%{transform:scale(.97) rotate(1deg)}}
+@keyframes ukSwing{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+@keyframes ukBorderB{0%,100%{border-color:#e8590c;box-shadow:0 0 0 0 rgba(232,89,12,.4)}50%{border-color:#ffb98a;box-shadow:0 0 0 8px rgba(232,89,12,0)}}
+@keyframes ukCorner{0%,100%{width:12px;height:12px}50%{width:20px;height:20px}}
+.uk-chula .uh-emb{animation:ukUp .8s both,ukFloat 5.5s ease-in-out .8s infinite,ukGlowPink 4s ease-in-out infinite}
+.uk-ku .uh-emb{animation:ukUp .8s both,ukSwayE 5s ease-in-out .8s infinite;transform-origin:50% 90%}
+.uk-psu .uh-emb{animation:ukUp .8s both,ukBobE 5s ease-in-out .8s infinite}
+.uk-kku .uh-emb{animation:ukUp .8s both,ukGlowGold 3.6s ease-in-out .8s infinite}
+.uk-cmu .uh-emb{animation:ukUp .8s both,ukGlowViolet 6s ease-in-out .8s infinite}
+.uk-kmutt .uh-emb{animation:ukUp .8s both,ukFloat 6s ease-in-out .8s infinite}.uk-kmutt .uh-emb::before,.uk-kmutt .uh-emb::after{animation:ukCorner 2.4s ease-in-out infinite}
+.uk-kmitl .uh-emb{animation:ukUp .8s both,ukBorderB 2.4s ease-in-out .8s infinite}
+.uk-kmutnb .uh-emb{animation:ukUp .8s both,ukStamp 3.8s ease-in-out .8s infinite}
+.uk-tu .uh-emb{animation:ukUp .8s both,ukSwing 5s ease-in-out .8s infinite;transform-origin:50% 0}
+.uk-mu .uh-emb{animation:ukUp .8s both,ukBeat 1.6s ease-in-out .8s infinite}
+
+/* ลายคั่น (ornament) ของแต่ละที่ขยับเฉพาะตัว */
+@keyframes ukDash{from{stroke-dashoffset:300}to{stroke-dashoffset:-300}}@keyframes ukFlame{0%,100%{transform:scale(1,1)}50%{transform:scale(1.1,1.2)}}
+.uk-mu .orn path{stroke-dasharray:300;animation:ukDash 3.5s linear infinite}
+.uk-psu .orn path:first-child{stroke-dasharray:4 4;animation:ukMarch 1.6s linear infinite}
+.uk-kmitl .orn circle{animation:ukBlk 1.4s ease-in-out infinite}.uk-kmitl .orn circle:nth-child(2){animation-delay:.3s}.uk-kmitl .orn circle:nth-child(3){animation-delay:.6s}.uk-kmitl .orn circle:nth-child(4){animation-delay:.9s}
+.uk-kmutnb .orn path:nth-child(n+2):nth-child(-n+5){animation:ukBlk 1.2s ease-in-out infinite}.uk-kmutnb .orn path:nth-child(3){animation-delay:.15s}.uk-kmutnb .orn path:nth-child(4){animation-delay:.3s}.uk-kmutnb .orn path:nth-child(5){animation-delay:.45s}
+.uk-kmutt .orn path:last-child{transform-box:fill-box;transform-origin:50% 50%;animation:ukSpin 7s linear infinite}
+.uk-tu .orn g:nth-of-type(2){transform-box:fill-box;transform-origin:50% 50%;animation:ukSpin 9s linear infinite}
+.uk-cmu .orn path:last-child{transform-box:fill-box;transform-origin:50% 100%;animation:ukFlame 1.7s ease-in-out infinite}
+.uk-ku .orn path:nth-child(n+2){transform-box:fill-box;transform-origin:50% 100%;animation:ukSway 3.2s ease-in-out infinite}
+
+/* เส้นเวลาที่เดิมนิ่ง ให้ขยับด้วย */
+@keyframes ukDia{0%,100%{transform:rotate(45deg) scale(1)}50%{transform:rotate(45deg) scale(1.3)}}
+@keyframes ukStripe{to{background-position:0 40px}}
+@keyframes ukPad{0%,100%{box-shadow:0 0 0 2px #e8590c}50%{box-shadow:0 0 0 7px rgba(232,89,12,0)}}
+@keyframes ukChev{0%,100%{transform:translateX(0);opacity:.6}50%{transform:translateX(7px);opacity:1}}
+@keyframes ukTri{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes ukLeafG{0%,100%{filter:none}50%{filter:brightness(1.5) drop-shadow(0 0 5px #4cd08a)}}
+.uk-chula .untl2 li::before{animation:ukDia 3s ease-in-out infinite}
+.uk-kku .untl2 li::before{background-size:100% 40px!important;animation:ukStripe 3s linear infinite}
+.uk-kmitl .untl2 li::before{animation:ukPad 2.4s ease-in-out infinite}
+.uk-kmutnb .untl2 li::before{animation:ukChev 1.3s ease-in-out infinite}
+.uk-cmu .untl2 li::before{animation:ukTri 3s ease-in-out infinite}
+.uk-ku .untl2 li::before{animation:ukLeafG 3.5s ease-in-out infinite}
+.uk-tu .tly{overflow:hidden}.uk-tu .tly::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.45) 50%,transparent 65%);transform:translateX(-130%);animation:ukShine 4.5s ease-in-out infinite}
+.uk-chula .untl2 li:nth-child(2n)::before,.uk-cmu .untl2 li:nth-child(2n)::before,.uk-ku .untl2 li:nth-child(2n)::before{animation-delay:-1.2s}
+
+/* ผู้ใช้ตั้งค่าลดการเคลื่อนไหว → หยุดทุกอย่างในหน้านี้ */
+@media (prefers-reduced-motion:reduce){.has-skin *,.has-skin *::before,.has-skin *::after{animation:none!important}.has-skin .uh-frame>*{opacity:1}}

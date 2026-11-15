@@ -26,7 +26,7 @@ function legendCard(L, i) {
     <h5>${esc(L.n)}</h5><div class="lgrole">${esc(L.role)}</div>${L.yr ? `<div class="lgyr">${esc(L.yr)}</div>` : ''}
     <details class="lgmore"><summary>อ่านเรื่องราว</summary><p>${esc(L.st)}</p></details></article>`;
 }
-const chapter = (no, title, sub) => `<div class="chp"><span class="chn">บทที่ ${thNum(no)}</span><h3>${title}</h3>${sub ? `<div class="chs">${sub}</div>` : ''}${ORN}</div>`;
+const chapter = (no, title, sub, sk) => `<div class="chp" data-no="${thNum(String(no).padStart(2, '0'))}"><span class="chn">${sk && sk.lab ? sk.lab(no) : 'บทที่ ' + thNum(no)}</span><h3>${title}</h3>${sub ? `<div class="chs">${sub}</div>` : ''}${sk && sk.orn ? sk.orn : ORN}</div>`;
 
 function uniPage(id) {
   let el = document.getElementById('unipage'); if (el) el.remove(); document.body.classList.remove('uni-open');
@@ -36,42 +36,47 @@ function uniPage(id) {
   const facts = [['calendar', 'ก่อตั้ง', I.founded], ['pin', 'ที่ตั้ง', I.place], ['flag', 'ใครเป็นผู้ริเริ่ม', I.founder], ['tree', 'ต้นไม้ประจำมหาวิทยาลัย', u.tree], ['crest', 'สัญลักษณ์', u.symbol], ['palette', 'สีประจำ', u.color]].map(fact).join('');
   const nav = [['about', 'พงศาวดาร'], ['strong', 'เสาหลัก'], ['legend', 'บุคคลสำคัญ'], ['fac', 'คณะ'], ['eng', 'วิศวะที่นี่'], ['tl', 'เส้นเวลา']];
   const L = (typeof UNILEG !== 'undefined' && UNILEG[id]) || [];
+  const sk = (typeof UNISKIN !== 'undefined' && UNISKIN[id]) || null; if (sk) uniFont(sk);   // หน้าตาเฉพาะของแต่ละมหาวิทยาลัย (data/uni_skin.js)
+  const ct = (i, dt, ds) => sk ? sk.ch[i] : [dt, ds];
+  const deco = sk && typeof UNIDECO !== 'undefined' && UNIDECO[id] ? UNIDECO[id](I, E) : '';
+  const stl = sk && sk.stat ? sk.stat : ['ก่อตั้งมหาวิทยาลัย', 'กำเนิดคณะวิศวะ', 'ปีของวิศวะที่นี่'];
   const bornN = parseInt(String(E.born).replace(/\D/g, '').slice(0, 4)), thNow = new Date().getFullYear() + 543, age = bornN ? thNow - bornN : 0;
   const me = typeof avatarSvg === 'function' ? `<div class="uh-me"><div class="uh-meav">${avatarSvg({ top: 'uni:' + id }, { w: 92 })}</div><div class="uh-met"><b>ลองสวมเสื้อช็อปของที่นี่</b><small>ตัวละครของคุณจะใส่เสื้อช็อป ${esc(t.s || t.n)} ทันที</small><div class="row" style="gap:8px;margin-top:8px"><button class="pri" data-a="avWearUni" data-v="${id}">สวมเลย</button><button data-a="avOpen">ห้องแต่งตัว</button></div></div></div>` : '';
-  el = document.createElement('div'); el.id = 'unipage'; el.dataset.u = id; el.className = 'omr uniomr uh-omr'; el.setAttribute('data-a', 'uniClose'); el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'รู้จัก ' + t.n);
+  el = document.createElement('div'); el.id = 'unipage'; el.dataset.u = id; el.className = 'omr uniomr uh-omr' + (sk ? ' has-skin uk-' + id : ''); el.setAttribute('data-a', 'uniClose'); el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'รู้จัก ' + t.n);
   el.innerHTML = `<div>
     <div class="unitop"><b>${uic('book', 18)} ตำนานมหาวิทยาลัย</b><span><button data-a="uniPickOther">เปลี่ยนที่อื่น</button> <button class="pri" data-a="uniClose">ปิด</button></span></div>
     <div class="unibody">
-      <header class="uh uni-${id}"><div class="uh-rays" aria-hidden="true"></div><div class="uh-dust" aria-hidden="true"></div>
+      <header class="uh uni-${id} lay-${sk ? sk.lay : 'c'}">${sk ? `<div class="uh-sc" aria-hidden="true">${sk.scene()}</div>` : '<div class="uh-rays" aria-hidden="true"></div><div class="uh-dust" aria-hidden="true"></div>'}${deco}
         <div class="uh-frame"><div class="uh-emb">${uniMark(id, 112)}</div>
-          <div class="uh-kick">ตำนานแห่งบัณฑิตวิศวะ</div>
-          <h2>${esc(t.n)}</h2><div class="uh-en">${esc(I.en)}</div>${ORN}
+          <div class="uh-kick">${sk ? sk.kick : 'ตำนานแห่งบัณฑิตวิศวะ'}</div>
+          <h2>${esc(t.n)}</h2><div class="uh-en">${esc(I.en)}</div>${sk ? sk.orn : ORN}
           <div class="uh-q"><span>“</span>${esc(u.motto)}<span>”</span></div>
-          <div class="uh-stats"><div><b>${thNum(String(I.founded).match(/\d{4}/) ? String(I.founded).match(/\d{4}/)[0] : '—')}</b><small>ก่อตั้งมหาวิทยาลัย</small></div><div><b>${thNum(E.born.replace(/\D/g, '').slice(0, 4))}</b><small>กำเนิดคณะวิศวะ</small></div>${age ? `<div><b>${thNum(age)}</b><small>ปีของวิศวะที่นี่</small></div>` : ''}</div></div>
+          <div class="uh-stats"><div><b>${thNum(String(I.founded).match(/\d{4}/) ? String(I.founded).match(/\d{4}/)[0] : '—')}</b><small>${stl[0]}</small></div><div><b>${thNum(E.born.replace(/\D/g, '').slice(0, 4))}</b><small>${stl[1]}</small></div>${age ? `<div><b>${thNum(age)}</b><small>${stl[2]}</small></div>` : ''}</div></div>
         ${me}
       </header>
       <nav class="uninav">${nav.map(([k, v]) => `<button class="chip" data-a="uniGo" data-v="${k}">${v}</button>`).join('')}</nav>
 
-      <section id="us-about" class="rvs">${chapter(1, 'พงศาวดารมหาวิทยาลัย', 'จุดเริ่มต้นและเรื่องราวที่ทำให้เกิดที่นี่')}<p class="uniprose lead">${esc(I.story)}</p><div class="unifacts">${facts}</div></section>
+      <section id="us-about" class="rvs">${chapter(1, ...ct(0, 'พงศาวดารมหาวิทยาลัย', 'จุดเริ่มต้นและเรื่องราวที่ทำให้เกิดที่นี่'), sk)}<p class="uniprose lead">${esc(I.story)}</p><div class="unifacts">${facts}</div></section>
 
-      <section id="us-strong" class="rvs">${chapter(2, 'เสาหลักแห่งความโดดเด่น', 'สิ่งที่ทำให้มหาวิทยาลัยนี้ไม่เหมือนที่ไหน')}<div class="unistrong">${I.strong.map((s, i) => `<div class="unis"><span class="n">${thNum(i + 1)}</span><b>${esc(s[0])}</b><p>${esc(s[1])}</p></div>`).join('')}</div></section>
+      <section id="us-strong" class="rvs">${chapter(2, ...ct(1, 'เสาหลักแห่งความโดดเด่น', 'สิ่งที่ทำให้มหาวิทยาลัยนี้ไม่เหมือนที่ไหน'), sk)}<div class="unistrong">${I.strong.map((s, i) => `<div class="unis"><span class="n">${thNum(i + 1)}</span><b>${esc(s[0])}</b><p>${esc(s[1])}</p></div>`).join('')}</div></section>
 
-      ${L.length ? `<section id="us-legend" class="rvs wide">${chapter(3, 'ทำเนียบบุคคลสำคัญ', 'ผู้วางรากฐาน ผู้ริเริ่ม และผู้ร่วมสร้างวิศวะที่นี่ — แตะ “อ่านเรื่องราว” ที่การ์ด')}<div class="lgrow" tabindex="0" aria-label="บุคคลสำคัญ">${L.map(legendCard).join('')}</div><p class="mute lgnote">${uic('info', 14)} ภาพบุคคลเป็นการ์ตูนที่วาดขึ้นตามจินตนาการ ไม่ใช่ภาพเหมือนจริง • พระมหากษัตริย์และพระบรมวงศ์แสดงเป็นตราสัญลักษณ์เพื่อความเหมาะสม • เนื้อหาสรุปจาก Wikipedia ภาษาไทย</p></section>` : ''}
+      ${L.length ? `<section id="us-legend" class="rvs wide">${chapter(3, ct(2, 'ทำเนียบบุคคลสำคัญ', '')[0], (sk ? sk.ch[2][1] : 'ผู้วางรากฐาน ผู้ริเริ่ม และผู้ร่วมสร้างวิศวะที่นี่') + ' — แตะ “อ่านเรื่องราว” ที่การ์ด', sk)}<div class="lgrow" tabindex="0" aria-label="บุคคลสำคัญ">${L.map(legendCard).join('')}</div><p class="mute lgnote">${uic('info', 14)} ภาพบุคคลเป็นการ์ตูนที่วาดขึ้นตามจินตนาการ ไม่ใช่ภาพเหมือนจริง • พระมหากษัตริย์และพระบรมวงศ์แสดงเป็นตราสัญลักษณ์เพื่อความเหมาะสม • เนื้อหาสรุปจาก Wikipedia ภาษาไทย</p></section>` : ''}
 
-      <section id="us-fac" class="rvs">${chapter(L.length ? 4 : 3, 'ราชอาณาจักรแห่งคณะ', 'คณะและหน่วยงานการเรียนการสอนในมหาวิทยาลัย')}${I.fac.map((g, i) => `<details ${i === 0 ? 'open' : ''}><summary>${esc(g[0])} <span class="mute">(${g[1].length})</span></summary><div class="unichips big">${g[1].map(f => `<span class="${/วิศวกรรม/.test(f) ? 'hl' : ''}">${esc(f)}</span>`).join('')}</div></details>`).join('')}<p class="mute" style="font-size:12px;margin-top:6px">รายชื่อคณะตามที่ Wikipedia ภาษาไทยรวบรวมไว้ ชื่อและจำนวนเปลี่ยนได้เมื่อมีการจัดตั้งหรือยุบรวม</p></section>
+      <section id="us-fac" class="rvs">${chapter(L.length ? 4 : 3, ...ct(3, 'ราชอาณาจักรแห่งคณะ', 'คณะและหน่วยงานการเรียนการสอนในมหาวิทยาลัย'), sk)}${I.fac.map((g, i) => `<details ${i === 0 ? 'open' : ''}><summary>${esc(g[0])} <span class="mute">(${g[1].length})</span></summary><div class="unichips big">${g[1].map(f => `<span class="${/วิศวกรรม/.test(f) ? 'hl' : ''}">${esc(f)}</span>`).join('')}</div></details>`).join('')}<p class="mute" style="font-size:12px;margin-top:6px">รายชื่อคณะตามที่ Wikipedia ภาษาไทยรวบรวมไว้ ชื่อและจำนวนเปลี่ยนได้เมื่อมีการจัดตั้งหรือยุบรวม</p></section>
 
-      <section id="us-eng" class="rvs">${chapter(L.length ? 5 : 4, 'กำเนิดวิศวกรรมศาสตร์', E.title)}<div class="engban"><div class="engyear"><small>ปีที่ก่อตั้ง</small><b>${thNum(E.born.replace(/\D/g, '').slice(0, 4))}</b><small>พ.ศ.</small></div><div><div class="engkick">${uic('gear', 16)} วิศวกรรมศาสตร์</div><div class="engtag">${esc(E.tag)}</div></div></div>
+      <section id="us-eng" class="rvs">${chapter(L.length ? 5 : 4, sk ? sk.ch[4][0] : 'กำเนิดวิศวกรรมศาสตร์', E.title, sk)}<div class="engban"><div class="engyear"><small>ปีที่ก่อตั้ง</small><b>${thNum(E.born.replace(/\D/g, '').slice(0, 4))}</b><small>พ.ศ.</small></div><div><div class="engkick">${uic('gear', 16)} วิศวกรรมศาสตร์</div><div class="engtag">${esc(E.tag)}</div></div></div>
         <p class="uniprose">${esc(E.lead)}</p>
         ${L.length ? '' : `<h4>ใครอยู่เบื้องหลัง</h4><div class="unipeople">${E.people.map(p => `<div><i>${uic('user', 16)}</i><div><b>${esc(p[0])}</b><span>${esc(p[1])}</span></div></div>`).join('')}</div>`}
         <h4>สาขา/ภาควิชาที่เปิดสอน</h4><div class="unichips big">${E.depts.map(d => `<span>${esc(d)}</span>`).join('')}</div>
         <h4>รู้ไหมว่า</h4><ul class="unifl">${E.facts.map(f => `<li>${uic('bulb', 16)}<span>${esc(f)}</span></li>`).join('')}</ul></section>
 
-      <section id="us-tl" class="rvs">${chapter(L.length ? 6 : 5, 'ลำดับกาลเวลา', 'จากวันแรกถึงปัจจุบัน')}<ol class="untl2">${E.timeline.map(([y, tx], i) => `<li style="--i:${i}"><span class="tly">${thNum(String(y).replace('พ.ศ. ', ''))}</span><span class="tlt">${esc(tx)}</span></li>`).join('')}</ol></section>
+      <section id="us-tl" class="rvs">${chapter(L.length ? 6 : 5, ...ct(5, 'ลำดับกาลเวลา', 'จากวันแรกถึงปัจจุบัน'), sk)}<ol class="untl2">${E.timeline.map(([y, tx], i) => `<li style="--i:${i}"><span class="tly">${thNum(String(y).replace('พ.ศ. ', ''))}</span><span class="tlt">${esc(tx)}</span></li>`).join('')}</ol></section>
 
-      <section class="uniend">${ORN}<div class="row" style="gap:8px;justify-content:center;flex-wrap:wrap"><a class="btn" href="${esc(I.web)}" target="_blank" rel="noopener">${uic('link', 16)} เว็บคณะวิศวะ</a><a class="btn" href="${esc(I.ewiki)}" target="_blank" rel="noopener">ประวัติคณะ (Wikipedia)</a><a class="btn" href="${esc(I.wiki)}" target="_blank" rel="noopener">เกี่ยวกับมหาวิทยาลัย</a></div>
+      <section class="uniend">${sk ? sk.orn : ORN}<div class="row" style="gap:8px;justify-content:center;flex-wrap:wrap"><a class="btn" href="${esc(I.web)}" target="_blank" rel="noopener">${uic('link', 16)} เว็บคณะวิศวะ</a><a class="btn" href="${esc(I.ewiki)}" target="_blank" rel="noopener">ประวัติคณะ (Wikipedia)</a><a class="btn" href="${esc(I.wiki)}" target="_blank" rel="noopener">เกี่ยวกับมหาวิทยาลัย</a></div>
         <p class="mute" style="font-size:12px;margin-top:10px">${uic('info', 14)} ข้อมูลสรุปจาก Wikipedia ภาษาไทยของมหาวิทยาลัยและคณะ (ตรวจเมื่อ พ.ย. 2569) บางหัวข้อในหน้าต้นทางยังไม่มีแหล่งอ้างอิง ตัวเลขอันดับและจำนวนหลักสูตรเปลี่ยนได้ ก่อนตัดสินใจสมัครควรเช็กกับเว็บคณะและ mytcas.com อีกครั้ง • ตราและเสื้อช็อปในแอปเป็นภาพที่วาดเอง ไม่ใช่ตราทางการ</p></section>
     </div></div>`;
   document.body.appendChild(el); document.body.classList.add('uni-open');
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches) el.querySelectorAll('animate,animateTransform,animateMotion').forEach(a => a.remove());   // ฉาก SVG ที่ใช้ SMIL ไม่ขยับเมื่อผู้ใช้ตั้งค่าลดการเคลื่อนไหว
   const b = el.querySelector('.unibody'); if (b) { b.scrollTop = 0; uniReveal(b); }
 }
 // ให้แต่ละบทค่อย ๆ ปรากฏเมื่อเลื่อนมาถึง (ปิดเองเมื่อผู้ใช้ตั้งค่าลดการเคลื่อนไหว)

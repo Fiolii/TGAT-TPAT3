@@ -59,9 +59,10 @@ const ICON = {
   stats: 'M4 20V10M10 20V4M16 20v-8M22 20H2',
   timer: 'M12 8v5l3 2M9 2h6M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16z',
   book: 'M4 5a2 2 0 0 1 2-2h14v15H6a2 2 0 0 0-2 2zM4 20a2 2 0 0 0 2 2h14',
+  cal: 'M4 6h16v15H4zM4 10h16M8 3v4M16 3v4M8 14h2M12 14h2M16 14h.01M8 17.500h2M12 17.500h2',
 };
 const ico = n => `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${ICON[n]}"/></svg>`;
-const NAV = [['', 'หน้าแรก', 'home'], ['exam', 'ทำข้อสอบ', 'exam'], ['stats', 'สถิติ', 'stats'], ['timer', 'จับเวลา', 'timer'], ['library', 'คลังความรู้', 'book']];
+const NAV = [['', 'หน้าแรก', 'home'], ['exam', 'ทำข้อสอบ', 'exam'], ['stats', 'สถิติ', 'stats'], ['timer', 'จับเวลา', 'timer'], ['cal', 'ปฏิทิน', 'cal'], ['library', 'คลังความรู้', 'book']];
 $('#dnav').innerHTML = NAV.map(([r, t, i]) => `<a href="#/${r}" data-r="${r}">${ico(i)}${t}</a>`).join('');
 $('#tabbar').innerHTML = NAV.map(([r, t, i]) => `<a href="#/${r}" data-r="${r}">${ico(i)}<span>${t}</span></a>`).join('');
 
@@ -128,7 +129,7 @@ setInterval(tick, 500);
 let E = null;      // exam state
 const X = { mode: 'practice', group: '', subject: '', topic: '', src: 'all', n: 10, shuffle: true };
 let libTab = 'lessons', libOpen = '';
-const routes = { '': viewHome, exam: viewExam, stats: viewStats, timer: viewTimer, library: viewLibrary, me: viewMe };
+const routes = { '': viewHome, exam: viewExam, stats: viewStats, timer: viewTimer, cal: viewCal, library: viewLibrary, me: viewMe };
 function render(keepScroll) {
   const r = (location.hash.replace(/^#\/?/, '') || '').split('/')[0];
   document.querySelectorAll('[data-r]').forEach(a => a.classList.toggle('on', a.dataset.r === r));
@@ -197,9 +198,11 @@ function viewHome() {
   const weak = weakTopics().slice(0, 3);
   const th = THEMES.find(x => x.id === store.get('theme', 'sixent')) || THEMES[0];
   const un = uniOf(th.id);
-  return `<div class="card hero uni-${th.id}">${th.id === 'sixent' ? '<svg class="gearmark" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="10" stroke-dasharray="9.95"/><circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/></svg>' : `<div class="heroicon" aria-hidden="true">${uniLogoHtml(th.id, 74)}</div>`}<h1>${th.s ? 'สู่วิศวะ ' + esc(th.s) : 'พร้อมติวหรือยัง? 🚀'}</h1>${th.s ? `<div class="unimotto herom">“${esc(un.motto)}”</div>` : ''}<p>เปิดข้อสอบทีละหน้าเหมือนสนามจริง ทบทวนจุดอ่อน และจับเวลาการอ่าน</p>
+  return `<div class="card hero uni-${th.id}">${dressHero()}${th.id === 'sixent' ? '<svg class="gearmark" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="none" stroke="currentColor" stroke-width="10" stroke-dasharray="9.95"/><circle cx="50" cy="50" r="32" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="50" r="10" fill="none" stroke="currentColor" stroke-width="4"/></svg>' : `<div class="heroicon" aria-hidden="true">${uniLogoHtml(th.id, 74)}</div>`}<h1>${th.s ? 'สู่วิศวะ ' + esc(th.s) : 'พร้อมติวหรือยัง? 🚀'}</h1>${th.s ? `<div class="unimotto herom">“${esc(un.motto)}”</div>` : ''}<p>เปิดข้อสอบทีละหน้าเหมือนสนามจริง ทบทวนจุดอ่อน และจับเวลาการอ่าน</p>
     <div class="row"><a class="btn w" href="#/exam">เริ่มทำข้อสอบ</a><a class="btn" href="#/timer">เริ่มจับเวลา</a></div></div>
   ${uniCard()}
+  ${branchCard()}
+  ${dqCard()}
   ${dailyCard()}
   <div id="frstrip">${typeof friendStrip === 'function' ? friendStrip(false) : ''}</div>
   ${achCard()}
@@ -371,16 +374,17 @@ function viewStats() {
 /* ====================== timer ====================== */
 function viewTimer() {
   const pomo = T.mode === 'pomo';
-  return `<h1>จับเวลา</h1><div id="frstrip2">${typeof friendStrip === 'function' ? friendStrip(true) : ''}</div><div class="card">
+  return `<h1>จับเวลา</h1>${yptDday()}<div id="frstrip2">${typeof friendStrip === 'function' ? friendStrip(true) : ''}</div><div class="card">
   <div class="chips" style="justify-content:center"><button class="chip ${pomo ? 'on' : ''}" data-a="tmode" data-v="pomo">Pomodoro</button><button class="chip ${!pomo ? 'on' : ''}" data-a="tmode" data-v="sw">จับเวลาอิสระ</button></div>
   ${pomo ? `<div class="chips" style="justify-content:center">${[[25, 5], [45, 10], [50, 10], [90, 15]].map(([f, b]) => `<button class="chip ${T.focusMin === f && T.breakMin === b ? 'on' : ''}" data-a="tpreset" data-v="${f},${b}">${f}/${b}</button>`).join('')}</div>` : ''}
-  <div class="tring"><svg viewBox="0 0 220 220"><circle cx="110" cy="110" r="100" fill="none" stroke="var(--line)" stroke-width="12"/><circle id="ring" cx="110" cy="110" r="100" fill="none" stroke="${T.phase === 'focus' ? 'var(--pri)' : 'var(--ok)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="628" stroke-dashoffset="${pomo ? 628 * (1 - T.remain / phaseTotal()) : 0}" style="transition:stroke-dashoffset .5s linear"/></svg>
+  <div class="tring">${dressTimer()}<svg viewBox="0 0 220 220"><circle cx="110" cy="110" r="100" fill="none" stroke="var(--line)" stroke-width="12"/><circle id="ring" cx="110" cy="110" r="100" fill="none" stroke="${T.phase === 'focus' ? 'var(--pri)' : 'var(--ok)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="628" stroke-dashoffset="${pomo ? 628 * (1 - T.remain / phaseTotal()) : 0}" style="transition:stroke-dashoffset .5s linear"/></svg>
     <div class="ct"><div class="mute">${pomo ? (T.phase === 'focus' ? '🎯 โฟกัส' : '☕ พัก') : '⏱ นับขึ้น'}</div><div class="clock" id="clk">0:00</div></div></div>
   <div class="row" style="justify-content:center">${T.running ? '<button class="pri" data-a="tpause">⏸ หยุดชั่วคราว</button>' : '<button class="pri" data-a="tstart">▶ เริ่ม</button>'}<button data-a="tstop">✔ จบ + บันทึก</button><button data-a="treset">↺ รีเซ็ต</button></div>
   <hr style="border:0;border-top:1px solid var(--line);margin:16px 0">
-  <label><span>วิชา/หัวข้อที่อ่าน</span><select data-change="tsub"><option value="">ทั่วไป</option>${uniq(allQ().map(q => q.subject)).map(s => `<option ${T.subject === s ? 'selected' : ''}>${esc(s)}</option>`).join('')}</select></label>
+  ${yptSubjects()}
   ${pomo ? `<label><span>โฟกัส (นาที)</span><input id="tf" type="number" min="1" value="${T.focusMin}" style="width:90px" data-change="tcfg"></label><label><span>พัก (นาที)</span><input id="tb" type="number" min="1" value="${T.breakMin}" style="width:90px" data-change="tcfg"></label>` : ''}
   <p class="mute">เวลาที่อ่านตั้งแต่ 1 นาทีขึ้นไปจะบันทึกลงสถิติ นาฬิกายังเดินต่อแม้เปลี่ยนหน้า (แต่ต้องเปิดแอปค้างไว้)</p></div>
+  ${yptStudyCard()}${yptPlanner()}${yptRank()}
   <div class="card"><h2>บันทึกล่าสุด</h2>${studies.slice(-6).reverse().map(s => `<div class="row between" style="padding:4px 0"><span>${new Date(s.ts).toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' })} · ${esc(s.subject)}</span><b>${Math.round(s.secs / 60)} นาที</b></div>`).join('') || '<span class="mute">ยังไม่มี</span>'}</div>`;
 }
 
@@ -507,7 +511,7 @@ function lessonView(k) {
 
 /* ====================== actions ====================== */
 const ACT = {
-  ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT, ...CHAR_ACT, ...SOC_ACT,
+  ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT, ...CHAR_ACT, ...SOC_ACT, ...BRANCH_ACT, ...YPT_ACT, ...CAL_ACT, ...DQ_ACT,
   setDate() { examDate = val('ed'); save(); render(true); },
   setExam(v) { examDate = v; save(); if ((location.hash || '#/') === '#/') render(true); else alert('ตั้งวันนับถอยหลังเป็น ' + v + ' แล้ว (ดูที่หน้าแรก)'); },
   themeOpen() { uniPage(null); themeSheet(true); }, themeClose() { themeSheet(false); },
@@ -614,6 +618,7 @@ function applyTheme() {
   const lg = document.querySelector('.logo'); if (lg) { if (t.id === 'sixent') { lg.classList.remove('emb'); lg.textContent = 'S'; } else { lg.classList.add('emb'); lg.innerHTML = uniMark(t.id, 32); } }
   const tb = document.querySelector('.themebtn[data-a=themeOpen]'); if (tb) tb.innerHTML = t.id === 'sixent' ? uic('palette', 22) : uniMark(t.id, 28);
   uniFavicon(t.id);
+  if (typeof dressApply === 'function') dressApply();   // ฉากพื้นหลัง/ลายคั่น/ธีมสาขา (data/dress.js)
   const mt =document.querySelector('meta[name=theme-color]'); if (mt) mt.content = t.pl;
   const sub = document.querySelector('.brand small'); if (sub) sub.textContent = t.s ? 'ติวเข้าวิศวะ · ' + t.s : 'ติวเข้าวิศวะ';
 }
@@ -631,6 +636,7 @@ function themeSheet(open) {
     <div class="swgrid">${THEMES.filter(t => t.id === 'sixent' || t.e8).map(sw).join('')}</div>
     <p class="mute" style="margin:10px 0 4px">มหาวิทยาลัยอื่นที่มีคณะวิศวะ</p><div class="swgrid">${THEMES.filter(t => t.id !== 'sixent' && !t.e8).map(sw).join('')}</div>
     <p class="mute" style="margin:10px 0 4px">โหมดหน้าจอ</p><div class="chips">${[['auto', 'อัตโนมัติ'], ['light', '☀ สว่าง'], ['dark', '🌙 มืด']].map(([k, v]) => `<button class="chip ${sc === k ? 'on' : ''}" data-a="schemePick" data-v="${k}">${v}</button>`).join('')}</div>
+    ${dressSheetExtra()}
     <p class="mute" style="font-size:12px">คติพจน์ สี ต้นไม้ สัญลักษณ์ และประวัติคณะอ้างอิงจาก Wikipedia ไทยของแต่ละมหาวิทยาลัย ตราสัญลักษณ์ เฉดสี ลายพื้นหลัง และเสื้อช็อปเป็นภาพที่วาดเองตามสัญลักษณ์ ไม่ใช่ตราหรือเสื้อทางการ — อยากใช้ตราหรือเสื้อจริง วางรูปไว้ในโฟลเดอร์ icons/uni/ (ดูไฟล์ README ในโฟลเดอร์)</p></div>`;
   document.body.appendChild(el);
 }
