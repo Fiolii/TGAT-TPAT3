@@ -1,10 +1,12 @@
-// คลิปแนะนำ SIXENT: เด้งขึ้นทุกครั้งที่เปิดเว็บ จนกว่าผู้ใช้จะติ๊ก "ไม่ต้องแสดงอีก" (เก็บใน sx_promo_off)
+// คลิปแนะนำ SIXENT: เด้งขึ้นทุกครั้งที่เปิดเว็บ ถ้าติ๊ก "ไม่ต้องแสดงอีกวันนี้" จะเงียบจนถึงเที่ยงคืน แล้วกลับมาเด้งใหม่ทุกวัน (เก็บใน sx_promo_off)
 // เริ่มเล่นแบบปิดเสียง (เบราว์เซอร์ไม่ให้เล่นเสียงเองก่อนผู้ใช้แตะ) มีปุ่มเปิดเสียง/หยุด/ข้าม · ไฟล์เว็บ 720×1280 (~20 MB) อยู่ที่ assets/promo/ (ต้นฉบับ 1080p อยู่ใน promo/renders ไม่ได้ขึ้นเว็บ) — ถ้าเปลี่ยนไฟล์ให้ตั้งชื่อใหม่เพื่อไม่ให้ติดแคช
 const PROMO_SRC = 'assets/promo/sixent-promo-hd.mp4', PROMO_POSTER = 'assets/promo/poster.jpg';
-const promoOff = () => { try { return JSON.parse(localStorage.getItem('sx_promo_off')) === true; } catch { return false; } };
+// เก็บ "วันที่" (ตามเวลาเครื่อง) ที่ผู้ใช้ติ๊กไม่ต้องแสดง — พอข้ามเที่ยงคืนวันที่เปลี่ยน คลิปจะกลับมาเด้งใหม่เอง (ค่าเก่า true จากรุ่นก่อนถือว่าหมดอายุ)
+const promoToday = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+const promoOff = () => { try { return JSON.parse(localStorage.getItem('sx_promo_off')) === promoToday(); } catch { return false; } };
 function promoClose(save) {
   const o = document.getElementById('promo'); if (!o) return;
-  const v = o.querySelector('video'); if (save && o.querySelector('#promoskip').checked) { try { localStorage.setItem('sx_promo_off', 'true'); } catch { } }
+  const v = o.querySelector('video'); if (save && o.querySelector('#promoskip').checked) { try { localStorage.setItem('sx_promo_off', JSON.stringify(promoToday())); } catch { } }
   if (v) { v.pause(); v.removeAttribute('src'); v.load(); }   // หยุดโหลดไฟล์ที่ค้างอยู่
   o.classList.add('out'); document.body.classList.remove('promo-open'); document.removeEventListener('keydown', promoKey);
   setTimeout(() => o.remove(), 220);
@@ -18,7 +20,7 @@ function promoOpen(manual) {
       <div class="promo-bar"><i></i></div>
       <button class="promo-snd" aria-label="เปิดเสียง">🔇 แตะเพื่อเปิดเสียง</button>
       <button class="promo-pp" aria-label="หยุดชั่วคราว">⏸</button></div>
-    <div class="promo-foot"><label class="promo-chk"><input type="checkbox" id="promoskip"${manual ? '' : ''}><span>ไม่ต้องแสดงอีก</span></label>
+    <div class="promo-foot"><label class="promo-chk"><input type="checkbox" id="promoskip"${manual ? '' : ''}><span>ไม่ต้องแสดงอีกวันนี้</span></label>
       <button class="pri promo-go" id="promogo">เริ่มใช้งาน ›</button></div></div>`;
   document.body.appendChild(o); document.body.classList.add('promo-open'); document.addEventListener('keydown', promoKey);
   const v = o.querySelector('video'), bar = o.querySelector('.promo-bar i'), snd = o.querySelector('.promo-snd'), pp = o.querySelector('.promo-pp');
