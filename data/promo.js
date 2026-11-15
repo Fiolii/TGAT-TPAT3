@@ -1,6 +1,6 @@
 // คลิปแนะนำ SIXENT: เด้งขึ้นทุกครั้งที่เปิดเว็บ จนกว่าผู้ใช้จะติ๊ก "ไม่ต้องแสดงอีก" (เก็บใน sx_promo_off)
-// เริ่มเล่นแบบปิดเสียง (เบราว์เซอร์ไม่ให้เล่นเสียงเองก่อนผู้ใช้แตะ) มีปุ่มเปิดเสียง/หยุด/ข้าม · ไฟล์เว็บเวอร์ชันเล็กอยู่ที่ assets/promo/ (ต้นฉบับ 1080p อยู่ใน promo/renders ไม่ได้ขึ้นเว็บ)
-const PROMO_SRC = 'assets/promo/sixent-promo.mp4', PROMO_POSTER = 'assets/promo/poster.jpg';
+// เริ่มเล่นแบบปิดเสียง (เบราว์เซอร์ไม่ให้เล่นเสียงเองก่อนผู้ใช้แตะ) มีปุ่มเปิดเสียง/หยุด/ข้าม · ไฟล์เว็บ 720×1280 (~20 MB) อยู่ที่ assets/promo/ (ต้นฉบับ 1080p อยู่ใน promo/renders ไม่ได้ขึ้นเว็บ) — ถ้าเปลี่ยนไฟล์ให้ตั้งชื่อใหม่เพื่อไม่ให้ติดแคช
+const PROMO_SRC = 'assets/promo/sixent-promo-hd.mp4', PROMO_POSTER = 'assets/promo/poster.jpg';
 const promoOff = () => { try { return JSON.parse(localStorage.getItem('sx_promo_off')) === true; } catch { return false; } };
 function promoClose(save) {
   const o = document.getElementById('promo'); if (!o) return;
