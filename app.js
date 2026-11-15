@@ -12,7 +12,7 @@ const rt = s => uni(esc(s).replace(/\\_/g, '\u0001')
   .replace(/([A-Za-z0-9\u0370-\u03ff\)\]°%])_\{([^}]+)\}/g, '$1<sub>$2</sub>')
   .replace(/([A-Za-z0-9\u0370-\u03ff\)\]°%])_([a-z]+|[0-9]+|[A-Z]{1,2}|[\u0E00-\u0E7F]+)/g, '$1<sub>$2</sub>')
   .replace(/\^[{(]([^})]+)[})]/g, '<sup>$1</sup>')
-  .replace(/\^(-?[0-9A-Za-z\u0370-\u03ff]+)/g, '<sup>$1</sup>')).replace(/\u0001/g, '_');
+  .replace(/\^(-?[0-9A-Za-z\u0370-\u03ff]+)/g, '<sup>$1</sup>')).replace(/\u0001/g, '<span class="gb"></span>');
 const nl = s => rt(s).replace(/\n/g, '<br>');
 // ตัวเลือกที่เป็นภาพ SVG (เฉพาะโจทย์ที่มากับแอป) แสดงเป็น HTML ดิบ; ที่เหลือ escape เสมอ
 const isFig = s => typeof s === 'string' && s.startsWith('<svg');
@@ -255,7 +255,7 @@ function examPaper() {
     <div class="row"><span class="eclock" id="et">0:00</span><button data-a="quit" aria-label="ออก">✕</button></div></div>
     <div class="prog"><i style="width:${(E.i + 1) / n * 100}%"></i></div></div>
   <div class="stage"><article class="sheet ${dir}" aria-label="ข้อ ${E.i + 1}">
-    <div class="shead"><span class="qno">ข้อ ${E.i + 1} / ${n}</span><span><span class="tag">${esc(q.subject)}</span><span class="tag">${esc(q.topic)}</span></span></div>
+    <div class="shead"><span class="qno">ข้อ ${E.i + 1} / ${n}</span><span><span class="tag">${esc(q.subject)}</span>${q.topic && q.topic !== q.subject ? `<span class="tag">${esc(q.topic)}</span>` : ''}</span></div>
     ${q.passage ? `<div class="passage">${nl(q.passage)}</div>` : ''}
     <div class="qtext">${nl(q.q)}</div>
     ${q.fig ? q.fig : ''}
@@ -449,7 +449,16 @@ function lessonListTopics() {
 function buildSlides(k) {
   const m = lessonMeta(k);
   if (m.ch) return [{ type: 'cover', h: m.title, intro: m.ch.intro || '', part: m.ch.part }, ...m.ch.slides, { type: 'end' }];
-  const l = LESSONS[k], secs = l.sections.map(s => ({ type: 'text', h: s.h, bullets: s.items }));
+  const l = LESSONS[k];
+  /* TPAT3/TGAT: หน้า "ภาพรวมรายหัวข้อ" ใช้บทเรียนแบบบทความ+กระดาน+จุดตาย (เหมือนหลักสูตรรายบท) แทนหัวข้อย่อยแบบเก่า
+     หัวข้อที่ไม่มีบทของตัวเอง (TGAT3 ย่อย) ใช้บท tg3-1 */
+  if (l.group === 'tpat3' || l.group === 'tgat') {
+    let cs = COURSE.filter(c => c.topic === k);
+    const alias = /^TGAT3/.test(l.title) ? 'tg3-1' : k === 'บทสนทนายาว' ? 'tg1-1' : '';
+    if (!cs.length && alias) cs = COURSE.filter(c => c.id === alias);
+    if (cs.length) return [{ type: 'cover', h: l.title, intro: l.intro }, ...cs.flatMap(c => c.slides), { type: 'end' }];
+  }
+  const secs = l.sections.map(s => ({ type: 'text', h: s.h, bullets: s.items }));
   const s = [{ type: 'cover', h: l.title, intro: l.intro }];
   if (l.slides) { s.push(...l.slides); s.push({ type: 'divider', h: 'สรุปสูตรและแนวคิดสำคัญ' }); s.push(...secs); } else s.push(...secs);
   s.push({ type: 'text', h: 'ตัวอย่างทำให้ดู', bullets: [l.example.q, 'วิธีทำ: ' + l.example.sol] });
