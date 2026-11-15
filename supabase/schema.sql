@@ -141,14 +141,14 @@ alter table public.profiles add column if not exists act_label text not null def
 alter table public.profiles add column if not exists act_since timestamptz;
 alter table public.profiles add column if not exists seen_at timestamptz;
 
--- ตั้งสถานะของฉัน (เรียกถี่ ๆ ได้) act: idle | timer | break | read | exam | off (off = ไม่แสดงสถานะให้เพื่อน)
+-- ตั้งสถานะของฉัน (เรียกถี่ ๆ ได้) act: idle | timer | break | read | exam | dress | shop | stats | uni | off (off = ไม่แสดงสถานะให้เพื่อน)
 create or replace function public.set_presence(p_act text, p_label text, p_secs int)
 returns void
 language plpgsql security definer set search_path = public as $$
 declare uid uuid := auth.uid();
 begin
   if uid is null then raise exception 'ยังไม่ได้เข้าสู่ระบบ'; end if;
-  if p_act is null or p_act not in ('idle', 'timer', 'break', 'read', 'exam', 'off') then raise exception 'สถานะไม่ถูกต้อง'; end if;
+  if p_act is null or p_act not in ('idle', 'timer', 'break', 'read', 'exam', 'dress', 'shop', 'stats', 'uni', 'off') then raise exception 'สถานะไม่ถูกต้อง'; end if;
   update public.profiles set
     act = p_act,
     act_label = left(coalesce(p_label, ''), 40),

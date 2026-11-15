@@ -27,10 +27,14 @@ async function socRaw(path, method, body, token) {
   return j;
 }
 function socSave(s) { const st = socSt(); st.s = { access: s.access_token, refresh: s.refresh_token, exp: s.expires_at ? s.expires_at * 1000 : Date.now() + (s.expires_in || 3600) * 1000, uid: s.user && s.user.id }; store.set('soc', st); }
-async function socToken() {
+/* ขอ token ทีละครั้งเท่านั้น: ถ้ามีหลายคำขอพร้อมกัน (ส่งสถานะ + โหลดเพื่อน + โพลล์) จะไม่สมัครบัญชีซ้ำ
+   และไม่ใช้ refresh token เดียวกันสองรอบ (รอบที่สองจะถูกปฏิเสธแล้วทำให้เสียบัญชี/เพื่อนเดิม) */
+let TOKP = null;
+function socToken() { if (!TOKP) TOKP = socToken1().finally(() => { TOKP = null; }); return TOKP; }
+async function socToken1() {
   const st = socSt(); let s = st.s;
   if (!s) { socSave(await socRaw('/auth/v1/signup', 'POST', {})); return socSt().s.access; }   // บัญชีแบบไม่ระบุตัวตน
-  if (Date.now() > s.exp - 60000) { try { socSave(await socRaw('/auth/v1/token?grant_type=refresh_token', 'POST', { refresh_token: s.refresh })); } catch (e) { if (e.status >= 400 && e.status < 500) { delete st.s; store.set('soc', st); return socToken(); } throw e; } }
+  if (Date.now() > s.exp - 60000) { try { socSave(await socRaw('/auth/v1/token?grant_type=refresh_token', 'POST', { refresh_token: s.refresh })); } catch (e) { if (e.status >= 400 && e.status < 500) { delete st.s; store.set('soc', st); return socToken1(); } throw e; } }
   return socSt().s.access;
 }
 async function socRpc(fn, args) {
@@ -51,35 +55,42 @@ async function socSync(force) {
   finally { SOC.busy = false; if (ME.tab === 'friends' && location.hash === '#/me') render(true); }
 }
 async function socLoadFriends(quiet) {
-  if (!socEnabled()) return; if (!quiet) { SOC.loading = true; if (ME.tab === 'friends') render(true); }
+  if (!socEnabled() || SOC.fbusy) return; SOC.fbusy = true; if (!quiet) { SOC.loading = true; if (ME.tab === 'friends') render(true); }
   try { await socSync(); SOC.friends = (await socRpc('my_friends')) || []; SOC.flast = Date.now(); SOC.err = ''; }
   catch (e) { if (!quiet) SOC.err = e.message; }
-  SOC.loading = false; if (ME.tab === 'friends' && location.hash === '#/me' && !quiet) render(true); else socPaint();
+  SOC.fbusy = false; SOC.loading = false; if (ME.tab === 'friends' && location.hash === '#/me' && !quiet) render(true); else socPaint();
 }
 setInterval(() => { if (typeof store !== 'undefined' && socEnabled() && document.visibilityState === 'visible') socSync(); }, 20000);
 
 /* ---------- สถานะ "กำลังทำอะไรอยู่": จับเวลา / อ่านบทเรียน / ทำข้อสอบ ----------
    เปิดเป็นรายคน (socSt().pr) ส่งแค่ ประเภทกิจกรรม + ชื่อบท/วิชา + เวลาที่ทำมาแล้ว — ไม่ส่งคะแนนหรือคำตอบ
    เวลาที่เพื่อนเห็นคำนวณฝั่งเซิร์ฟเวอร์ จึงไม่คลาดเคลื่อนตามนาฬิกาเครื่อง ถือว่า "ออนไลน์" เมื่อมีสัญญาณภายใน 150 วินาที */
-const PRES = { sig: '', pt: 0, busy: false, rdKey: '', rdT0: 0, st: {}, lastPoll: 0, polling: false, told: {}, first: true, kt: 0 };
-const PACT = { timer: ['⏱', 'จับเวลาอ่านหนังสือ', 'จับเวลา'], break: ['☕', 'พักระหว่างโฟกัส', 'พักอยู่'], read: ['📖', 'อ่านบทเรียน', 'อ่านบท'], exam: ['📝', 'ทำข้อสอบ', 'ทำข้อสอบ'] };
+const PRES = { sig: '', pt: 0, busy: false, pgKey: '', pgT0: 0, st: {}, lastPoll: 0, polling: false, told: {}, first: true, kt: 0 };
+// [ไอคอน, ประโยคเต็ม, คำสั้น, นับเป็น "กำลังติว"?]
+const PACT = { timer: ['⏱', 'จับเวลาอ่านหนังสือ', 'จับเวลา', 1], break: ['☕', 'พักระหว่างโฟกัส', 'พักอยู่', 0], read: ['📖', 'อ่านบทเรียน', 'อ่านบท', 1], exam: ['📝', 'ทำข้อสอบ', 'ทำข้อสอบ', 1],
+  dress: ['👕', 'แต่งตัวละคร', 'แต่งตัว', 0], shop: ['🛍', 'เลือกซื้อของในร้านค้า', 'ช็อปปิ้ง', 0], stats: ['📊', 'ดูสถิติของตัวเอง', 'ดูสถิติ', 0], uni: ['🎓', 'อ่านประวัติมหาวิทยาลัย', 'อ่านประวัติ', 0] };
+const isStudy = a => !!(PACT[a] && PACT[a][3]);
 const socPres = () => socEnabled() && socSt().pr === true;
 const plain = s => String(s == null ? '' : s).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 40);
+/* หน้าที่ผู้ใช้เปิดอยู่ → กิจกรรม ; จับเวลาที่กำลังเดินชนะเมื่อกำลังอ่านบท หรือเมื่อออกจากหน้าจอไปแล้ว */
 function socActivity() {
-  const sec = ms => Math.max(0, Math.round(ms / 1000)), h = location.hash; let rd = '';
-  if (h === '#/library' && typeof libTab !== 'undefined' && libTab === 'lessons' && libOpen && hasLesson(libOpen)) {
-    if (PRES.rdKey !== libOpen) { PRES.rdKey = libOpen; PRES.rdT0 = Date.now(); } rd = plain(lessonMeta(libOpen).title);
-  } else PRES.rdKey = '';
+  const sec = ms => Math.max(0, Math.round(ms / 1000)), h = location.hash, vis = document.visibilityState === 'visible', uo = document.getElementById('unipage'); let pg = null;
   if (E && !E.done && h.startsWith('#/exam')) return { k: 'exam', l: E.mode === 'mock' ? 'สอบจำลอง' : 'ฝึกทำโจทย์', s: sec(Date.now() - E.t0) };
-  if (T.running) {
+  if (uo) pg = { k: 'uni', l: plain(typeof uniShort === 'function' ? uniShort(uo.dataset.u) : ''), key: 'uni' + uo.dataset.u };
+  else if (h === '#/library' && typeof libTab !== 'undefined' && libTab === 'lessons' && libOpen && hasLesson(libOpen)) pg = { k: 'read', l: plain(lessonMeta(libOpen).title), key: 'read' + libOpen };
+  else if (h === '#/me' && ME.tab === 'dress') pg = { k: 'dress', l: '', key: 'dress' };
+  else if (h === '#/me' && ME.tab === 'shop') pg = { k: 'shop', l: '', key: 'shop' };
+  else if (h === '#/stats') pg = { k: 'stats', l: '', key: 'stats' };
+  if (!pg) PRES.pgKey = ''; else if (PRES.pgKey !== pg.key) { PRES.pgKey = pg.key; PRES.pgT0 = Date.now(); }
+  if (T.running && (!pg || pg.k === 'read' || !vis)) {
     const brk = T.mode === 'pomo' && T.phase === 'break';
-    return { k: brk ? 'break' : 'timer', l: brk ? '' : (rd || plain(T.subject)), s: T.mode === 'sw' ? sec(tElapsed() * 1000) : sec(((brk ? T.breakMin : T.focusMin) * 60 - T.remain) * 1000) };
+    return { k: brk ? 'break' : 'timer', l: brk ? '' : ((pg && pg.k === 'read' && pg.l) || plain(T.subject)), s: T.mode === 'sw' ? sec(tElapsed() * 1000) : sec(((brk ? T.breakMin : T.focusMin) * 60 - T.remain) * 1000) };
   }
-  if (rd) return { k: 'read', l: rd, s: sec(Date.now() - PRES.rdT0) };
+  if (pg) return { k: pg.k, l: pg.l, s: sec(Date.now() - PRES.pgT0) };
   return { k: 'idle', l: '', s: 0 };
 }
 async function socPush(force) {
-  if (!socPres() || !SOC.me || PRES.busy) return;
+  if (!socPres() || PRES.busy) return;
   const vis = document.visibilityState === 'visible', live = vis || T.running, a = live ? socActivity() : { k: 'idle', l: '', s: 0 }, sig = a.k + '|' + a.l;
   if (!force && sig === PRES.sig && !(live && Date.now() - PRES.pt > 19000)) return;
   PRES.busy = true;
@@ -89,7 +100,7 @@ async function socPush(force) {
 const socWatching = () => { const h = location.hash; return h === '' || h === '#' || h === '#/' || h === '#/timer' || (h === '#/me' && ME.tab === 'friends'); };
 async function socPoll(force) {
   if (!socEnabled() || PRES.polling || document.visibilityState !== 'visible') return;
-  if (!force && (!socWatching() || Date.now() - PRES.lastPoll < 14000)) return;
+  if (!force && (!socWatching() || Date.now() - PRES.lastPoll < 6000)) return;
   PRES.polling = true;
   try {
     const rows = (await socRpc('friend_status')) || [], old = PRES.st, now = Date.now(); PRES.st = {};
@@ -97,8 +108,8 @@ async function socPoll(force) {
     PRES.lastPoll = now;
     if (!SOC.flast || rows.length !== SOC.friends.length || rows.some(r => !SOC.friends.some(f => f.id === r.id)) || now - SOC.flast > 180000) await socLoadFriends(true);
     if (!PRES.first && !(E && !E.done && location.hash.startsWith('#/exam'))) rows.forEach(r => {
-      const s = socStat(r.id), p = old[r.id], was = p && p.seen != null && p.seen < 150 && PACT[p.act], f = SOC.friends.find(x => x.id === r.id);
-      if (s && s.live && PACT[s.act] && !was && f && now - (PRES.told[r.id] || 0) > 300000) { PRES.told[r.id] = now; toast(PACT[s.act][0] + ' ' + String(f.nick || 'เพื่อน').slice(0, 12) + ' กำลัง' + PACT[s.act][1] + (s.label ? ' · ' + s.label : '') + ' — ไปสู้ด้วยกัน!'); }
+      const s = socStat(r.id), p = old[r.id], was = p && p.seen != null && p.seen < 150 && isStudy(p.act), f = SOC.friends.find(x => x.id === r.id);
+      if (s && s.live && isStudy(s.act) && !was && f && now - (PRES.told[r.id] || 0) > 300000) { PRES.told[r.id] = now; toast(PACT[s.act][0] + ' ' + String(f.nick || 'เพื่อน').slice(0, 12) + ' กำลัง' + PACT[s.act][1] + (s.label ? ' · ' + s.label : '') + ' — ไปสู้ด้วยกัน!'); }
     });
     PRES.first = false; socPaint();
   } catch { /* เงียบไว้ ลองใหม่รอบหน้า */ }
@@ -106,8 +117,11 @@ async function socPoll(force) {
 }
 function socKick() { if (!socEnabled()) return; clearTimeout(PRES.kt); PRES.kt = setTimeout(() => { socPush(); socPoll(); }, 700); }
 const socReady = () => typeof store !== 'undefined' && typeof T !== 'undefined';   // social.js โหลดก่อน app.js
-setInterval(() => { if (!socReady()) return; socPush(); socPoll(); }, 5000);
+setInterval(() => { if (!socReady()) return; socPush(); socPoll(); }, 3000);
 document.addEventListener('visibilitychange', () => { if (!socReady()) return; PRES.pt = 0; socPush(); if (document.visibilityState === 'visible') socPoll(true); });
+// เปิดเว็บแล้วขึ้นออนไลน์ทันที: ส่งสถานะก่อน (ไม่รอโหลดรายชื่อเพื่อน) แล้วค่อยโหลดเพื่อนกับสถานะเพื่อนพร้อมกัน
+function socStart() { if (!socEnabled()) return; socPush(true); socPoll(true); socLoadFriends(true); }
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', socStart); else socStart();
 
 function socStat(id) {
   const s = PRES.st[id]; if (!s || s.act === 'off' || s.seen == null) return null;
@@ -119,8 +133,8 @@ function statusHtml(id, f) {
   const s = socStat(id);
   if (!s) return `<span class="fst">ใช้งานล่าสุด ${socAgo(f.updated_at)}</span>`;
   if (!s.live) return `<span class="fst">ออฟไลน์ · เห็นล่าสุด ${socAgo(Date.now() - s.seen * 1000)}</span>`;
-  if (s.act === 'idle') return `<span class="fst on"><i></i>เปิดแอปอยู่</span>`;
-  return `<span class="fst act"><i></i>${PACT[s.act][0]} ${PACT[s.act][1]}${s.label ? ': ' + esc(s.label) : ''} · ${durTxt(s.mins)}</span>`;
+  if (s.act === 'idle') return `<span class="fst on"><i></i>ออนไลน์ · เปิดแอปอยู่</span>`;
+  return `<span class="fst ${isStudy(s.act) ? 'act' : 'on'}"><i></i>${PACT[s.act][0]} ${PACT[s.act][1]}${s.label ? ': ' + esc(s.label) : ''} · ${durTxt(s.mins)}</span>`;
 }
 function socPaint() {
   document.querySelectorAll('[data-fst]').forEach(el => { const f = SOC.friends.find(x => x.id === el.dataset.fst); if (f) el.innerHTML = statusHtml(f.id, f); });
@@ -140,9 +154,9 @@ function friendCard(f) {
 }
 /* แถบเพื่อนบนหน้าแรก (และแบบกะทัดรัดในหน้าจับเวลา): ตัวละครเพื่อน + สถานะสด เรียงคนที่กำลังอ่านอยู่ขึ้นก่อน */
 function frTile(f) {
-  const s = socStat(f.id), nm = String(f.nick || '').slice(0, 12), cls = s && s.live ? (s.act !== 'idle' ? 'act' : 'on') : '';
-  const line = s && s.live && s.act !== 'idle' ? PACT[s.act][0] + ' ' + PACT[s.act][2] : s && s.live ? 'ออนไลน์' : 'ออฟไลน์';
-  const sub = s && s.live && s.act !== 'idle' ? esc(s.label || durTxt(s.mins)) : '';
+  const s = socStat(f.id), nm = String(f.nick || '').slice(0, 12), doing = s && s.live && PACT[s.act], cls = s && s.live ? (isStudy(s.act) ? 'act' : 'on') : '';
+  const line = doing ? PACT[s.act][0] + ' ' + PACT[s.act][2] : s && s.live ? 'ออนไลน์' : 'ออฟไลน์';
+  const sub = doing ? esc(s.label || (isStudy(s.act) ? durTxt(s.mins) : '')) : '';
   return `<button class="frt ${cls}" data-a="socView" data-v="${esc(f.id)}" aria-label="${esc(nm)} ${esc(line)}"><span class="frtav">${avatarSvg(avClean(f.avatar), { view: 'bust', w: 70, nick: nm, uni: f.uni })}<i class="dot"></i></span><b>${esc(nm)}</b><span class="frts">${line}</span>${sub ? `<span class="frts sub">${sub}</span>` : ''}</button>`;
 }
 function friendStrip(compact) {
@@ -150,10 +164,10 @@ function friendStrip(compact) {
   const addBtn = `<button class="chip" data-a="avOpen" data-v="friends">${SOC.friends.length ? 'จัดการ' : '+ เพิ่มเพื่อน'}</button>`;
   if (!socEnabled()) return compact ? '' : `<div class="card frhome"><div class="row between" style="gap:10px"><div><b>👥 ติวด้วยกันกับเพื่อน</b><div class="mute" style="font-size:13px">เพิ่มเพื่อนด้วยโค้ด ดูตัวละคร และเห็นว่าใครกำลังอ่านอยู่</div></div><button class="pri" data-a="avOpen" data-v="friends">เริ่มเลย</button></div></div>`;
   if (!SOC.flast) return compact ? '' : `<div class="card frhome"><b>👥 เพื่อนของฉัน</b><div class="mute" style="font-size:13px">${SOC.err ? '⚠️ ' + esc(SOC.err) : 'กำลังโหลดเพื่อน…'}</div></div>`;
-  const rank = f => { const s = socStat(f.id); return s && s.live ? (s.act !== 'idle' ? 0 : 1) : 2; };
+  const rank = f => { const s = socStat(f.id); return s && s.live ? (isStudy(s.act) ? 0 : s.act !== 'idle' ? 1 : 2) : 3; };
   let list = SOC.friends.map((f, i) => [f, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(x => x[0]);
   const act = list.filter(f => rank(f) === 0).length;
-  if (compact) { list = list.filter(f => rank(f) < 2); if (!list.length) return ''; }
+  if (compact) { list = list.filter(f => rank(f) < 3); if (!list.length) return ''; }
   if (!list.length) return `<div class="card frhome"><div class="row between" style="gap:10px"><div><b>👥 ยังไม่มีเพื่อน</b><div class="mute" style="font-size:13px">แชร์โค้ดของคุณหรือกรอกโค้ดเพื่อน แล้วมาติวด้วยกัน</div></div>${addBtn}</div></div>`;
   return `<div class="card frhome ${compact ? 'compact' : ''}"><div class="row between" style="gap:8px"><h2 style="margin:0">👥 ${compact ? 'เพื่อนที่ออนไลน์' : 'เพื่อนของฉัน'} ${act ? `<span class="tag live">🔥 ${act} คนกำลังอ่านอยู่</span>` : ''}</h2>${addBtn}</div><div class="frrow">${list.map(frTile).join('')}</div></div>`;
 }
@@ -220,4 +234,4 @@ function socDeepLink() {
   if (!socEnabled()) { toast('เปิดระบบเพื่อนก่อน แล้วกรอกโค้ด ' + code + ' เพื่อเพิ่มเพื่อน'); store.set('socPending', code); return; }
   setTimeout(() => { const i = document.getElementById('socCode'); if (i) i.value = code; if (confirm('เพิ่มเพื่อนด้วยโค้ด ' + code + ' ?')) SOC_ACT.socAdd(code); }, 400);
 }
-setTimeout(async () => { socDeepLink(); if (socEnabled()) { await socSync(); await socLoadFriends(true); socPoll(true); socPush(true); } }, 1200);
+setTimeout(() => { socDeepLink(); if (socEnabled()) socSync(); }, 1200);
