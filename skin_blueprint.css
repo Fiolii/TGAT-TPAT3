@@ -1,0 +1,71 @@
+/* สกิน "แบบแปลน" ยืมไวยากรณ์ภาพจากสไตล์ Blueprint ของ lemo-opuscar (cyanotype: เส้นขาวบนน้ำเงินปรัสเซียน, เส้นศูนย์กลาง/เส้นมิติ/หมายเลขรูป FIG. / ป้ายชื่อแบบ title block)
+   เปิดด้วย data-skin="blueprint" บน <html> (ปุ่มอยู่ในแผงปรับหน้าตา: ฉัน → ธีม) · เขียนเองทั้งหมด ไม่ได้คัดลอกโค้ดหรือภาพจากรีโปนั้น */
+:root[data-skin="blueprint"]{
+  --bg:#1f4283;--card:rgba(231,240,249,.06);--ink:#e7f0f9;--mute:rgba(231,240,249,.68);--line:rgba(231,240,249,.32);
+  --pri:#e7f0f9;--pri2:rgba(231,240,249,.12);--onpri:#183463;--grad:linear-gradient(135deg,#e7f0f9,#bcd3ee);
+  --ok:#bfe3ff;--okbg:rgba(191,227,255,.12);--bad:#ff8a8a;--badbg:rgba(255,138,138,.12);--warn:#ffe9a8;--warnbg:rgba(255,233,168,.12);
+  --patbg:none;--patimg:none;--gl-fill:rgba(231,240,249,.05);--gl-fill2:rgba(231,240,249,.08);--gl-edge:rgba(231,240,249,.6);--gl-edge2:rgba(231,240,249,.4);--gl-shadow:none;--gl-blur:none;
+  color-scheme:dark;
+}
+:root[data-skin="blueprint"] body{
+  background:
+    linear-gradient(rgba(231,240,249,.16) 1px,transparent 1px) 0 0/120px 120px,
+    linear-gradient(90deg,rgba(231,240,249,.16) 1px,transparent 1px) 0 0/120px 120px,
+    linear-gradient(rgba(231,240,249,.07) 1px,transparent 1px) 0 0/24px 24px,
+    linear-gradient(90deg,rgba(231,240,249,.07) 1px,transparent 1px) 0 0/24px 24px,
+    radial-gradient(120% 80% at 20% 0%,#2f62b3 0%,transparent 60%),radial-gradient(100% 70% at 90% 100%,#16336b 0%,transparent 65%),#1d3f80;
+  background-attachment:fixed;font-feature-settings:"tnum";
+}
+/* ปิดแสงฟุ้ง/ลายพื้นของสกินเดิม */
+:root[data-skin="blueprint"] body::before,:root[data-skin="blueprint"] body::after,:root[data-skin="blueprint"] .amb,:root[data-skin="blueprint"] #bgfx{display:none!important}
+
+/* การ์ด = แผ่นเส้นบาง + เครื่องหมายมุม + หมายเลข FIG. */
+:root[data-skin="blueprint"] .view{counter-reset:fig}
+:root[data-skin="blueprint"] .card,:root[data-skin="blueprint"] .stat,:root[data-skin="blueprint"] .preset{
+  background:rgba(231,240,249,.05)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:1.5px solid rgba(231,240,249,.62)!important;border-radius:6px!important;box-shadow:none!important;position:relative}
+:root[data-skin="blueprint"] .card{counter-increment:fig}
+:root[data-skin="blueprint"] .card::before{content:"";position:absolute;inset:-5px;pointer-events:none;border-radius:2px;
+  background:
+    linear-gradient(#e7f0f9,#e7f0f9) 0 0/12px 1.5px no-repeat,linear-gradient(#e7f0f9,#e7f0f9) 0 0/1.5px 12px no-repeat,
+    linear-gradient(#e7f0f9,#e7f0f9) 100% 0/12px 1.5px no-repeat,linear-gradient(#e7f0f9,#e7f0f9) 100% 0/1.5px 12px no-repeat,
+    linear-gradient(#e7f0f9,#e7f0f9) 0 100%/12px 1.5px no-repeat,linear-gradient(#e7f0f9,#e7f0f9) 0 100%/1.5px 12px no-repeat,
+    linear-gradient(#e7f0f9,#e7f0f9) 100% 100%/12px 1.5px no-repeat,linear-gradient(#e7f0f9,#e7f0f9) 100% 100%/1.5px 12px no-repeat;opacity:.85}
+:root[data-skin="blueprint"] .card::after{content:"FIG. " counter(fig);position:absolute;right:12px;top:-9px;padding:0 6px;font:600 10px/16px "B612","Noto Sans Thai",monospace;letter-spacing:.14em;color:var(--ink);background:#1f4283;border-radius:2px;opacity:.9;background-image:none}
+:root[data-skin="blueprint"] .card:hover{transform:none}
+
+/* หัวข้อ: ตัวเขียนมือ + เส้นมิติใต้หัวข้อ */
+:root[data-skin="blueprint"] .view h1{font-family:"Architects Daughter","Noto Sans Thai",cursive;font-weight:400;font-size:30px;letter-spacing:.01em;background:none;-webkit-text-fill-color:var(--ink);color:var(--ink);position:relative;padding-bottom:12px}
+:root[data-skin="blueprint"] .view h1::after{content:"";position:absolute;left:0;right:18%;bottom:2px;height:8px;
+  background:linear-gradient(var(--ink),var(--ink)) 0 50%/100% 1px no-repeat,linear-gradient(135deg,transparent 45%,var(--ink) 46% 54%,transparent 55%) 0 50%/8px 8px no-repeat,linear-gradient(45deg,transparent 45%,var(--ink) 46% 54%,transparent 55%) 100% 50%/8px 8px no-repeat}
+:root[data-skin="blueprint"] .view h2,:root[data-skin="blueprint"] .view h3{font-family:"Noto Sans Thai",sans-serif;text-transform:none;letter-spacing:.02em}
+:root[data-skin="blueprint"] .tag{border:1px dashed rgba(231,240,249,.55)!important;background:transparent!important;color:var(--ink)!important;font-family:"B612","Noto Sans Thai",monospace;letter-spacing:.06em;border-radius:3px!important}
+
+/* ปุ่ม/ชิป/ช่องกรอก = เส้นบาง ปุ่มหลักเป็นแผ่นขาว */
+:root[data-skin="blueprint"] button,:root[data-skin="blueprint"] .btn{background:transparent!important;color:var(--ink)!important;border:1.5px solid rgba(231,240,249,.7)!important;border-radius:4px!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}
+:root[data-skin="blueprint"] button.pri,:root[data-skin="blueprint"] .btn.pri,:root[data-skin="blueprint"] .chip.on,:root[data-skin="blueprint"] .seg button.on,:root[data-skin="blueprint"] .hubtabs .on{background:#e7f0f9!important;color:#183463!important;border-color:#e7f0f9!important}
+:root[data-skin="blueprint"] .chip{border-radius:3px!important}
+:root[data-skin="blueprint"] input:not([type=range]):not([type=checkbox]):not([type=radio]),:root[data-skin="blueprint"] select,:root[data-skin="blueprint"] textarea{background:rgba(231,240,249,.06)!important;color:var(--ink)!important;border:0!important;border-bottom:1.5px dashed rgba(231,240,249,.7)!important;border-radius:3px 3px 0 0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+:root[data-skin="blueprint"] input::placeholder{color:rgba(231,240,249,.5)}
+:root[data-skin="blueprint"] option{background:#1d3f80;color:#e7f0f9}
+
+/* แถบความคืบหน้า = เส้นแรเงา 45° */
+:root[data-skin="blueprint"] .bar,:root[data-skin="blueprint"] .prog{background:transparent!important;border:1.5px solid rgba(231,240,249,.7);border-radius:2px!important}
+:root[data-skin="blueprint"] .bar>i,:root[data-skin="blueprint"] .prog>i{background:repeating-linear-gradient(45deg,#e7f0f9 0 2px,transparent 2px 7px)!important;animation:none;box-shadow:none;border-radius:0!important}
+
+/* แถบบน/ล่าง = โต๊ะเขียนแบบสีเข้ม */
+:root[data-skin="blueprint"] .top,:root[data-skin="blueprint"] .tabbar,:root[data-skin="blueprint"] .dnav{background:#0d1116!important;border:1.5px solid rgba(231,240,249,.6)!important;border-radius:6px!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;box-shadow:none!important}
+:root[data-skin="blueprint"] .tabbar a,:root[data-skin="blueprint"] .tabbar button{color:rgba(231,240,249,.7)!important;border:0!important}
+:root[data-skin="blueprint"] .tabbar .on{color:#e7f0f9!important;background:rgba(231,240,249,.14)!important;border-radius:4px!important}
+
+/* ลายเส้นคั่นเดิมและตกแต่งที่ขัดกับแบบแปลนให้เบาลง */
+:root[data-skin="blueprint"] .view>*{animation:bpDraw .7s cubic-bezier(.3,.7,.2,1) both}
+@keyframes bpDraw{from{opacity:0;clip-path:inset(0 100% 0 0)}to{opacity:1;clip-path:inset(-8px -8px -8px -8px)}}
+:root[data-skin="blueprint"] .view>*:nth-child(2){animation-delay:.08s}:root[data-skin="blueprint"] .view>*:nth-child(3){animation-delay:.16s}:root[data-skin="blueprint"] .view>*:nth-child(4){animation-delay:.24s}:root[data-skin="blueprint"] .view>*:nth-child(n+5){animation-delay:.32s}
+@media (prefers-reduced-motion:reduce){:root[data-skin="blueprint"] .view>*{animation:none}}
+:root[data-skin="blueprint"] .hero-sc,:root[data-skin="blueprint"] .heroicon{display:none!important}
+/* กระดาษข้อสอบยังเป็นกระดาษสีครีม: ใช้ตัวอักษรเข้มและเส้นเข้มภายในแผ่นนั้น */
+:root[data-skin="blueprint"] .sheet{--ink:#171a2b;--mute:#5d6380;--line:#c9cde0;--card:#fff;--pri:#1d3f80;--pri2:rgba(29,63,128,.1);--ok:#12805a;--okbg:#e2f6ee;--bad:#c23b3b;--badbg:#fbe9e9;--warn:#9a6700;--warnbg:#fff4d6;color:#171a2b;border:2px solid #e7f0f9!important;box-shadow:0 0 0 4px rgba(231,240,249,.2)!important;border-radius:6px!important}
+:root[data-skin="blueprint"] .sheet button,:root[data-skin="blueprint"] .sheet .btn{color:#171a2b!important;border:1.5px solid rgba(23,26,43,.4)!important}
+:root[data-skin="blueprint"] .sheet button.pri,:root[data-skin="blueprint"] .sheet .btn.pri{background:#1d3f80!important;color:#fff!important;border-color:#1d3f80!important}
+:root[data-skin="blueprint"] .sheet .card{background:rgba(29,63,128,.05)!important;border-color:rgba(23,26,43,.3)!important}
+:root[data-skin="blueprint"] .sheet .card::before,:root[data-skin="blueprint"] .sheet .card::after{display:none}

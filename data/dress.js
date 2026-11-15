@@ -42,7 +42,7 @@ function dressTimer() { const id = store.get('theme', 'sixent'); return id === '
 /* ส่วนเสริมในหน้าเลือกธีม: ธีมสาขา + โหมดเอฟเฟกต์ */
 function dressSheetExtra() {
   const br = brCur(), fx = fxMode();
-  return `<p class="mute" style="margin:12px 0 4px">ธีมสาขาวิศวะ (ซ้อนกับธีมมหาวิทยาลัยได้)</p>
+  return (typeof lookPanel === 'function' ? lookPanel() : '') + `<p class="mute" style="margin:12px 0 4px">ธีมสาขาวิศวะ (ซ้อนกับธีมมหาวิทยาลัยได้)</p>
     <button class="swatch brpick" data-a="branchOpen" ${br ? `style="--s1:${br.c[0]};--s2:${br.c[1]}"` : ''}><i>${brIcon(br, 30, br ? br.c[0] : 'currentColor')}</i><span><b>${br ? 'วิศวกรรม' + esc(br.n) : 'ยังไม่ได้เลือกสาขา'}</b><small>${br ? esc(br.tag) : 'โยธา เครื่องกล ไฟฟ้า คอมพิวเตอร์ เคมี และอีก 7 สาขา'}</small></span><em>›</em></button>
     <p class="mute" style="margin:10px 0 4px">ฉากพื้นหลังของธีม</p><div class="chips">${[['anim', '✨ ขยับ'], ['still', '🖼 นิ่ง'], ['off', '🚫 ปิด']].map(([k, v]) => `<button class="chip ${fx === k ? 'on' : ''}" data-a="fxPick" data-v="${k}">${v}</button>`).join('')}</div>
     <p class="mute" style="font-size:12px">ฉากที่ขยับอาจกินแบตเตอรี่/ทำให้เครื่องรุ่นเก่ากระตุก ถ้าเป็นแบบนั้นให้เลือก "นิ่ง" หรือ "ปิด"</p>`;

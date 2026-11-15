@@ -125,7 +125,7 @@ function itemLock(it) {
 
 /* ---------- ห้องแต่งตัว + ร้านค้า (รวมเป็นหน้าเดียวที่ #/me) ----------
    ตัวละครอยู่ติดบนจอเสมอ → เลือกหมวดด้านล่าง → แตะของที่มีแล้วเพื่อใส่ทันที / แตะของที่ยังไม่มีเพื่อ "ลองใส่" แล้วกดซื้อที่แถบด้านล่างครั้งเดียว */
-const ME = { tab: CHAR_ON ? 'dress' : 'friends', cat: 'hair', f: 'all', try: {} };
+const ME = { tab: 'profile', cat: 'hair', f: 'all', try: {} };
 const meCfg = () => Object.assign({}, avCfg(), ME.try);
 const AV_CATS = [
   ['hair', 'ทรงผม', '💇', ['hair']], ['face', 'ใบหน้า', '😊', ['fc']], ['top', 'เสื้อ', '👕', ['top']], 
@@ -207,11 +207,11 @@ function avSyncBar() {
 window.addEventListener('hashchange', avSyncBar);
 function viewMe() {
   if (ME.tab === 'shop') ME.tab = 'dress';
-  if (!CHAR_ON && ME.tab === 'dress') ME.tab = 'friends';
-  const tabs = [...(CHAR_ON ? [['dress', '👕 ตัวละคร']] : []), ['friends', '👥 เพื่อน'], ['theme', '🎨 ธีม'], ['ach', '🏆 ผลงาน']];
-  const body = ({ dress: dressTab, friends: friendsTab, theme: meThemeTab, ach: meAchTab }[ME.tab] || dressTab)();
+  if (!CHAR_ON && ME.tab === 'dress') ME.tab = 'profile';
+  const tabs = [['profile', '🪪 โปรไฟล์'], ...(CHAR_ON ? [['dress', '👕 ตัวละคร']] : []), ['friends', '👥 เพื่อน'], ['theme', '🎨 ธีม'], ['ach', '🏆 ผลงาน']];
+  const body = ({ profile: viewProfile, dress: dressTab, friends: friendsTab, theme: meThemeTab, ach: meAchTab }[ME.tab] || dressTab)();
   setTimeout(avSyncBar, 0);
-  return `<h1>ฉัน</h1><div class="seg tabs2 ${CHAR_ON ? 'tabs4' : ''}">${tabs.map(([k, t]) => `<button class="${ME.tab === k ? 'on' : ''}" data-a="avTab" data-v="${k}">${t}</button>`).join('')}</div>${body}`;
+  return `<h1>ฉัน</h1><div class="seg tabs2 ${CHAR_ON ? 'tabs5' : 'tabs4'}">${tabs.map(([k, t]) => `<button class="${ME.tab === k ? 'on' : ''}" data-a="avTab" data-v="${k}">${t}</button>`).join('')}</div>${body}`;
 }
 /* ภาพตัวละครขยับตามนิ้ว/เมาส์ (ความลึกแบบกึ่ง 3 มิติ) + โยกเบา ๆ เมื่อไม่มีใครแตะ */
 (function () {
@@ -226,8 +226,8 @@ function viewMe() {
 /* ---------- การกระทำ ---------- */
 function avUpdateHero(id) { const h = document.querySelector('.uh-meav'); if (h) h.innerHTML = avatarSvg({ top: 'uni:' + id }, { w: 92 }); }
 const CHAR_ACT = {
-  avOpen(v) { ME.tab = ['friends', 'theme', 'ach'].includes(v) ? v : (CHAR_ON ? 'dress' : 'friends'); if (v === 'shop') ME.cat = 'hair'; ME.try = {}; uniPage(null); if (location.hash !== '#/me') location.hash = '#/me'; else render(true); },
-  avTab(v) { ME.tab = (v === 'shop' || v === 'dress') ? (CHAR_ON ? 'dress' : 'friends') : v; if (v === 'shop') ME.cat = 'hair'; ME.try = {}; render(true); if (v === 'friends' && typeof socLoadFriends === 'function') socLoadFriends(); },
+  avOpen(v) { ME.tab = ['profile', 'friends', 'theme', 'ach'].includes(v) ? v : (CHAR_ON ? 'dress' : 'profile'); if (v === 'shop') ME.cat = 'hair'; ME.try = {}; uniPage(null); if (location.hash !== '#/me') location.hash = '#/me'; else render(true); },
+  avTab(v) { ME.tab = (v === 'shop' || v === 'dress') ? (CHAR_ON ? 'dress' : 'profile') : v; if (v === 'shop') ME.cat = 'hair'; ME.try = {}; render(true); if (v === 'friends' && typeof socLoadFriends === 'function') socLoadFriends(); },
   avFilter(v) { ME.f = v; render(true); },
   avLayers() { ME.layers = !ME.layers; render(true); },
   avLayer(v) { const c = avCfg(), h = (c.hide || []).slice(), i = h.indexOf(v); if (i >= 0) h.splice(i, 1); else h.push(v); c.hide = h; avSave(c); render(true); },

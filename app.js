@@ -493,7 +493,7 @@ function lessonView(k) {
 
 /* ====================== actions ====================== */
 const ACT = {
-  ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT, ...CHAR_ACT, ...SOC_ACT, ...BRANCH_ACT, ...YPT_ACT, ...CAL_ACT, ...DQ_ACT, ...HUB_ACT,
+  ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT, ...CHAR_ACT, ...SOC_ACT, ...BRANCH_ACT, ...YPT_ACT, ...CAL_ACT, ...DQ_ACT, ...HUB_ACT, ...PROF_ACT,
   setDate() { examDate = val('ed'); save(); render(true); },
   setExam(v) { examDate = v; save(); if ((location.hash || '#/') === '#/') render(true); else alert('ตั้งวันนับถอยหลังเป็น ' + v + ' แล้ว (ดูที่หน้าแรก)'); },
   themeOpen() { uniPage(null); themeSheet(true); }, themeClose() { themeSheet(false); },
@@ -597,6 +597,7 @@ function applyTheme() {
   r.style.setProperty('--patimg', t.id === 'sixent' && !un.pat ? 'none' : uniPat(un.pat, '#ffffff', .26));
   r.style.setProperty('--patbg', t.id === 'sixent' ? 'none' : uniPat(un.pat, dark ? t.pd : t.pl, dark ? .16 : .12));
   uniProbe(t.id);
+  if (typeof applyLook === 'function') applyLook();   // ความใส/ความสว่างที่ผู้ใช้ตั้งเอง (data/look.js)
   const lg = document.querySelector('.logo'); if (lg) { if (t.id === 'sixent') { lg.classList.remove('emb'); lg.textContent = 'S'; } else { lg.classList.add('emb'); lg.innerHTML = uniMark(t.id, 32); } }
   const tb = document.querySelector('.themebtn[data-a=themeOpen]'); if (tb) tb.innerHTML = t.id === 'sixent' ? uic('palette', 22) : uniMark(t.id, 28);
   uniFavicon(t.id);

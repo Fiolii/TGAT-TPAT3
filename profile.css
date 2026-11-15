@@ -1,0 +1,37 @@
+/* โปรไฟล์: บัตรนักเรียนเตรียมวิศวะ */
+.pf-card{position:relative;overflow:hidden;background:linear-gradient(135deg,color-mix(in srgb,var(--pfc,var(--pri)) 22%,var(--card)),var(--card) 60%)}
+.pf-card::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--pfc,var(--pri)) 10%,transparent) 0 2px,transparent 2px 22px);pointer-events:none;opacity:.7}
+.pf-card>*{position:relative}
+.pf-top{display:flex;gap:16px;align-items:center}
+.pf-av{flex:none;filter:drop-shadow(0 10px 14px rgba(0,0,0,.28))}.pf-av svg{display:block}
+.pf-id{min-width:0;flex:1;display:grid;gap:6px}
+.pf-kick{font-size:11.5px;letter-spacing:.08em}
+.pf-nick{font-size:25px;font-weight:700;border:0!important;background:transparent!important;padding:2px 0!important;min-height:0;width:100%;border-bottom:2px dashed color-mix(in srgb,var(--pfc,var(--pri)) 55%,transparent)!important;border-radius:0!important;box-shadow:none!important;color:var(--ink)}
+.pf-bio{width:100%;margin-top:12px;font-size:14.5px}
+.pf-xp{margin-top:12px;display:grid;gap:5px}
+.pf-xpbar{height:10px;border-radius:999px;background:color-mix(in srgb,var(--pfc,var(--pri)) 16%,transparent);overflow:hidden}
+.pf-xpbar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--pfc,var(--pri)),color-mix(in srgb,var(--pfc,var(--pri)) 55%,#ec4899));transition:width .7s cubic-bezier(.22,1,.36,1)}
+.pf-goals{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.pf-g{display:grid;gap:4px;align-content:start;padding:12px;border-radius:16px;border:1px solid var(--line);background:color-mix(in srgb,var(--pri) 5%,transparent)}.pf-g b{font-size:15.5px;line-height:1.35}.pf-g .chip{justify-self:start;margin-top:2px}
+.pf-pick{display:flex;flex-wrap:wrap;gap:7px}
+.pf-pick button{min-height:38px;padding:5px 14px;border-radius:999px;font-size:13.5px}
+.pf-pick button.on{background:var(--pri);color:var(--onpri,#fff);border-color:var(--pri)}
+.pf-pick.pf-swrow{gap:10px}.pf-sw{width:36px!important;height:36px;min-height:0!important;padding:0!important;border-radius:50%!important;background:var(--c)!important;border:3px solid var(--card)!important;box-shadow:0 0 0 1.5px var(--line)}
+.pf-sw.on{box-shadow:0 0 0 3px var(--pri)!important;transform:scale(1.1)}
+.pf-pick.em button{width:46px;height:46px;padding:0;font-size:22px;border-radius:14px}
+.pf-stats{display:grid;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.pf-stat{display:grid;gap:2px;justify-items:center;text-align:center;padding:12px 6px;border-radius:16px;border:1px solid var(--line);background:color-mix(in srgb,var(--pri) 5%,transparent)}
+.pf-si{font-size:20px}.pf-stat b{font-size:19px;color:var(--pri)}.pf-stat small{font-size:11.5px;color:var(--mute)}
+.pf-tp{display:grid;gap:8px}
+.pf-t{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:10px 14px;border-radius:14px;border:1px solid var(--line);text-align:left;min-height:44px}
+.pf-t span{flex:1;min-width:0}.pf-t b{font-size:15px}.pf-t small{color:var(--mute)}
+.pf-t.ok{background:var(--okbg,rgba(34,197,94,.1))}.pf-t.ok b{color:var(--ok,#16a34a)}
+.pf-t.bad{background:var(--badbg,rgba(239,68,68,.08))}.pf-t.bad b{color:var(--bad,#dc2626)}
+.pf-badges{display:flex;flex-wrap:wrap;gap:10px}
+.pf-b{display:grid;justify-items:center;gap:2px;width:84px;padding:10px 6px;border-radius:16px;border:1px solid var(--line);background:color-mix(in srgb,var(--warn,#f59e0b) 10%,transparent);text-align:center}.pf-b i{font-style:normal;font-size:30px}.pf-b small{font-size:11px;line-height:1.3;color:var(--mute)}
+@media (max-width:420px){.pf-top{gap:12px}.pf-av svg{width:78px;height:78px}.pf-nick{font-size:22px}}
+:root[data-skin="blueprint"] .pf-card::before{display:none}
+
+.pf-sh{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.pf-shbtn{flex:none;width:176px;max-width:46%;padding:6px;border-radius:20px;border:1px solid var(--line);background:radial-gradient(80% 70% at 50% 30%,color-mix(in srgb,var(--pri) 16%,transparent),transparent 75%)}.pf-shbtn svg{display:block;width:100%;height:auto;filter:drop-shadow(0 8px 10px rgba(0,0,0,.25))}
+.pf-shi{flex:1;min-width:170px}.pf-shi>b{font-size:17px}
