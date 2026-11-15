@@ -1,0 +1,21 @@
+/* คลิปแนะนำตอนเปิดเว็บ (data/promo.js) */
+#promo{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));background:rgba(8,8,20,.72);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);animation:pmIn .28s ease}
+#promo.out{opacity:0;transition:opacity .2s}
+@keyframes pmIn{from{opacity:0}to{opacity:1}}
+body.promo-open{overflow:hidden}
+.promo-box{width:min(100%,calc((100dvh - 150px) * 9 / 16),420px);display:grid;gap:10px;animation:pmUp .35s cubic-bezier(.22,1,.36,1)}
+@keyframes pmUp{from{transform:translateY(14px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+.promo-stage{position:relative;aspect-ratio:9/16;border-radius:22px;overflow:hidden;background:#0b0c1a;box-shadow:0 24px 60px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.16)}
+.promo-stage video{display:block;width:100%;height:100%;object-fit:cover;cursor:pointer}
+.promo-bar{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.2)}.promo-bar i{display:block;height:100%;width:0;background:var(--pri,#ec4899)}
+.promo-snd{position:absolute;left:12px;top:12px;min-height:38px;padding:6px 13px;border-radius:999px;font-size:13px;font-weight:600;color:#fff!important;background:rgba(10,10,24,.62)!important;border:1px solid rgba(255,255,255,.3)!important;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:pmPulse 1.8s ease-in-out infinite}
+.promo-snd.on{animation:none}
+@keyframes pmPulse{50%{box-shadow:0 0 0 6px rgba(255,255,255,.14)}}
+.promo-pp{position:absolute;right:12px;top:12px;width:40px;height:40px;min-height:0;padding:0;border-radius:50%;font-size:16px;color:#fff!important;background:rgba(10,10,24,.62)!important;border:1px solid rgba(255,255,255,.3)!important}
+.promo-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:18px;background:var(--card,#fff);border:1px solid var(--line,#ddd)}
+.promo-chk{display:flex;align-items:center;gap:9px;font-size:14.5px;cursor:pointer;color:var(--ink,#111);min-height:44px}
+.promo-chk input{width:22px;height:22px;accent-color:var(--pri,#ec4899);flex:none}
+.promo-go{min-height:46px;padding:0 20px;border-radius:14px;font-weight:700;white-space:nowrap}
+#promo.done .promo-go{animation:pmPulse 1.6s ease-in-out infinite}
+#promo.broken .promo-stage::after{content:"โหลดคลิปไม่สำเร็จ";position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:15px;background:rgba(10,10,24,.8)}
+@media (prefers-reduced-motion:reduce){#promo,.promo-box,.promo-snd{animation:none}}

@@ -73,7 +73,7 @@ const viewRank = () => hubTabs('progress', 'rank') + '<h1>อันดับเ�
 
 /* ---------- ฉัน: แท็บธีมและผลงาน ---------- */
 const meThemeTab = () => `${uniCard()}${branchCard()}<div class="card">${dressSheetExtra()}</div>`;
-const meAchTab = () => `${shirtCard()}${achCard()}<div class="card" style="display:grid;align-content:center"><div class="mute" style="margin-bottom:6px">คำคมประจำวัน</div>${quoteHtml()}</div><div class="row" style="justify-content:center;margin:6px 0 2px"><button class="chip" data-a="adminOpen" style="opacity:.55;min-height:32px;padding:4px 12px;font-size:12.5px">🔧 แอดมิน</button></div>`;
+const meAchTab = () => `${shirtCard()}${achCard()}<div class="card" style="display:grid;align-content:center"><div class="mute" style="margin-bottom:6px">คำคมประจำวัน</div>${quoteHtml()}</div><div class="row" style="justify-content:center;margin:6px 0 2px"><button class="chip" data-promo-open style="min-height:36px;padding:4px 14px;font-size:13px">🎬 ดูคลิปแนะนำอีกครั้ง</button> <button class="chip" data-a="adminOpen" style="opacity:.55;min-height:32px;padding:4px 12px;font-size:12.5px">🔧 แอดมิน</button></div>`;
 
 /* ---------- ปุ่มอวาตาร์บนแถบบน (เปลี่ยนตามลุคตัวละครเมื่อมีการแก้) ---------- */
 let hubAvSig = '';
