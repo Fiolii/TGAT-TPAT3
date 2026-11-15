@@ -1,41 +1,15 @@
-// ตัวละครของฉัน — วาดแบบ "ตุ๊กตากระดาษ" เป็น SVG 200×310 (วาดเองทั้งหมด ไม่ใช้รูปภายนอก)
+// ตัวละครของฉัน — การ์ตูนหัวโตน่ารักแรเงานุ่มแบบกึ่ง 3 มิติ เป็น SVG 200×310 (วาดเองทั้งหมด ไม่ใช้รูปภายนอก)
+// ไฟล์นี้: สี/ค่าเริ่มต้น + เสื้อ ชั้นนอก หมวก แว่น ของที่คอ ของในมือ ฉากหลัง (พิกัดเดิม 120×130 / หัวเดิม) — ถูกจัดวางใหม่โดย data/char_core.js
 // ลำดับชั้นภาพ: ฉากหลัง → ผมด้านหลัง → ขา/กางเกง/รองเท้า → คอ+แขน → เสื้อ → ชั้นนอก → ของที่คอ → หัว → ผม → ของที่หน้า/ศีรษะ → ของในมือ
-const AVSKIN = { a: '#f7d9ba', b: '#edc196', c: '#d9a577', d: '#bf8a5d', e: '#8d5a3b' };
-const AVHAIR = ['#1f1b1b', '#3b2a20', '#5a3a24', '#8a4b2a', '#d9b25a', '#9a9a9a', '#2b3a6b', '#c2527f'];
+const AVSKIN = { a: '#fce9de', b: '#f3cfae', c: '#e0b085', d: '#c48d62', e: '#8f5d3d', f: '#fdd9d0', g: '#6e4630' };
+const AVHAIR = ['#1f1b1b', '#3b2a20', '#5a3a24', '#8a4b2a', '#c98d3c', '#e8c872', '#9a9a9a', '#f2f2f5', '#2b3a6b', '#3b82c4', '#16a085', '#7c4dbd', '#c2527f', '#ff8fb1', '#d6392f', '#ff9e4a'];
+const AVEYEC = ['#6b3f24', '#2a2230', '#2f6fd0', '#2e9e6a', '#7c4dbd', '#d6609a', '#c98d1a', '#7b8794'];
 const AVTEE = ['#ffffff', '#3b82f6', '#ef4444', '#22c55e', '#f59e0b', '#111827', '#ec4899', '#8b5cf6'];
 const AVBOT = ['#1f2937', '#334155', '#0f172a', '#6b5b43', '#9ca3af', '#7c2d2d'];
-const AVDEF = { g: 'm', skin: 'b', hair: 'short', hc: '#1f1b1b', top: 'uni:sixent', tc: '#3b82f6', outer: '', head: '', face: '', neck: '', hand: '', bottom: 'trouser', bc: '#1f2937', shoes: 'sneaker', bg: '' };
+const AVDEF = { g: 'm', skin: 'a', hair: 'short', hc: '#1f1b1b', hc2: '', eye: 'sparkle', ec: '#6b3f24', mouth: 'smile', top: 'uni:sixent', tc: '#3b82f6', outer: '', head: '', hacc: '', face: '', neck: '', hand: '', bottom: 'trouser', bc: '#1f2937', shoes: 'sneaker', pet: '', fx: '', bg: '' };
 let AVC = 0;
 const avMix = (h, t, a) => { const p = s => { if (s.length === 4) s = '#' + s[1] + s[1] + s[2] + s[2] + s[3] + s[3]; return [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16)); }, x = p(h), y = p(t); return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * a).toString(16).padStart(2, '0')).join(''); };
 const avUniCol = id => { const t = (typeof THEMES !== 'undefined' && THEMES.find(x => x.id === id)) || { pl: '#4f46e5' }; return t.pl; };
-
-/* ---------- ผม ---------- */
-function avHairBack(h, c) {
-  const d = avMix(c, '#000', .25);
-  switch (h) {
-    case 'long': return `<path d="M52 64Q46 20 100 18Q154 20 148 64L158 168Q130 182 100 180Q70 182 42 168Z" fill="${c}"/><path d="M60 120Q62 160 56 172M140 120Q138 160 144 172" stroke="${d}" stroke-width="2" fill="none" opacity=".5"/>`;
-    case 'bob': return `<path d="M52 62Q46 18 100 16Q154 18 148 62L152 124Q100 138 48 124Z" fill="${c}"/>`;
-    case 'ponytail': return `<path d="M128 38Q184 40 176 104Q172 140 150 150Q160 108 140 74Z" fill="${c}"/><path d="M150 148Q158 108 168 80" stroke="${d}" stroke-width="2" fill="none" opacity=".5"/>`;
-    case 'bun': return `<circle cx="100" cy="16" r="17" fill="${c}"/><circle cx="100" cy="16" r="17" fill="none" stroke="${d}" stroke-width="1.2" opacity=".5"/>`;
-    case 'curly': return [[58, 52], [142, 52], [52, 76], [148, 76], [72, 30], [128, 30], [100, 22]].map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="17" fill="${c}"/>`).join('');
-    default: return '';
-  }
-}
-function avHairFront(h, c) {
-  const d = avMix(c, '#000', .28), hl = avMix(c, '#fff', .25);
-  const shine = `<path d="M70 38Q92 28 118 34" stroke="${hl}" stroke-width="3" fill="none" stroke-linecap="round" opacity=".55"/>`;
-  switch (h) {
-    case 'short': return `<path d="M57 70Q48 18 100 18Q152 18 143 70Q136 46 114 42Q98 54 80 44Q62 50 57 70Z" fill="${c}"/>${shine}`;
-    case 'side': return `<path d="M56 72Q46 20 100 18Q154 22 144 68Q142 44 118 38Q90 34 72 52Q60 58 56 72Z" fill="${c}"/><path d="M118 38Q104 46 90 52" stroke="${d}" stroke-width="2" fill="none" opacity=".6"/>${shine}`;
-    case 'long': return `<path d="M56 72Q46 20 100 18Q154 20 144 72Q142 46 100 44Q60 46 56 72Z" fill="${c}"/><path d="M57 66Q50 104 58 148L70 148Q64 104 70 62Z" fill="${c}"/><path d="M143 66Q150 104 142 148L130 148Q136 104 130 62Z" fill="${c}"/>${shine}`;
-    case 'bob': return `<path d="M56 68Q46 20 100 18Q154 20 144 68Q134 50 100 48Q66 50 56 68Z" fill="${c}"/><path d="M56 64Q50 94 54 118L68 118Q62 92 68 60Z" fill="${c}"/><path d="M144 64Q150 94 146 118L132 118Q138 92 132 60Z" fill="${c}"/>${shine}`;
-    case 'ponytail': return `<path d="M56 72Q46 20 100 18Q154 20 144 72Q140 46 112 40Q96 52 76 44Q62 50 56 72Z" fill="${c}"/><circle cx="141" cy="52" r="5" fill="#ef4444"/>${shine}`;
-    case 'bun': return `<path d="M57 70Q48 20 100 20Q152 20 143 70Q134 48 100 46Q66 48 57 70Z" fill="${c}"/>${shine}`;
-    case 'curly': return [[66, 44], [88, 34], [112, 34], [134, 44], [100, 40]].map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="14" fill="${c}"/>`).join('') + `<path d="M58 66Q60 50 74 48" fill="${c}"/>`;
-    case 'buzz': return `<path d="M60 64Q58 28 100 26Q142 28 140 64Q130 44 100 42Q70 44 60 64Z" fill="${c}" opacity=".8"/>`;
-    default: return '';
-  }
-}
 
 /* ---------- เสื้อทั่วไป (พิกัดเดียวกับเสื้อช็อป 120×130 แล้วเลื่อนไป 40,96) ---------- */
 const AV_LS = 'M44 8L16 22L2 52L22 62L30 50L30 120L90 120L90 50L98 62L118 52L104 22L76 8Q60 28 44 8Z';
@@ -44,7 +18,7 @@ const AV_SSV = 'M44 8L16 22L6 42L24 50L30 42L30 120L90 120L90 42L96 50L114 42L10
 const AV_GOWN = 'M44 8L12 24L-6 74L22 80L30 54L30 140L90 140L90 54L98 80L126 74L108 24L76 8Q60 28 44 8Z';
 function avFlower(x, y, r, c1, c2) { x = +x; y = +y; return `<g>${[0, 72, 144, 216, 288].map(a => `<circle cx="${(x + Math.cos(a * Math.PI / 180) * r).toFixed(1)}" cy="${(y + Math.sin(a * Math.PI / 180) * r).toFixed(1)}" r="${(r * .72).toFixed(1)}" fill="${c1}"/>`).join('')}<circle cx="${x}" cy="${y}" r="${(r * .55).toFixed(1)}" fill="${c2}"/></g>`; }
 function avGarment(type, c, uid) {
-  const edge = 'stroke="rgba(0,0,0,.3)" stroke-width="1.2" stroke-linejoin="round"';
+  const edge = 'stroke="rgba(70,40,55,.62)" stroke-width="1.2" stroke-linejoin="round"';
   const dk = avMix(c, '#000', .22);
   switch (type) {
     case 'tee': return `<path d="${AV_SS}" fill="${c}" ${edge}/><path d="M44 8Q60 28 76 8" fill="none" stroke="${dk}" stroke-width="2.4"/>`;
@@ -61,8 +35,8 @@ function avGarment(type, c, uid) {
 
 /* ---------- ชั้นนอก ---------- */
 function avOuter(type) {
-  if (type === 'lab') return `<g transform="translate(40 96)"><path fill-rule="evenodd" d="M44 8L16 22L2 54L22 66L30 52L30 144L90 144L90 52L98 66L118 54L104 22L76 8L60 44Z M60 44L74 144L46 144Z" fill="#f7f9fc" stroke="rgba(0,0,0,.3)" stroke-width="1.2" stroke-linejoin="round"/><path d="M44 8L58 36L50 40ZM76 8L62 36L70 40Z" fill="#e6ebf3" stroke="rgba(0,0,0,.2)"/><rect x="34" y="96" width="16" height="16" rx="2" fill="none" stroke="rgba(0,0,0,.22)"/><rect x="70" y="96" width="16" height="16" rx="2" fill="none" stroke="rgba(0,0,0,.22)"/><path d="M38 100v-8h8v8" stroke="#2563eb" stroke-width="2" fill="none"/><path d="M30 140H90" stroke="rgba(0,0,0,.16)"/></g>`;
-  if (type === 'vest') return `<g transform="translate(40 96)"><path fill-rule="evenodd" d="M46 10L34 22L30 50L30 122L90 122L90 50L86 22L74 10L60 44Z M60 44L67 122L53 122Z" fill="#ff7a1a" stroke="rgba(0,0,0,.3)" stroke-width="1.2" stroke-linejoin="round"/><path d="M30 84H56M64 84H90M30 104H55M65 104H90" stroke="#e6eef4" stroke-width="6"/><path d="M34 22L40 46M86 22L80 46" stroke="#e6eef4" stroke-width="5"/></g>`;
+  if (type === 'lab') return `<g><path fill-rule="evenodd" d="M44 8L16 22L2 54L22 66L30 52L30 144L90 144L90 52L98 66L118 54L104 22L76 8L60 44Z M60 44L74 144L46 144Z" fill="#f7f9fc" stroke="rgba(70,40,55,.62)" stroke-width="1.2" stroke-linejoin="round"/><path d="M44 8L58 36L50 40ZM76 8L62 36L70 40Z" fill="#e6ebf3" stroke="rgba(0,0,0,.2)"/><rect x="34" y="96" width="16" height="16" rx="2" fill="none" stroke="rgba(0,0,0,.22)"/><rect x="70" y="96" width="16" height="16" rx="2" fill="none" stroke="rgba(0,0,0,.22)"/><path d="M38 100v-8h8v8" stroke="#2563eb" stroke-width="2" fill="none"/><path d="M30 140H90" stroke="rgba(0,0,0,.16)"/></g>`;
+  if (type === 'vest') return `<g><path fill-rule="evenodd" d="M46 10L34 22L30 50L30 122L90 122L90 50L86 22L74 10L60 44Z M60 44L67 122L53 122Z" fill="#ff7a1a" stroke="rgba(70,40,55,.62)" stroke-width="1.2" stroke-linejoin="round"/><path d="M30 84H56M64 84H90M30 104H55M65 104H90" stroke="#e6eef4" stroke-width="6"/><path d="M34 22L40 46M86 22L80 46" stroke="#e6eef4" stroke-width="5"/></g>`;
   return '';
 }
 
@@ -107,21 +81,6 @@ function avHand(type, skin) {
   return k ? items[k] + hand : hand;
 }
 
-/* ---------- ขา/กางเกง/รองเท้า ---------- */
-function avLegs(bot, bc, shoes, skin) {
-  const dk = avMix(bc, '#000', .25), sk = skin, sh = shoes === 'loafer' ? ['#5b3a24', '#3b2314'] : ['#f8fafc', '#cbd5e1'];
-  const shoe = (x, f) => shoes === 'loafer'
-    ? `<path d="M${x - 14} 288H${x + 14}Q${x + 18} 296 ${x + 14} 301H${x - 16}Q${x - 18} 294 ${x - 14} 288Z" fill="${sh[0]}" stroke="${sh[1]}" stroke-width="1.200"/><path d="M${x - 15} 299H${x + 15}" stroke="${sh[1]}" stroke-width="2"/>`
-    : `<path d="M${x - 14} 286H${x + 14}Q${x + 20} 292 ${x + 16} 301H${x - 17}Q${x - 18} 292 ${x - 14} 286Z" fill="${sh[0]}" stroke="${sh[1]}" stroke-width="1.200"/><path d="M${x - 17} 297H${x + 17}" stroke="${f}" stroke-width="3"/><path d="M${x - 6} 289L${x + 6} 291" stroke="${sh[1]}" stroke-width="1.500"/>`;
-  const legs = (to) => `<path d="M76 208H98L97 ${to}H77Z M102 208H124L123 ${to}H103Z" fill="${sk}"/>`;
-  let b = '';
-  if (bot === 'skirt') b = legs(290) + `<path d="M68 206H132L144 262Q100 272 56 262Z" fill="${bc}" stroke="rgba(0,0,0,.3)" stroke-width="1.200"/><path d="M84 210L78 266M100 210V270M116 210L122 266" stroke="${dk}" stroke-width="1.400" opacity=".6"/>`;
-  else if (bot === 'shorts') b = legs(290) + `<path d="M70 206H130L132 256H102L100 240L98 256H68Z" fill="${bc}" stroke="rgba(0,0,0,.3)" stroke-width="1.200"/><path d="M100 212V240" stroke="${dk}" stroke-width="1.400"/>`;
-  else b = `<path d="M72 206H99L97 290H76Z M101 206H128L124 290H103Z" fill="${bc}" stroke="rgba(0,0,0,.3)" stroke-width="1.200"/><path d="M85 222V288M114 222V288" stroke="${dk}" stroke-width="1.200" opacity=".45"/>`;
-  b += `<rect x="70" y="204" width="60" height="9" rx="3" fill="${dk}"/>`;
-  return b + shoe(86, '#cbd5e1') + shoe(114, '#cbd5e1');
-}
-
 /* ---------- ฉากหลัง ---------- */
 function avBg(bg, uid) {
   const R = (fill) => `<rect width="200" height="310" rx="22" fill="${fill}"/>`;
@@ -137,39 +96,3 @@ function avBg(bg, uid) {
   return '';
 }
 
-/* ---------- ประกอบตัวละคร ---------- */
-// over = ค่าที่ทับ (เช่น {top:'uni:chula'}) ; o = {w, view:'full'|'half', bg:true}
-function avatarSvg(over, o) {
-  o = o || {}; const c = Object.assign({}, typeof avCfg === 'function' ? avCfg() : AVDEF, over || {}), uid = ++AVC;
-  const skin = AVSKIN[c.skin] || AVSKIN.b, hc = c.hc || '#1f1b1b', uc = avUniCol(o.uni || (typeof curThemeId === 'function' ? curThemeId() : 'sixent'));
-  const nick = o.nick != null ? String(o.nick) : (typeof store !== 'undefined' ? store.get('nick', 'น้องวิศวะ') : 'น้องวิศวะ');
-  const isUni = /^unig?:/.test(c.top);
-  let top;
-  if (isUni) {
-    const gold = c.top.startsWith('unig:'), id = c.top.split(':')[1];
-    top = uniShirt(nick, id, { paper: true, gold }).replace('<svg class="shirt"', '<svg x="40" y="96" width="120" height="130" overflow="visible" class="shirt"');
-  } else top = `<g transform="translate(40 96)">${avGarment(c.top, c.tc, uid)}</g>`;
-  const sleeveSkin = `<g transform="translate(40 96)" stroke="${skin}" stroke-width="11" stroke-linecap="round"><path d="M20 36L11 62M100 36L109 62"/></g>`;
-  const hoodBack = c.top === 'hoodie' ? `<path d="M64 96Q100 84 136 96L142 124Q100 142 58 124Z" fill="${avMix(c.tc, '#000', .12)}" stroke="rgba(0,0,0,.25)"/>` : '';
-  const female = c.g === 'f', face = `
-    <circle cx="56" cy="74" r="8" fill="${skin}"/><circle cx="144" cy="74" r="8" fill="${skin}"/>
-    <circle cx="100" cy="66" r="42" fill="${skin}"/>
-    <circle cx="74" cy="84" r="7" fill="#f08c8c" opacity=".35"/><circle cx="126" cy="84" r="7" fill="#f08c8c" opacity=".35"/>
-    <g class="avey"><ellipse cx="84" cy="70" rx="4.800" ry="6.200" fill="#2a2230"/><ellipse cx="116" cy="70" rx="4.800" ry="6.200" fill="#2a2230"/><circle cx="85.800" cy="67.600" r="1.800" fill="#fff"/><circle cx="117.800" cy="67.600" r="1.800" fill="#fff"/></g>
-    ${female ? '<path d="M77.500 65.500l-4-3M122.500 65.500l4-3" stroke="#2a2230" stroke-width="2.200" stroke-linecap="round"/>' : ''}
-    <path d="M75 58Q84 53 93 58M107 58Q116 53 125 58" stroke="${avMix(hc, '#000', .15)}" stroke-width="2.800" fill="none" stroke-linecap="round"/>
-    <path d="M99 78Q101 83 104 80" stroke="rgba(0,0,0,.28)" stroke-width="1.800" fill="none" stroke-linecap="round"/>
-    <path d="M92 89Q100 96 108 89" stroke="#8a3b3b" stroke-width="2.600" fill="none" stroke-linecap="round"/>`;
-  const vb = o.view === 'half' ? '10 14 180 236' : o.view === 'bust' ? '30 10 140 170' : '0 0 200 310';
-  const dims = o.w ? ` width="${o.w}"` : '';
-  const showBg = (o.bg !== false) && c.bg;
-  return `<svg class="av ${o.cls || ''}" viewBox="${vb}"${dims} role="img" aria-label="ตัวละคร ${esc(nick)}" xmlns="http://www.w3.org/2000/svg">
-    ${showBg ? avBg(c.bg, uid) : ''}
-    <g class="avbody"><ellipse cx="100" cy="302" rx="52" ry="5" fill="rgba(0,0,0,.2)"/>
-    ${avHairBack(c.hair, hc)}${avLegs(c.bottom, c.bc, c.shoes, skin)}
-    <rect x="89" y="96" width="22" height="20" rx="8" fill="${avMix(skin, '#000', .08)}"/>${sleeveSkin}
-    ${top}<g class="avhands"><circle cx="51" cy="163" r="7" fill="${skin}"/></g>${avOuter(c.outer)}${hoodBack}
-    ${(() => { const nk = String(c.neck).split(':'); return avNeck(nk[0], nk[1] ? avUniCol(nk[1]) : uc, nick); })()}
-    ${face}${avHairFront(c.hair, hc)}${avFace(c.face)}${avHead(c.head, uc)}
-    ${avHand(c.hand, skin)}</g></svg>`;
-}

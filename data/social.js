@@ -8,14 +8,14 @@ const socSt = () => store.get('soc', {});            // {on:true, s:{access,refr
 const socEnabled = () => socOn() && !!socSt().on;
 
 /* ---------- ตรวจข้อมูลตัวละครที่มาจากเพื่อน (ห้ามเชื่อ: ค่าสีและชื่อไอเท็มถูกแทรกลง SVG) ---------- */
-const AV_HAIRS = ['short', 'side', 'long', 'bob', 'ponytail', 'bun', 'curly', 'buzz'];
 function avClean(c) {
   c = c && typeof c === 'object' ? c : {}; const o = Object.assign({}, AVDEF), col = v => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v : null;
   if (['m', 'f', 'n'].includes(c.g)) o.g = c.g; if (AVSKIN[c.skin]) o.skin = c.skin; if (AV_HAIRS.includes(c.hair)) o.hair = c.hair;
-  o.hc = col(c.hc) || o.hc; o.tc = col(c.tc) || o.tc; o.bc = col(c.bc) || o.bc;
-  if (['trouser', 'skirt', 'shorts'].includes(c.bottom)) o.bottom = c.bottom; if (['sneaker', 'loafer'].includes(c.shoes)) o.shoes = c.shoes;
+  o.sz = Math.min(1.15, Math.max(.85, +c.sz || 1)); o.bw = Math.min(1.2, Math.max(.85, +c.bw || 1)); o.look = c.look === 'soft' ? 'soft' : 'flat'; o.hc = col(c.hc) || o.hc; o.hc2 = col(c.hc2) || ''; o.ec = col(c.ec) || o.ec; o.tc = col(c.tc) || o.tc; o.bc = col(c.bc) || o.bc;
+  if (AV_EYES.some(e => e[0] === c.eye)) o.eye = c.eye; if (AV_MOUTHS.some(e => e[0] === c.mouth)) o.mouth = c.mouth;
+  if (['trouser', 'skirt', 'shorts', 'jeans', 'pleated', 'cargo', 'leggings'].includes(c.bottom)) o.bottom = c.bottom; if (['sneaker', 'loafer', 'boots', 'slipper', 'highcut', 'mary'].includes(c.shoes)) o.shoes = c.shoes;
   AV_SLOTS.forEach(s => { if (c[s] != null && typeof c[s] === 'string' && AVBY[s + ':' + c[s]]) o[s] = c[s]; });
-  return o;
+  return avFixG(o);
 }
 
 /* ---------- เรียกเซิร์ฟเวอร์ ---------- */
@@ -44,7 +44,7 @@ async function socRpc(fn, args) {
 
 /* ---------- ซิงก์โปรไฟล์ของฉัน ---------- */
 function socPayload() {
-  const cfg = avCfg(), keep = {}; ['g', 'skin', 'hair', 'hc', 'top', 'tc', 'outer', 'head', 'face', 'neck', 'hand', 'bottom', 'bc', 'shoes', 'bg'].forEach(k => keep[k] = cfg[k]);
+  const cfg = avCfg(), keep = {}; ['g', 'skin', 'hair', 'hc', 'hc2', 'eye', 'ec', 'mouth', 'top', 'tc', 'outer', 'head', 'hacc', 'face', 'neck', 'hand', 'bottom', 'bc', 'shoes', 'pet', 'fx', 'bg', 'sz', 'bw', 'look', 'fc', 'legs'].forEach(k => keep[k] = cfg[k]);
   return { p_nick: String(store.get('nick', 'น้องวิศวะ')).slice(0, 12), p_uni: curThemeId(), p_avatar: keep, p_xp: xpNow(), p_title: shirtInfo().title };
 }
 async function socSync(force) {

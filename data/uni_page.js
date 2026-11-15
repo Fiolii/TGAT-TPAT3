@@ -41,7 +41,7 @@ function uniPage(id) {
   const deco = sk && typeof UNIDECO !== 'undefined' && UNIDECO[id] ? UNIDECO[id](I, E) : '';
   const stl = sk && sk.stat ? sk.stat : ['ก่อตั้งมหาวิทยาลัย', 'กำเนิดคณะวิศวะ', 'ปีของวิศวะที่นี่'];
   const bornN = parseInt(String(E.born).replace(/\D/g, '').slice(0, 4)), thNow = new Date().getFullYear() + 543, age = bornN ? thNow - bornN : 0;
-  const me = typeof avatarSvg === 'function' ? `<div class="uh-me"><div class="uh-meav">${avatarSvg({ top: 'uni:' + id }, { w: 92 })}</div><div class="uh-met"><b>ลองสวมเสื้อช็อปของที่นี่</b><small>ตัวละครของคุณจะใส่เสื้อช็อป ${esc(t.s || t.n)} ทันที</small><div class="row" style="gap:8px;margin-top:8px"><button class="pri" data-a="avWearUni" data-v="${id}">สวมเลย</button><button data-a="avOpen">ห้องแต่งตัว</button></div></div></div>` : '';
+  const me = typeof avatarSvg === 'function' && CHAR_ON ? `<div class="uh-me"><div class="uh-meav">${avatarSvg({ top: 'uni:' + id }, { w: 92 })}</div><div class="uh-met"><b>ลองสวมเสื้อช็อปของที่นี่</b><small>ตัวละครของคุณจะใส่เสื้อช็อป ${esc(t.s || t.n)} ทันที</small><div class="row" style="gap:8px;margin-top:8px"><button class="pri" data-a="avWearUni" data-v="${id}">สวมเลย</button><button data-a="avOpen">ห้องแต่งตัว</button></div></div></div>` : '';
   el = document.createElement('div'); el.id = 'unipage'; el.dataset.u = id; el.className = 'omr uniomr uh-omr' + (sk ? ' has-skin uk-' + id : ''); el.setAttribute('data-a', 'uniClose'); el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'รู้จัก ' + t.n);
   el.innerHTML = `<div>
     <div class="unitop"><b>${uic('book', 18)} ตำนานมหาวิทยาลัย</b><span><button data-a="uniPickOther">เปลี่ยนที่อื่น</button> <button class="pri" data-a="uniClose">ปิด</button></span></div>

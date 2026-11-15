@@ -78,7 +78,7 @@ const meAchTab = () => `${shirtCard()}${achCard()}<div class="card" style="displ
 /* ---------- ปุ่มอวาตาร์บนแถบบน (เปลี่ยนตามลุคตัวละครเมื่อมีการแก้) ---------- */
 let hubAvSig = '';
 function hubAfterRender() {
-  const b = document.querySelector('#top .themebtn[data-a=avOpen]'); if (!b || typeof avatarSvg !== 'function') return;
+  const b = document.querySelector('#top .themebtn[data-a=avOpen]'); if (!b || typeof avatarSvg !== 'function' || !CHAR_ON) return;
   const sig = JSON.stringify(typeof avCfg === 'function' ? avCfg() : '') + '|' + store.get('theme', 'sixent'); if (sig === hubAvSig) return; hubAvSig = sig;
   b.innerHTML = `<span class="hdav">${avatarSvg({}, { view: 'bust', w: 34 })}</span>`; b.setAttribute('aria-label', 'ฉัน — ตัวละคร ร้านค้า เพื่อน ธีม'); b.title = 'ฉัน';
 }

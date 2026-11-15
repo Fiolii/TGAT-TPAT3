@@ -114,7 +114,7 @@ function shirtSvgBase(name) {
 }
 function shirtCard() {
   const si = shirtInfo(), nm = store.get('nick', 'น้องวิศวะ'), pct_ = si.next ? Math.min(100, Math.round((si.xp - TITLES[TITLES.findIndex(t => t[1] === si.title)][0]) / (si.next[0] - TITLES[TITLES.findIndex(t => t[1] === si.title)][0]) * 100)) : 100;
-  const av = typeof avatarSvg === 'function';
+  const av = typeof avatarSvg === 'function' && typeof CHAR_ON !== 'undefined' && CHAR_ON;
   return `<div class="card shirtcard">${av ? `<a class="avmini" href="#/me" data-a="avOpen" data-v="dress" aria-label="ตัวละครของฉัน — แตะเพื่อแต่งตัว">${avatarSvg({}, { view: 'half' })}</a>` : `<button class="shirtbtn" data-a="nickEdit" aria-label="แก้ชื่อบนเสื้อช็อป" title="แตะเพื่อแก้ชื่อบนอก">${shirtSvg(nm)}</button>`}
     <div class="shirtinfo"><div class="mute">เสื้อช็อป${(THEMES.find(t => t.id === curThemeId()) || {}).s ? ' · ' + esc(THEMES.find(t => t.id === curThemeId()).s) : 'ของฉัน'}</div><b style="font-size:19px">${esc(nm)}</b>${av ? ' <button class="nickbtn" data-a="nickEdit" aria-label="แก้ชื่อบนเสื้อช็อป">✎</button>' : ''} <span class="tag">${si.title}</span>${av ? ' ' + coinChip() : ''}
     ${curThemeId() !== 'sixent' ? `<div class="unimotto">“${esc(uniOf(curThemeId()).motto)}”</div>` : ''}
