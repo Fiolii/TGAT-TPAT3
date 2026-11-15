@@ -73,7 +73,7 @@ function engQuiz() {
   if (!Q.qs.length) return '<div class="card"><p class="mute">หมวดนี้มีคำน้อยเกินไปสำหรับควิซ — เลือก "ทั้งหมด" ดูนะ</p></div>';
   if (Q.i >= Q.qs.length) {
     const wrong = Q.qs.filter(q => q.pick !== q.id);
-    return `<div class="card en-done"><div style="font-size:44px">${Q.score >= Q.qs.length * .8 ? '🏆' : '💪'}</div><h2>ได้ ${Q.score}/${Q.qs.length} ข้อ</h2>
+    return `<div class="card en-done"><div style="font-size:44px">${Q.score >= Q.qs.length * .8 ? '🏆' : '💪'}</div><h2>คะแนน ${Q.score}/${Q.qs.length} ข้อ</h2>
       ${wrong.length ? `<div class="en-wrong">${wrong.map(q => { const w = engBy(q.id); return `<div class="en-wr"><b>${esc(w.w)}</b><span>${esc(w.th)}</span>${engSpkBtn(w.id)}</div>`; }).join('')}</div><p class="mute">คำที่ตอบผิดถูกส่งกลับไปทบทวนวันนี้แล้ว</p>` : '<p class="mute">ถูกหมดเลย!</p>'}
       <div class="row" style="justify-content:center;gap:8px"><button class="pri" data-a="enRestart">ควิซชุดใหม่</button><button data-a="enMode" data-v="cards">ไปทบทวนการ์ด</button></div></div>`;
   }

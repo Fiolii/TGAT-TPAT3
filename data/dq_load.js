@@ -36,7 +36,7 @@ async function dqLoad() {
 window.addEventListener('load', () => setTimeout(dqLoad, 300));
 
 const dqSeen = () => new Set(attempts.map(a => a.qid));
-const dqThai = d => d ? new Date(d + 'T00:00:00').toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '';
+const dqThai = d => d ? new Date(d + 'T00:00:00').toLocaleDateString(typeof I18N_ON === 'function' && I18N_ON() ? 'en-GB' : 'th-TH', { day: 'numeric', month: 'short', year: '2-digit' }) : '';
 function dqCard() {
   if (!DQ.loaded || !DQ.questions.length) return '';
   const seen = dqSeen(), fresh = DQ.questions.filter(q => !seen.has(q.id)), today = DQ.notes.filter(n => n.date === (DQ.notes[0] || {}).date).slice(0, 3);

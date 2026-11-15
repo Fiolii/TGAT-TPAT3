@@ -38,3 +38,7 @@
 @media (prefers-reduced-motion:reduce){.en-card{animation:none;transition:none}}
 :root[data-skin="blueprint"] .en-card{background:rgba(231,240,249,.05);box-shadow:none;border:1.5px solid rgba(231,240,249,.62);border-radius:6px}
 :root[data-skin="blueprint"] .en-yes{background:#e7f0f9!important;color:#183463!important}
+
+/* ปุ่มสลับภาษา (data/i18n.js) */
+.langbtn{flex:none;min-width:44px;height:38px;padding:0 10px;margin-right:6px;border-radius:12px;font-size:13px;font-weight:700;letter-spacing:.04em}
+@media (max-width:420px){.langbtn{min-width:40px;padding:0 8px;margin-right:4px}}
