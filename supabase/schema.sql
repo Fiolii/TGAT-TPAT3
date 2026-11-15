@@ -131,3 +131,47 @@ grant execute on function public.my_friends() to authenticated;
 grant execute on function public.remove_friend(uuid) to authenticated;
 grant execute on function public.rotate_code() to authenticated;
 grant execute on function public.delete_me() to authenticated;
+
+-- ============================================================
+-- เพิ่มเติม (รอบ 2): สถานะเพื่อน "กำลังทำอะไรอยู่" (จับเวลา / อ่านบทเรียน / ทำข้อสอบ)
+-- รันส่วนนี้ซ้ำได้ ไม่ทำลายข้อมูลเดิม ข้อมูลที่เพิ่ม: ประเภทกิจกรรม + ชื่อบทเรียน/วิชา + เวลาที่ทำมาแล้ว + เวลาที่เห็นล่าสุด
+-- ============================================================
+alter table public.profiles add column if not exists act text not null default 'idle';
+alter table public.profiles add column if not exists act_label text not null default '';
+alter table public.profiles add column if not exists act_since timestamptz;
+alter table public.profiles add column if not exists seen_at timestamptz;
+
+-- ตั้งสถานะของฉัน (เรียกถี่ ๆ ได้) act: idle | timer | break | read | exam | off (off = ไม่แสดงสถานะให้เพื่อน)
+create or replace function public.set_presence(p_act text, p_label text, p_secs int)
+returns void
+language plpgsql security definer set search_path = public as $$
+declare uid uuid := auth.uid();
+begin
+  if uid is null then raise exception 'ยังไม่ได้เข้าสู่ระบบ'; end if;
+  if p_act is null or p_act not in ('idle', 'timer', 'break', 'read', 'exam', 'off') then raise exception 'สถานะไม่ถูกต้อง'; end if;
+  update public.profiles set
+    act = p_act,
+    act_label = left(coalesce(p_label, ''), 40),
+    act_since = now() - make_interval(secs => greatest(0, least(coalesce(p_secs, 0), 86400))),
+    seen_at = case when p_act = 'off' then null else now() end
+  where id = uid;
+end $$;
+
+-- สถานะเพื่อนทั้งหมด (เบา เรียกซ้ำได้) เวลาคำนวณฝั่งเซิร์ฟเวอร์ ไม่พึ่งนาฬิกาเครื่อง
+create or replace function public.friend_status()
+returns table (id uuid, act text, act_label text, act_secs int, seen_secs int)
+language sql security definer stable set search_path = public as $$
+  select p.id,
+         case when p.seen_at is null then 'off' else p.act end,
+         case when p.seen_at is null then '' else p.act_label end,
+         case when p.act_since is null then 0 else greatest(0, extract(epoch from now() - p.act_since))::int end,
+         case when p.seen_at is null then null else greatest(0, extract(epoch from now() - p.seen_at))::int end
+  from public.friendships fr join public.profiles p on p.id = fr.b
+  where fr.a = auth.uid()
+  limit 100;
+$$;
+
+revoke all on function public.set_presence(text, text, int) from public, anon;
+revoke all on function public.friend_status() from public, anon;
+grant execute on function public.set_presence(text, text, int) to authenticated;
+grant execute on function public.friend_status() to authenticated;

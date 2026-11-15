@@ -72,3 +72,24 @@ svg.av{display:block;overflow:visible}
 .frav{flex:none;border:0;padding:0;background:radial-gradient(80% 70% at 50% 30%,color-mix(in srgb,var(--pri) 16%,transparent),transparent 75%);border-radius:14px;overflow:hidden;cursor:pointer}.frav svg.av{overflow:hidden}
 .frin{min-width:0;display:grid;gap:2px}.frin b{font-size:16px}
 .socview{text-align:center}.socview .avbig{width:230px;max-width:70vw}
+
+/* ===== แถบเพื่อน + สถานะสด ===== */
+.frhome{padding:14px 14px 12px}
+.frhome .tag.live{background:color-mix(in srgb,#f97316 18%,var(--card));color:var(--ink);border-color:color-mix(in srgb,#f97316 40%,transparent)}
+.frrow{display:flex;gap:10px;overflow-x:auto;margin:10px -4px 0;padding:4px 4px 6px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+.frt{flex:none;width:92px;display:grid;justify-items:center;gap:1px;padding:8px 4px 8px;border-radius:18px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;scroll-snap-align:start;text-align:center;font:inherit;min-height:0}
+.frt b{font-size:13.5px;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frtav{position:relative;display:block;width:70px;height:78px;border-radius:14px;overflow:hidden;background:radial-gradient(80% 70% at 50% 30%,color-mix(in srgb,var(--pri) 16%,transparent),transparent 75%)}
+.frtav svg.av{width:70px;height:auto;overflow:hidden;opacity:.55;filter:grayscale(.6)}
+.frt.on .frtav svg.av,.frt.act .frtav svg.av{opacity:1;filter:none}
+.frt .dot{position:absolute;right:4px;bottom:4px;width:13px;height:13px;border-radius:50%;background:#9ca3af;border:2px solid var(--card)}
+.frt.on .dot{background:#22c55e}
+.frt.act{border-color:color-mix(in srgb,#f97316 55%,var(--line));background:linear-gradient(180deg,color-mix(in srgb,#f97316 12%,var(--card)),var(--card))}
+.frt.act .dot{background:#f97316;animation:frpulse 1.6s ease-out infinite}
+.frts{font-size:11.5px;color:var(--mute);max-width:86px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frt.act .frts{color:var(--ink);font-weight:600}.frts.sub{font-weight:400!important;color:var(--mute)!important;font-size:11px}
+@keyframes frpulse{0%{box-shadow:0 0 0 0 rgba(249,115,22,.6)}100%{box-shadow:0 0 0 9px rgba(249,115,22,0)}}
+.fst{display:inline}
+.fst i{display:inline-block;width:9px;height:9px;border-radius:50%;background:#22c55e;margin-right:6px;vertical-align:middle}
+.fst.act{color:var(--ink);font-weight:600}.fst.act i{background:#f97316;animation:frpulse 1.6s ease-out infinite}
+@media (prefers-reduced-motion:reduce){.frt.act .dot,.fst.act i{animation:none}}

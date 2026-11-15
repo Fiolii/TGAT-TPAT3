@@ -137,6 +137,7 @@ function render(keepScroll) {
   $('#app').innerHTML = `<div class="${r === 'exam' && E && !E.done ? '' : 'view'}">${(routes[r] || viewHome)()}</div>`;
   mountSim();
   achAfterRender(r);
+  if (typeof socKick === 'function') socKick();
   if (!keepScroll) window.scrollTo(0, 0);
   tick();
 }
@@ -200,6 +201,7 @@ function viewHome() {
     <div class="row"><a class="btn w" href="#/exam">เริ่มทำข้อสอบ</a><a class="btn" href="#/timer">เริ่มจับเวลา</a></div></div>
   ${uniCard()}
   ${dailyCard()}
+  <div id="frstrip">${typeof friendStrip === 'function' ? friendStrip(false) : ''}</div>
   ${achCard()}
   <div class="grid2">${shirtCard()}<div class="card" style="display:grid;align-content:center"><div class="mute" style="margin-bottom:6px">คำคมประจำวัน</div>${quoteHtml()}</div></div>
   <div class="grid2">
@@ -369,7 +371,7 @@ function viewStats() {
 /* ====================== timer ====================== */
 function viewTimer() {
   const pomo = T.mode === 'pomo';
-  return `<h1>จับเวลา</h1><div class="card">
+  return `<h1>จับเวลา</h1><div id="frstrip2">${typeof friendStrip === 'function' ? friendStrip(true) : ''}</div><div class="card">
   <div class="chips" style="justify-content:center"><button class="chip ${pomo ? 'on' : ''}" data-a="tmode" data-v="pomo">Pomodoro</button><button class="chip ${!pomo ? 'on' : ''}" data-a="tmode" data-v="sw">จับเวลาอิสระ</button></div>
   ${pomo ? `<div class="chips" style="justify-content:center">${[[25, 5], [45, 10], [50, 10], [90, 15]].map(([f, b]) => `<button class="chip ${T.focusMin === f && T.breakMin === b ? 'on' : ''}" data-a="tpreset" data-v="${f},${b}">${f}/${b}</button>`).join('')}</div>` : ''}
   <div class="tring"><svg viewBox="0 0 220 220"><circle cx="110" cy="110" r="100" fill="none" stroke="var(--line)" stroke-width="12"/><circle id="ring" cx="110" cy="110" r="100" fill="none" stroke="${T.phase === 'focus' ? 'var(--pri)' : 'var(--ok)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="628" stroke-dashoffset="${pomo ? 628 * (1 - T.remain / phaseTotal()) : 0}" style="transition:stroke-dashoffset .5s linear"/></svg>
