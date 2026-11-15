@@ -203,25 +203,47 @@ const FIG = (function () {
   const cellOpt = a => svg('0 0 44 44', `<rect x="1" y="1" width="42" height="42" fill="#fff" stroke="${C.ink}" stroke-opacity=".5"/>` + cellGlyph(a, 1, 1), 'ลวดลายตัวเลือก', 'ofig');
 
   /* ---------- เฟือง สายพาน รอก ---------- */
-  function gearCirc(cx, cy, N, label, o) {
-    o = o || {}; const r = N * 1.7, circ = 2 * Math.PI * r;
-    return `<circle cx="${fx(cx)}" cy="${cy}" r="${fx(r)}" fill="${o.fill || C.t}" stroke="${C.ink}" stroke-width="5" stroke-dasharray="${fx(circ / (2 * N))}"/><circle cx="${fx(cx)}" cy="${cy}" r="${fx(r - 3)}" fill="${o.fill || C.t}" stroke="${C.ink}" stroke-width="1.2"/><circle cx="${fx(cx)}" cy="${cy}" r="2.5" fill="${C.ink}"/><text x="${fx(cx)}" y="${fx(cy + Math.min(r * 0.55, 20) + 3)}" text-anchor="middle" font-size="10" fill="${C.ink}">${label}</text>${o.arrow ? `<text x="${fx(cx)}" y="${cy - 4}" text-anchor="middle" font-size="13" font-weight="700" fill="#d6336c">${o.arrow}</text>` : ''}`;
+  // เฟือง: ฟันวาดด้วยเส้นประ ; ไม่ใส่ตัวหนังสือในเฟือง (ใช้ตัวอักษรเดียว + คำอธิบายด้านล่าง) เพื่อไม่ให้ทับกันเมื่อเฟืองซ้อน/ติดแกนเดียวกัน
+  const GEAR_U = 2;
+  function gearCirc(cx, cy, N, o) {
+    o = o || {}; const r = N * GEAR_U, circ = 2 * Math.PI * r;
+    return `<g opacity="${o.op || 1}"><circle cx="${fx(cx)}" cy="${cy}" r="${fx(r)}" fill="${o.fill || C.t}" stroke="${C.ink}" stroke-width="6" stroke-dasharray="${fx(circ / (2 * N))}"/><circle cx="${fx(cx)}" cy="${cy}" r="${fx(r - 3.5)}" fill="${o.fill || C.t}" stroke="${C.ink}" stroke-width="1.4"/>${o.back ? `<circle cx="${fx(cx)}" cy="${cy}" r="${fx(r * .52)}" fill="none" stroke="${C.ink}" stroke-width="1" stroke-dasharray="3 3" opacity=".55"/>` : ''}</g>`;
   }
-  // teeth[] เรียงซ้าย→ขวา; coax[i]=true คือเฟืองตัวที่ i อยู่บนแกนเดียวกับตัวที่ i-1 (ไม่ขบกัน)
+  // teeth[] เรียงซ้าย→ขวา; coax[i]=true คือเฟืองตัวที่ i อยู่บนแกนเดียวกับตัวที่ i-1 (ไม่ขบกัน) ; labels[i]='A 12' (อักษร + จำนวนฟัน)
   function gearTrainSvg(teeth, labels, coax, drive) {
     let prevX = 0, prevN = 0; const centers = [];
-    teeth.forEach((N, i) => { const r = N * 1.7; let x; if (i === 0) x = r; else if (coax[i]) x = prevX; else x = prevX + prevN * 1.7 + r; centers.push([x, r]); prevX = x; prevN = N; });
-    const maxR = Math.max(...teeth) * 1.7, W = Math.max(...centers.map(c => c[0] + c[1])) + 8, cy = maxR + 6;
-    let out = ''; teeth.map((_, i) => i).sort((a, b) => teeth[b] - teeth[a]).forEach(i => { out += gearCirc(centers[i][0] + 4, cy, teeth[i], labels[i], { arrow: i === 0 ? drive : '', fill: coax[i] ? '#f4d9ff' : C.t }); });
-    return svg(`0 0 ${fx(W + 8)} ${fx(cy * 2 + 12)}`, out, 'ชุดเฟืองต่อกัน');
+    teeth.forEach((N, i) => { const r = N * GEAR_U; let x; if (i === 0) x = r; else if (coax[i]) x = prevX; else x = prevX + prevN * GEAR_U + r; centers.push([x, r]); prevX = x; prevN = N; });
+    const maxR = Math.max(...teeth) * GEAR_U, pad = 12, W = Math.max(...centers.map(c => c[0] + c[1])) + 2 * pad, cy = maxR + pad, ox = pad;
+    const hasTop = i => coax[i + 1];   // เฟืองที่มีตัวเล็กติดแกนเดียวกันอยู่ด้านหน้า → วาดจางลงให้เห็นว่าอยู่คนละชั้น
+    let out = ''; teeth.map((_, i) => i).sort((p, q) => (hasTop(q) ? 1 : 0) - (hasTop(p) ? 1 : 0) || teeth[q] - teeth[p]).forEach(i => {
+      out += gearCirc(centers[i][0] + ox, cy, teeth[i], { fill: coax[i] ? '#f4d9ff' : (hasTop(i) ? '#cfd9ff' : C.t), op: hasTop(i) ? .78 : 1, back: hasTop(i) });
+    });
+    // ตัวอักษรกำกับ + ลูกศรทิศของเฟืองตัวขับ
+    teeth.forEach((N, i) => {
+      const [x, r] = centers[i], X = x + ox, ch = String(labels[i]).split(' ')[0], big = hasTop(i);
+      const lx = big ? X - r * .5 : X, ly = big ? cy - r * .38 : cy;
+      out += `<text x="${fx(lx)}" y="${fx(ly + 5)}" text-anchor="middle" font-size="${r < 26 ? 13 : 16}" font-weight="800" fill="${C.ink}" stroke="#fff" stroke-width="3" paint-order="stroke">${ch}</text>`;
+      if (!big) out += `<circle cx="${fx(X)}" cy="${cy}" r="2.4" fill="${C.ink}"/>`;
+      if (i === 0 && drive) out += `<path d="M${fx(X - r * .5)} ${fx(cy - r * .1)} A ${fx(r * .5)} ${fx(r * .5)} 0 1 1 ${fx(X + r * .12)} ${fx(cy + r * .48)}" fill="none" stroke="#d6336c" stroke-width="2.2" stroke-linecap="round"/><path d="M${fx(X + r * .12)} ${fx(cy + r * .48)} l-6 -2 M${fx(X + r * .12)} ${fx(cy + r * .48)} l1 -6.500" stroke="#d6336c" stroke-width="2.2" stroke-linecap="round" fill="none"/>`;
+    });
+    // คำอธิบายใต้ภาพ: สีของเฟือง + จำนวนฟัน (ตัวที่ติดแกนเดียวกันบอกไว้ชัด)
+    let lx = pad, ly = cy + maxR + 20, items = '';
+    teeth.forEach((N, i) => {
+      const ch = String(labels[i]).split(' ')[0], txt = ch + ' = ' + N + ' ฟัน' + (coax[i] ? ' (แกนเดียวกับ ' + String(labels[i - 1]).split(' ')[0] + ')' : ''), w = 24 + txt.length * 5.6;
+      if (lx + w > W - 4 && lx > pad) { lx = pad; ly += 18; }
+      items += `<rect x="${fx(lx)}" y="${ly - 10}" width="12" height="12" rx="3" fill="${coax[i] ? '#f4d9ff' : (hasTop(i) ? '#cfd9ff' : C.t)}" stroke="${C.ink}"/><text x="${fx(lx + 17)}" y="${ly}" font-size="12" fill="currentColor">${txt}</text>`; lx += w + 10;
+    });
+    return svg(`0 0 ${fx(Math.max(W, 250))} ${fx(ly + 10)}`, out + items, 'ชุดเฟืองต่อกัน');
   }
+  // ล้อสายพาน: r1, r2 เป็นสัดส่วนรัศมีของล้อ A และ B (ปรับขนาดภาพให้พอดีเอง) ; lab1/lab2 วางใต้ล้อ ไม่ทับสายพาน
   function pulleyBeltSvg(r1, r2, crossed, lab1, lab2) {
-    const d = 120, c1 = [r1 + 8, Math.max(r1, r2) + 8], c2 = [r1 + 8 + d, c1[1]]; let belt = '';
-    const sp = crossed ? (r1 + r2) / d : (r1 - r2) / d, cp = Math.sqrt(1 - sp * sp), n1 = [sp, -cp], n2 = [sp, cp];
-    const pts = k => crossed ? [[c1[0] + r1 * k[0], c1[1] + r1 * k[1]], [c2[0] - r2 * k[0], c2[1] - r2 * k[1]]] : [[c1[0] + r1 * k[0], c1[1] + r1 * k[1]], [c2[0] + r2 * k[0], c2[1] + r2 * k[1]]];
-    [n1, n2].forEach(k => { const p = pts(k); belt += `<line x1="${fx(p[0][0])}" y1="${fx(p[0][1])}" x2="${fx(p[1][0])}" y2="${fx(p[1][1])}" stroke="#d6336c" stroke-width="2"/>`; });
-    const out = belt + [[c1, r1, lab1], [c2, r2, lab2]].map(([c, r, l]) => `<circle cx="${fx(c[0])}" cy="${fx(c[1])}" r="${r}" fill="${C.t}" stroke="${C.ink}" stroke-width="2"/><circle cx="${fx(c[0])}" cy="${fx(c[1])}" r="2.5" fill="${C.ink}"/><text x="${fx(c[0])}" y="${fx(c[1] + 16)}" text-anchor="middle" font-size="11" fill="${C.ink}">${l}</text>`).join('');
-    return svg(`0 0 ${fx(r1 + r2 + d + 16)} ${Math.max(r1, r2) * 2 + 16}`, out, crossed ? 'ล้อสายพานแบบไขว้' : 'ล้อสายพานแบบเปิด');
+    const s = 38 / Math.max(r1, r2), R1 = Math.max(12, r1 * s), R2 = Math.max(12, r2 * s), d = 170, padL = Math.max(14, 36 - R1), padR = Math.max(14, 36 - R2), top = 24;
+    const cy = top + Math.max(R1, R2), c1 = [padL + R1, cy], c2 = [padL + R1 + d, cy], W = c2[0] + R2 + padR, H = cy + Math.max(R1, R2) + 34;
+    const sp = crossed ? (R1 + R2) / d : (R1 - R2) / d, cp = Math.sqrt(1 - sp * sp), n1 = [sp, -cp], n2 = [sp, cp]; let belt = '';
+    const pts = k => crossed ? [[c1[0] + R1 * k[0], c1[1] + R1 * k[1]], [c2[0] - R2 * k[0], c2[1] - R2 * k[1]]] : [[c1[0] + R1 * k[0], c1[1] + R1 * k[1]], [c2[0] + R2 * k[0], c2[1] + R2 * k[1]]];
+    [n1, n2].forEach(k => { const p = pts(k); belt += `<line x1="${fx(p[0][0])}" y1="${fx(p[0][1])}" x2="${fx(p[1][0])}" y2="${fx(p[1][1])}" stroke="#d6336c" stroke-width="2.4"/>`; });
+    const wheel = (c, R, l, arrow) => `<circle cx="${fx(c[0])}" cy="${fx(c[1])}" r="${fx(R)}" fill="${C.t}" stroke="${C.ink}" stroke-width="2.4"/><circle cx="${fx(c[0])}" cy="${fx(c[1])}" r="${fx(R * .55)}" fill="none" stroke="${C.ink}" stroke-width="1" opacity=".45"/><circle cx="${fx(c[0])}" cy="${fx(c[1])}" r="3" fill="${C.ink}"/>${arrow ? `<text x="${fx(c[0])}" y="${fx(c[1] - R - 6)}" text-anchor="middle" font-size="15" fill="#d6336c" font-weight="700">↻</text>` : ''}<text x="${fx(c[0])}" y="${fx(c[1] + R + 19)}" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor">${l}</text>`;
+    return svg(`0 0 ${fx(W)} ${fx(H)}`, belt + wheel(c1, R1, lab1, true) + wheel(c2, R2, lab2, false), crossed ? 'ล้อสายพานแบบไขว้' : 'ล้อสายพานแบบเปิด');
   }
   function blockTackleSvg(n, load) {
     const w = 40 + n * 26, xs = []; for (let i = 0; i < n; i++) xs.push(18 + i * 26);
