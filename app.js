@@ -130,7 +130,7 @@ setInterval(tick, 500);
 let E = null;      // exam state
 const X = { mode: 'practice', group: '', subject: '', topic: '', src: 'all', n: 10, shuffle: true };
 let libTab = 'lessons', libOpen = '';
-const routes = { '': viewToday, exam: viewPractice, stats: viewProgress, timer: viewFocus, cal: viewCalHub, rank: viewRank, library: viewLibHub, me: viewMe };
+const routes = { '': viewToday, exam: viewPractice, stats: viewProgress, timer: viewFocus, cal: viewCalHub, rank: viewRank, library: viewLibHub, english: viewEnglish, me: viewMe };
 function render(keepScroll) {
   const r = (location.hash.replace(/^#\/?/, '') || '').split('/')[0];
   document.querySelectorAll('[data-r]').forEach(a => a.classList.toggle('on', a.dataset.r === hubPrimary(r)));
@@ -493,7 +493,7 @@ function lessonView(k) {
 
 /* ====================== actions ====================== */
 const ACT = {
-  ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT, ...CHAR_ACT, ...SOC_ACT, ...BRANCH_ACT, ...YPT_ACT, ...CAL_ACT, ...DQ_ACT, ...HUB_ACT, ...PROF_ACT,
+  ...ADMIN_ACT, ...ACH_ACT, ...ART_ACT, ...CHAR_ACT, ...SOC_ACT, ...BRANCH_ACT, ...YPT_ACT, ...CAL_ACT, ...DQ_ACT, ...HUB_ACT, ...PROF_ACT, ...ENG_ACT,
   setDate() { examDate = val('ed'); save(); render(true); },
   setExam(v) { examDate = v; save(); if ((location.hash || '#/') === '#/') render(true); else alert('ตั้งวันนับถอยหลังเป็น ' + v + ' แล้ว (ดูที่หน้าแรก)'); },
   themeOpen() { uniPage(null); themeSheet(true); }, themeClose() { themeSheet(false); },

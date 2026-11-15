@@ -2,11 +2,11 @@
 // แต่ละแท็บมีแถบสลับแท็บย่อยด้านบนหน้า (hubTabs) และการ์ดต่าง ๆ ถูกย้ายมารวมตามหน้าที่ใช้ ไม่ลบฟีเจอร์ใด
 // หน้าเดิมยังเป็นตัวสร้างเนื้อหา (viewExam/viewStats/viewCal/viewTimer/viewLibrary/viewMe) — ไฟล์นี้แค่ห่อและย้ายการ์ด
 
-const HUB_PRIMARY = { '': '', timer: '', exam: 'exam', library: 'exam', stats: 'stats', cal: 'stats', rank: 'stats', me: 'me' };   // เส้นทาง → แท็บล่างที่ต้องไฮไลต์
+const HUB_PRIMARY = { '': '', timer: '', exam: 'exam', library: 'exam', english: 'exam', stats: 'stats', cal: 'stats', rank: 'stats', me: 'me' };   // เส้นทาง → แท็บล่างที่ต้องไฮไลต์
 const hubPrimary = r => (r in HUB_PRIMARY ? HUB_PRIMARY[r] : '');
 const HUB_TABS = {
   today: [['', 'วันนี้'], ['timer', 'จับเวลา']],
-  practice: [['exam', 'ข้อสอบ'], ['library', 'บทเรียน'], ['library:info', 'ข้อมูลสอบ']],
+  practice: [['exam', 'ข้อสอบ'], ['library', 'บทเรียน'], ['english', 'อังกฤษ'], ['library:info', 'ข้อมูลสอบ']],
   progress: [['stats', 'สถิติ'], ['cal', 'ปฏิทิน'], ['rank', 'อันดับ']],
 };
 const hubTabs = (g, active) => `<div class="hubtabs" role="tablist">${HUB_TABS[g].map(([v, t]) => `<button role="tab" class="${v === active ? 'on' : ''}" aria-selected="${v === active}" data-a="hubGo" data-v="${v}">${t}</button>`).join('')}</div>`;
