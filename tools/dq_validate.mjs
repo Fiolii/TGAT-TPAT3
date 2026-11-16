@@ -9,7 +9,7 @@ const base = vm.runInContext('QUESTIONS.map(q => JSON.parse(JSON.stringify({ id:
 // ตัวช่วยตรวจ "ข้อถูกยาวที่สุดจนเดาได้": คืน {ratio, longest} ของตัวเลือกปรนัย (ข้ามตัวเลือกที่เป็นรูป/ตัวเลือกสั้นมาก)
 const lenInfo = q => { if (q.type === 'num' || !Array.isArray(q.c) || q.c.some(s => String(s).startsWith('<svg'))) return null; const L = q.c.map(s => [...String(s)].length), ca = L[q.a], o = L.filter((_, i) => i !== q.a), avg = o.reduce((x, y) => x + y, 0) / o.length; return { ratio: ca / avg, longest: ca > Math.max(...o), ca, avg }; };
 const daysDir = path.join(root, 'data', 'dq', 'days');
-const prior = []; if (fs.existsSync(daysDir)) for (const f of fs.readdirSync(daysDir).filter(x => /^\d{4}-\d{2}-\d{2}\.json$/.test(x)).sort()) { try { const d = JSON.parse(fs.readFileSync(path.join(daysDir, f), 'utf8')); (d.questions || []).forEach(q => prior.push({ ...q, _day: f })); } catch { /* ไฟล์เสียจะถูกตรวจตอนสร้าง bundle */ } }
+const prior = []; if (fs.existsSync(daysDir)) for (const f of fs.readdirSync(daysDir).filter(x => /^\d{4}-\d{2}-\d{2}(_\d+)?\.json$/.test(x)).sort()) { try { const d = JSON.parse(fs.readFileSync(path.join(daysDir, f), 'utf8')); (d.questions || []).forEach(q => prior.push({ ...q, _day: f })); } catch { /* ไฟล์เสียจะถูกตรวจตอนสร้าง bundle */ } }
 const tax = new Set(base.map(q => [q.group, q.subject, q.topic].join('|')));
 const GROUPS = { tpat3: 'TPAT3', tgat: null, alevel: null };
 
@@ -23,26 +23,38 @@ if (process.argv[2] === '--coverage') {
   const by = {}; [...base, ...prior].forEach(q => { const k = [q.group, q.subject, q.topic].join(' | '); by[k] = (by[k] || 0) + 1; });
   console.log('จำนวนโจทย์ต่อหัวข้อ (รวมแพ็กรายวันที่มีอยู่):'); Object.entries(by).sort((a, b) => a[1] - b[1]).forEach(([k, n]) => console.log(String(n).padStart(4), k)); console.log('รวม', base.length + prior.length, 'ข้อ'); process.exit(0);
 }
+// --day YYYY-MM-DD [ขั้นต่ำต่อหัวข้อ=3] → ดูว่าวันนั้นแต่ละหัวข้อมีโจทย์ใหม่กี่ข้อ และหัวข้อไหนยังขาด (ใช้วางแผนเขียนแพ็กส่วนที่ 1, 2, 3 …)
+if (process.argv[2] === '--day') {
+  const d = process.argv[3], need = +process.argv[4] || 3; if (!/^\d{4}-\d{2}-\d{2}$/.test(d || '')) { console.error('ใช้: --day YYYY-MM-DD [ขั้นต่ำ]'); process.exit(1); }
+  const c = {}; [...tax].forEach(k => c[k] = 0); prior.filter(q => q._day.startsWith(d)).forEach(q => { const k = [q.group, q.subject, q.topic].join('|'); c[k] = (c[k] || 0) + 1; });
+  const rows = Object.entries(c).sort((a, b) => a[1] - b[1]); let miss = 0, total = 0;
+  rows.forEach(([k, n]) => { total += n; if (n < need) miss += need - n; console.log(String(n).padStart(3), n < need ? '✗ ขาด ' + (need - n) : '✓      ', k); });
+  console.log('วันที่ ' + d + ' มีโจทย์ใหม่ ' + total + ' ข้อ · ' + (miss ? 'ยังขาดอีกอย่างน้อย ' + miss + ' ข้อ ให้ครบหัวข้อละ ' + need : 'ครบทุกหัวข้อแล้ว (หัวข้อละ ≥ ' + need + ')'));
+  const nextPart = (() => { let n = 1; while (fs.existsSync(path.join(daysDir, d + (n === 1 ? '' : '_' + n) + '.json'))) n++; return n; })();
+  console.log('ไฟล์ถัดไปที่ต้องเขียน: ' + d + (nextPart === 1 ? '' : '_' + nextPart) + '.json' + (nextPart > 1 ? ' (id เริ่ม dq-' + d.replace(/-/g, '') + '-' + String((nextPart - 1) * 40 + 1).padStart(2, '0') + ')' : ''));
+  process.exit(0);
+}
 const file = process.argv[2]; if (!file) { console.error('ใช้: node tools/dq_validate.mjs <ไฟล์แพ็ก.json> | --coverage'); process.exit(1); }
 const errs = [], warns = []; const E = (m) => errs.push(m), W = (m) => warns.push(m);
 let pack; try { pack = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { console.error('อ่าน JSON ไม่ได้:', e.message); process.exit(1); }
-const fm = /(\d{4})-(\d{2})-(\d{2})\.json$/.exec(file.replace(/\\/g, '/')); if (!fm) E('ชื่อไฟล์ต้องเป็น YYYY-MM-DD.json');
+const fm = /(\d{4})-(\d{2})-(\d{2})(?:_(\d+))?\.json$/.exec(file.replace(/\\/g, '/')); if (!fm) E('ชื่อไฟล์ต้องเป็น YYYY-MM-DD.json หรือ YYYY-MM-DD_2.json (แพ็กส่วนที่ 2, 3, …ของวันเดียวกัน)');
+const part = fm && fm[4] ? +fm[4] : 1;
 const date = fm ? fm[1] + '-' + fm[2] + '-' + fm[3] : ''; if (pack.date !== date) E('ฟิลด์ date ต้องตรงกับชื่อไฟล์ (' + date + ')');
 const qs = Array.isArray(pack.questions) ? pack.questions : (E('ต้องมี questions เป็นอาร์เรย์'), []), notes = Array.isArray(pack.notes) ? pack.notes : [];
 if (qs.length < 12) E('วันละอย่างน้อย 12 ข้อ (ตอนนี้ ' + qs.length + ')'); if (qs.length > 40) E('วันละไม่เกิน 40 ข้อ');
-if (notes.length < 2 || notes.length > 6) E('ต้องมีเกร็ดความรู้ 2–6 รายการ (ตอนนี้ ' + notes.length + ')');
+if (part === 1 ? (notes.length < 2 || notes.length > 6) : notes.length > 6) E('เกร็ดความรู้ ' + (part === 1 ? 'ต้องมี 2–6 รายการ' : 'ไม่เกิน 6 รายการ (ส่วนที่ 2 ขึ้นไปไม่มีก็ได้)') + ' (ตอนนี้ ' + notes.length + ')');
 const norm = s => String(s || '').toLowerCase().replace(/[\s\p{P}\p{S}]/gu, '');
 const tri = s => { const t = new Set(); for (let i = 0; i + 3 <= s.length; i++) t.add(s.slice(i, i + 3)); return t; };
 const jac = (a, b) => { if (!a.size || !b.size) return 0; let n = 0; a.forEach(x => { if (b.has(x)) n++; }); return n / (a.size + b.size - n); };
 const selfName = path.basename(file), corpus = [...base, ...prior.filter(q => q._day !== selfName)].map(q => ({ id: q.id, t: tri(norm(q.q)) }));
-const ids = new Set(), seenTxt = [];
+const ids = new Set(), seenTxt = [], priorIds = new Set(prior.filter(q => q._day !== selfName).map(q => q.id));
 const BAD = /<\s*\/?\s*(script|iframe|img|svg|style|a)\b|javascript:|on\w+\s*=|lorem ipsum|TODO|\?\?\?/i;
 const str = (v, min, max, what) => { if (typeof v !== 'string' || v.trim().length < min || v.length > max) { E(what + ' ต้องเป็นข้อความยาว ' + min + '–' + max + ' ตัวอักษร'); return false; } if (BAD.test(v)) { E(what + ' มีรูปแบบที่ไม่อนุญาต (HTML/สคริปต์/ข้อความค้าง)'); return false; } return true; };
 const posCount = [0, 0, 0, 0, 0], diffCount = { 1: 0, 2: 0, 3: 0 }; let longestN = 0, lenN = 0;
 qs.forEach((q, i) => {
   const w = 'ข้อ ' + (i + 1) + (q && q.id ? ' (' + q.id + ')' : '');
   if (!q || typeof q !== 'object') { E(w + ' ไม่ใช่ออบเจ็กต์'); return; }
-  const idm = new RegExp('^dq-' + date.replace(/-/g, '') + '-\\d{2}$'); if (!idm.test(q.id || '')) E(w + ': id ต้องเป็น dq-' + date.replace(/-/g, '') + '-NN'); else if (ids.has(q.id)) E(w + ': id ซ้ำ'); ids.add(q.id);
+  const idm = new RegExp('^dq-' + date.replace(/-/g, '') + '-\\d{2,3}$'); if (!idm.test(q.id || '')) E(w + ': id ต้องเป็น dq-' + date.replace(/-/g, '') + '-NN (ส่วนที่ 2 เริ่ม 41, ส่วนที่ 3 เริ่ม 81 …)'); else if (ids.has(q.id)) E(w + ': id ซ้ำ'); else if (priorIds.has(q.id)) E(w + ': id ซ้ำกับแพ็กอื่นของวันเดียวกัน'); ids.add(q.id);
   if (!(q.group in GROUPS)) E(w + ': group ต้องเป็น tpat3 | tgat | alevel');
   if (!tax.has([q.group, q.subject, q.topic].join('|'))) E(w + ': หัวข้อ (group|subject|topic) ไม่มีในคลังเดิม — ใช้ชื่อให้ตรงกับที่ --coverage แสดง เพื่อให้ลิงก์ไปบทเรียนได้');
   if (![1, 2, 3].includes(q.diff)) E(w + ': diff ต้องเป็น 1–3'); else diffCount[q.diff]++;
@@ -74,7 +86,7 @@ if (lenN >= 8 && longestN / lenN > 0.3) E('ข้อถูกเป็นตั�
 const gc = {}; qs.forEach(q => gc[q.group] = (gc[q.group] || 0) + 1); ['tpat3', 'tgat', 'alevel'].forEach(g => { if (qs.length >= 12 && !(gc[g] >= 3)) E('ต้องมีโจทย์กลุ่ม ' + g + ' อย่างน้อย 3 ข้อ'); });
 const nids = new Set(); notes.forEach((nn, i) => {
   const w = 'เกร็ด ' + (i + 1); if (!nn || typeof nn !== 'object') { E(w + ' ไม่ใช่ออบเจ็กต์'); return; }
-  if (!new RegExp('^dn-' + date.replace(/-/g, '') + '-\\d{2}$').test(nn.id || '')) E(w + ': id ต้องเป็น dn-' + date.replace(/-/g, '') + '-NN'); else if (nids.has(nn.id)) E(w + ': id ซ้ำ'); nids.add(nn.id);
+  if (!new RegExp('^dn-' + date.replace(/-/g, '') + '-\\d{2,3}$').test(nn.id || '')) E(w + ': id ต้องเป็น dn-' + date.replace(/-/g, '') + '-NN'); else if (nids.has(nn.id)) E(w + ': id ซ้ำ'); nids.add(nn.id);
   str(nn.title, 4, 80, w + ' หัวข้อ'); str(nn.body, 120, 900, w + ' เนื้อหา'); if (nn.topic != null) str(nn.topic, 2, 60, w + ' topic'); if (nn.link != null && !/^https:\/\/[^\s"'<>]+$/.test(nn.link)) E(w + ': link ต้องเป็น https:// เท่านั้น');
 });
 console.log('ตรวจ', file, '→ โจทย์', qs.length, 'ข้อ (กลุ่ม', JSON.stringify(gc) + ') เกร็ด', notes.length, '| ยาก/กลาง/ง่าย', diffCount[3] + '/' + diffCount[2] + '/' + diffCount[1]);

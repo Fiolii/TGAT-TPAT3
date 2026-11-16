@@ -4,7 +4,7 @@
 import fs from 'fs'; import path from 'path'; import { fileURLToPath } from 'url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dir = path.join(root, 'data', 'dq'), days = path.join(dir, 'days'); fs.mkdirSync(days, { recursive: true });
-const files = fs.readdirSync(days).filter(f => /^\d{4}-\d{2}-\d{2}\.json$/.test(f)).sort();
+const files = fs.readdirSync(days).filter(f => /^\d{4}-\d{2}-\d{2}(_\d+)?\.json$/.test(f)).sort();
 const byMonth = {}; let nq = 0, nn = 0, latest = '';
 for (const f of files) {
   const d = JSON.parse(fs.readFileSync(path.join(days, f), 'utf8')), date = f.slice(0, 10), mk = date.slice(0, 7);
