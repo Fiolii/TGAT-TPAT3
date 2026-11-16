@@ -1,9 +1,9 @@
 {
  "v": 1,
- "updated": "2026-11-16T13:02:48.309Z",
+ "updated": "2026-11-16T13:09:45.048Z",
  "latest": "2026-11-16",
- "days": 8,
- "questions": 224,
+ "days": 9,
+ "questions": 256,
  "notes": 6,
  "bundles": [
   "bundle-2026-11.json"
