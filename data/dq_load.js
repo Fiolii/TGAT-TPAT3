@@ -4,12 +4,12 @@
 const DQ = { loaded: false, questions: [], notes: [], latest: '', err: '' };
 const dqStr = (v, max) => typeof v === 'string' && v.length > 0 && v.length <= max;
 function dqOkQ(q) {
-  if (!q || typeof q !== 'object' || !/^dq-\d{8}-\d{2}$/.test(q.id || '') || !['tpat3', 'tgat', 'alevel'].includes(q.group) || !dqStr(q.subject, 40) || !dqStr(q.topic, 60) || !dqStr(q.q, 1600) || ![1, 2, 3].includes(q.diff) || !dqStr(q.exp, 1600)) return false;
+  if (!q || typeof q !== 'object' || !/^dq-\d{8}-\d{2,3}$/.test(q.id || '') || !['tpat3', 'tgat', 'alevel'].includes(q.group) || !dqStr(q.subject, 40) || !dqStr(q.topic, 60) || !dqStr(q.q, 1600) || ![1, 2, 3].includes(q.diff) || !dqStr(q.exp, 1600)) return false;
   if (q.passage != null && !dqStr(q.passage, 2600)) return false;
   if (q.type === 'num') return typeof q.ans === 'number' && isFinite(q.ans) && typeof q.tol === 'number' && q.tol >= 0;
   return Array.isArray(q.c) && q.c.length === 5 && q.c.every(s => dqStr(s, 420) && !s.startsWith('<svg')) && Number.isInteger(q.a) && q.a >= 0 && q.a <= 4 && Array.isArray(q.why) && q.why.length === 5;
 }
-const dqOkN = n => n && /^dn-\d{8}-\d{2}$/.test(n.id || '') && dqStr(n.title, 90) && dqStr(n.body, 1000) && (n.link == null || /^https:\/\/[^\s"'<>]+$/.test(n.link));
+const dqOkN = n => n && /^dn-\d{8}-\d{2,3}$/.test(n.id || '') && dqStr(n.title, 90) && dqStr(n.body, 1000) && (n.link == null || /^https:\/\/[^\s"'<>]+$/.test(n.link));
 // กระจายตำแหน่งเฉลยให้สมดุลเหมือนโจทย์เดิม (ตายตัวจาก id)
 function dqBalance(q) {
   if (!q.c) return; let h = 0; for (const ch of q.id) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
