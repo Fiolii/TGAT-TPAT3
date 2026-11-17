@@ -1,0 +1,14 @@
+/* บัญชีผู้ใช้ (data/acct.js) */
+.ac-card h2{margin-top:0}
+.ac-form{display:grid;gap:10px;margin-top:10px}
+.ac-form label{display:grid;gap:4px;font-size:13.5px;color:var(--mute)}
+.ac-form input{min-height:46px;font-size:16px}
+.ac-tabs{margin:0 0 4px}.ac-tabs button{flex:1}
+.ac-msg{padding:9px 12px;border-radius:12px;font-size:14px;line-height:1.45}
+.ac-msg.bad{background:var(--badbg,rgba(239,68,68,.1));color:var(--bad,#dc2626);border:1px solid color-mix(in srgb,var(--bad,#dc2626) 35%,transparent)}
+.ac-msg.ok{background:var(--okbg,rgba(34,197,94,.1));color:var(--ok,#16a34a);border:1px solid color-mix(in srgb,var(--ok,#16a34a) 35%,transparent)}
+.ac-code{font:700 clamp(19px,5.4vw,26px)/1.4 ui-monospace,"Cascadia Mono",Consolas,monospace;letter-spacing:.06em;text-align:center;padding:14px 10px;border-radius:16px;border:2px dashed var(--pri);background:color-mix(in srgb,var(--pri) 8%,transparent);user-select:all;word-break:break-all}
+.ac-chk{display:flex;align-items:center;gap:10px;margin:12px 0 4px;min-height:44px;cursor:pointer}.ac-chk input{width:22px;height:22px;accent-color:var(--pri);flex:none}
+.ac-danger{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}.ac-danger summary{cursor:pointer;color:var(--mute);font-size:13.5px;min-height:36px;display:flex;align-items:center}
+.ac-card button.bad{background:var(--bad,#dc2626)!important;color:#fff!important;border-color:transparent!important}
+:root[data-skin="blueprint"] .ac-code{border-color:#e7f0f9;background:rgba(231,240,249,.08)}

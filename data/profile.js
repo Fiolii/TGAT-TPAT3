@@ -31,6 +31,8 @@ function viewProfile() {
       <div class="pf-xp"><div class="pf-xpbar"><i style="width:${d.prog}%"></i></div><small class="mute">${d.nxt ? `อีก ${(d.nxt[0] - d.xp).toLocaleString('th-TH')} แต้มถึง “${esc(d.nxt[1])}”` : 'ถึงระดับสูงสุดแล้ว 🎉'}</small></div>
       <div class="row" style="gap:8px;margin-top:10px"><button class="pri" data-a="profShare">📸 สร้างการ์ดแชร์</button><button data-a="profCopy">📋 คัดลอกข้อความ</button></div></div>
 
+    ${typeof acctCard === 'function' ? acctCard() : ''}
+
     <div class="card pf-shirt"><h2>👕 เสื้อช็อปของฉัน</h2>
       <div class="pf-sh"><button class="pf-shbtn" data-a="nickEdit" aria-label="แก้ชื่อที่ปักบนอก" title="แตะเพื่อแก้ชื่อบนอก">${typeof shirtSvg === 'function' ? shirtSvg(nick) : ''}</button>
         <div class="pf-shi"><b>${d.theme.id === 'sixent' ? 'เสื้อช็อป SIXENT' : 'เสื้อช็อป ' + esc(d.theme.s || d.theme.n)}</b>
