@@ -202,7 +202,9 @@ const PRESETS = [
   { t: 'TGAT2 การคิดอย่างมีเหตุผล', f: q => q.subject === 'TGAT2' },
   { t: 'TGAT3 สมรรถนะการทำงาน', f: q => q.subject === 'TGAT3' },
   { t: 'A-Level คณิตศาสตร์', f: q => q.subject === 'คณิต' },
-  { t: 'A-Level วิทย์ (ฟิสิกส์ เคมี ชีว)', f: q => q.group === 'alevel' && q.subject !== 'คณิต' },
+  { t: 'A-Level ฟิสิกส์', f: q => q.group === 'alevel' && q.subject === 'ฟิสิกส์' },
+  { t: 'A-Level เคมี', f: q => q.group === 'alevel' && q.subject === 'เคมี' },
+  { t: 'A-Level ชีววิทยา', f: q => q.group === 'alevel' && q.subject === 'ชีววิทยา' },
 ];
 function pool() {
   const wrong = new Set(attempts.filter(a => !a.ok).map(a => a.qid)), seen = new Set(attempts.map(a => a.qid));

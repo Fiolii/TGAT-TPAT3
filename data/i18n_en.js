@@ -65,7 +65,7 @@ const I18N_EN = {
   "แหล่งอ้างอิง": "References", "แหล่งข้อสอบเก่า": "Past-paper sources", "แหล่งโจทย์": "Question sources", "แหล่งภาษาไทย": "Thai-language sources",
   "ข้อสอบเก่า/แนวข้อสอบ — ไปอ่านต่อที่ไหน": "Past papers & practice — where to read more", "สมัคร": "Apply", "รอบการรับสมัครเข้ามหาวิทยาลัย": "University admission rounds",
   "สอบ A-Level": "A-Level exam", "สอบ TPAT3 / TGAT": "TPAT3 / TGAT exam", "TGAT1 ภาษาอังกฤษ": "TGAT1 English", "TGAT3 สมรรถนะการทำงาน": "TGAT3 Work Competency", "TPAT3 ทั้งชุด": "TPAT3 full set",
-  "A-Level คณิตศาสตร์": "A-Level Mathematics", "A-Level วิทย์ (ฟิสิกส์ เคมี ชีว)": "A-Level Science (Physics, Chemistry, Biology)", "A-Level — ปฏิทินสอบ": "A-Level — exam calendar", "TGAT / TPAT — ปฏิทินสอบ": "TGAT / TPAT — exam calendar",
+  "A-Level คณิตศาสตร์": "A-Level Mathematics", "A-Level วิทย์ (ฟิสิกส์ เคมี ชีว)": "A-Level Science (Physics, Chemistry, Biology)", "A-Level ฟิสิกส์": "A-Level Physics", "A-Level เคมี": "A-Level Chemistry", "A-Level ชีววิทยา": "A-Level Biology", "A-Level — ปฏิทินสอบ": "A-Level — exam calendar", "TGAT / TPAT — ปฏิทินสอบ": "TGAT / TPAT — exam calendar",
   "วันสอบ": "Exam date", "วันที่": "Date", "รูปแบบ": "Format", "ใช้เวลา": "Duration", "คะแนนเต็ม": "Full marks", "วิชา/ส่วน": "Subject / section", "รอบ/ชุด": "Round / set",
   "เต็ม": "Full", "ที่มา": "Source", "แล้ว (ดูที่หน้าแรก)": "set (see the Today page)", "ตั้งวันนับถอยหลัง:": "Set countdown:", "หรือกำหนดเอง": "or custom",
   /* ===== ธีม / หน้าตา ===== */
