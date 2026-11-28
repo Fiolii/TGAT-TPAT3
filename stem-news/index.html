@@ -4,333 +4,619 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>STEM News Desk</title>
+<meta name="description" content="คลังข่าววิทยาศาสตร์ เทคโนโลยี วิศวกรรม ไทยและต่างประเทศ พร้อมเจาะลึกและโจทย์ฝึก สำหรับเตรียมสอบ TPAT3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Noto+Sans+Thai:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f6f5f1; --surface:#ffffff; --ink:#1b1d22; --muted:#5f636c; --line:#e3e1da;
-  --accent:#1f5eff; --accent-soft:#e8eeff; --thai:#c2410c; --thai-soft:#fff1e8;
-  --warn:#8a6100; --warn-soft:#fff6d9;
+  --bg:#f4f3ef; --surface:#ffffff; --surface2:#faf9f6; --ink:#17191e; --muted:#5d616b; --line:#e4e1d9; --line2:#eeece6;
+  --accent:#2457f5; --accent-soft:#e9eeff; --thai:#c2410c; --thai-soft:#fff0e6;
+  --warn:#8a6100; --warn-soft:#fff5d6; --ok:#0f7a4f; --ok-soft:#e3f6ec; --bad:#b42323; --bad-soft:#fde8e8;
+  --hero1:#0d1b4a; --hero2:#1f3fa8; --hero3:#6b3fd1; --on-hero:#f4f6ff;
   --c-space:#5b4bd6; --c-ai:#0f8a6a; --c-bio:#c0336f; --c-phys:#1f6fb8; --c-energy:#b8701f; --c-eng:#55606e; --c-math:#8a3fb0;
+  --shadow:0 1px 2px rgba(20,22,30,.04),0 4px 14px -6px rgba(20,22,30,.10);
+  --shadow-h:0 2px 4px rgba(20,22,30,.05),0 12px 28px -10px rgba(20,22,30,.22);
+  --r:16px;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#121317; --surface:#1b1d23; --ink:#ecebe7; --muted:#9a9ea8; --line:#2b2e36;
-    --accent:#7f9cff; --accent-soft:#1f2741; --thai:#ff9a5c; --thai-soft:#3a2418;
-    --warn:#ffd36b; --warn-soft:#352c12;
-    --c-space:#a79cff; --c-ai:#4fd1a9; --c-bio:#ff7fb0; --c-phys:#6fb3ff; --c-energy:#f2b56a; --c-eng:#a9b3c0; --c-math:#d39cf2;
+    --bg:#0f1115; --surface:#181b21; --surface2:#1d2027; --ink:#eceae6; --muted:#9a9ea8; --line:#2a2e37; --line2:#23262e;
+    --accent:#86a2ff; --accent-soft:#1d2645; --thai:#ff9d61; --thai-soft:#38231a;
+    --warn:#ffd36b; --warn-soft:#342b11; --ok:#5fd6a0; --ok-soft:#14301f; --bad:#ff8a8a; --bad-soft:#3a1a1a;
+    --hero1:#070b1f; --hero2:#142a72; --hero3:#4a2a9a;
+    --c-space:#a99eff; --c-ai:#4fd1a9; --c-bio:#ff80b1; --c-phys:#71b4ff; --c-energy:#f2b56a; --c-eng:#aab4c1; --c-math:#d59ef3;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 16px -8px rgba(0,0,0,.5);
+    --shadow-h:0 2px 4px rgba(0,0,0,.35),0 14px 30px -10px rgba(0,0,0,.65);
   }
 }
 :root[data-theme="dark"]{
-  --bg:#121317; --surface:#1b1d23; --ink:#ecebe7; --muted:#9a9ea8; --line:#2b2e36;
-  --accent:#7f9cff; --accent-soft:#1f2741; --thai:#ff9a5c; --thai-soft:#3a2418;
-  --warn:#ffd36b; --warn-soft:#352c12;
-  --c-space:#a79cff; --c-ai:#4fd1a9; --c-bio:#ff7fb0; --c-phys:#6fb3ff; --c-energy:#f2b56a; --c-eng:#a9b3c0; --c-math:#d39cf2;
+  --bg:#0f1115; --surface:#181b21; --surface2:#1d2027; --ink:#eceae6; --muted:#9a9ea8; --line:#2a2e37; --line2:#23262e;
+  --accent:#86a2ff; --accent-soft:#1d2645; --thai:#ff9d61; --thai-soft:#38231a;
+  --warn:#ffd36b; --warn-soft:#342b11; --ok:#5fd6a0; --ok-soft:#14301f; --bad:#ff8a8a; --bad-soft:#3a1a1a;
+  --hero1:#070b1f; --hero2:#142a72; --hero3:#4a2a9a;
+  --c-space:#a99eff; --c-ai:#4fd1a9; --c-bio:#ff80b1; --c-phys:#71b4ff; --c-energy:#f2b56a; --c-eng:#aab4c1; --c-math:#d59ef3;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 16px -8px rgba(0,0,0,.5);
+  --shadow-h:0 2px 4px rgba(0,0,0,.35),0 14px 30px -10px rgba(0,0,0,.65);
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Thai",system-ui,sans-serif;line-height:1.6;font-size:15px}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Thai",system-ui,sans-serif;line-height:1.65;font-size:15px;-webkit-font-smoothing:antialiased}
 a{color:var(--accent)}
-.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
-header{padding:28px 0 8px}
-.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
-h1{font-size:26px;margin:0;letter-spacing:-.01em}
-.sub{color:var(--muted);margin:2px 0 0;font-size:14px}
-.back{display:inline-block;color:var(--muted);font-size:13px;text-decoration:none;margin-bottom:4px}
-.back:hover{color:var(--ink)}
-.theme-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;font-size:13px}
-.banner{margin:16px 0 0;background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 14px;font-size:13.5px}
-nav.tabs{display:flex;gap:4px;margin:20px 0 0;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
-nav.tabs button{border:0;background:none;font:inherit;color:var(--muted);padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-weight:500}
-nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
-main{padding:20px 0 60px}
+button{font:inherit;color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+h1,h2,h3,.disp{font-family:"Noto Sans Thai","IBM Plex Sans Thai",sans-serif}
+
+/* ---------- hero ---------- */
+.hero{background:radial-gradient(1200px 400px at 85% -10%,var(--hero3),transparent 60%),linear-gradient(135deg,var(--hero1),var(--hero2));color:var(--on-hero);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;background-image:radial-gradient(1px 1px at 12% 30%,#fff9,transparent),radial-gradient(1px 1px at 32% 70%,#fff7,transparent),radial-gradient(1.5px 1.5px at 58% 22%,#fffa,transparent),radial-gradient(1px 1px at 76% 64%,#fff8,transparent),radial-gradient(1px 1px at 90% 35%,#fff9,transparent),radial-gradient(1px 1px at 46% 88%,#fff6,transparent);pointer-events:none}
+.hero .wrap{position:relative;z-index:1;padding-top:18px;padding-bottom:22px}
+.hero-top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.back{color:#d9e0ff;font-size:13.5px;text-decoration:none;opacity:.9}
+.back:hover{opacity:1;text-decoration:underline}
+.theme-btn{border:1px solid #ffffff3a;background:#ffffff14;color:var(--on-hero);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:13px;backdrop-filter:blur(6px)}
+.theme-btn:hover{background:#ffffff26}
+.kicker{display:inline-flex;gap:6px;align-items:center;margin-top:18px;font-size:12.5px;letter-spacing:.06em;color:#c9d3ff;text-transform:uppercase}
+.kicker i{width:7px;height:7px;border-radius:50%;background:#5dffa7;box-shadow:0 0 0 4px #5dffa733;display:inline-block}
+.hero h1{font-size:clamp(28px,5vw,42px);line-height:1.15;margin:6px 0 6px;font-weight:800;letter-spacing:-.01em}
+.hero p.lead{margin:0;max-width:640px;color:#d6dcf7;font-size:15px}
+.hstats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}
+.hstat{background:#ffffff12;border:1px solid #ffffff22;border-radius:14px;padding:10px 12px;backdrop-filter:blur(6px)}
+.hstat b{display:block;font-family:"Noto Sans Thai",sans-serif;font-size:22px;line-height:1.2}
+.hstat span{font-size:12.5px;color:#c9d1f5}
+
+/* ---------- tabs ---------- */
+.tabbar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:8px 0}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs button{border:0;background:none;color:var(--muted);padding:7px 14px;cursor:pointer;border-radius:999px;white-space:nowrap;font-weight:600;font-size:14.5px}
+nav.tabs button:hover{color:var(--ink);background:var(--surface)}
+nav.tabs button[aria-selected="true"]{color:var(--surface);background:var(--ink)}
+main{padding:22px 0 60px}
 section[hidden]{display:none}
-.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
-.controls input,.controls select{font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
-.controls input{flex:1 1 220px;min-width:0}
+.note{background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:9px 14px;font-size:13px;margin:0 0 16px}
+
+/* ---------- controls ---------- */
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.search{flex:1 1 240px;min-width:0;position:relative}
+.search input{width:100%;font:inherit;font-size:14.5px;padding:9px 12px 9px 36px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
+.search::before{content:"⌕";position:absolute;left:12px;top:50%;transform:translateY(-52%);color:var(--muted);font-size:18px}
+select{font:inherit;font-size:14px;padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .chip-row{display:flex;gap:6px;flex-wrap:wrap}
-.chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:4px 10px;border-radius:999px;cursor:pointer;font:inherit;font-size:13px}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-.feed{display:flex;flex-direction:column;gap:10px}
-.item{display:grid;grid-template-columns:92px 1fr;gap:14px}
-.date{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;padding-top:2px}
-.date b{display:block;color:var(--ink);font-size:20px;line-height:1.1}
-.item h3{margin:0 0 4px;font-size:16px;line-height:1.45}
-.item p{margin:0 0 6px;color:var(--ink)}
-.why{font-size:13.5px;color:var(--muted);border-left:3px solid var(--accent-soft);padding-left:8px;margin:6px 0}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:4px 11px;border-radius:999px;cursor:pointer;font-size:13px;display:inline-flex;gap:5px;align-items:center}
+.chip:hover{color:var(--ink);border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.count{color:var(--muted);font-size:13px;margin:4px 0 14px}
+
+/* ---------- tags ---------- */
+.tag{padding:1px 9px;border-radius:999px;font-size:12px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;font-weight:500}
+.reg-thai{background:var(--thai-soft);color:var(--thai)}
+.reg-intl{background:var(--accent-soft);color:var(--accent)}
+.verify{background:var(--warn-soft);color:var(--warn)}
+.tcat{background:color-mix(in srgb,var(--cc) 13%,transparent);color:var(--cc)}
+.cat-space{--cc:var(--c-space)}.cat-ai{--cc:var(--c-ai)}.cat-bio{--cc:var(--c-bio)}.cat-phys{--cc:var(--c-phys)}.cat-energy{--cc:var(--c-energy)}.cat-eng{--cc:var(--c-eng)}.cat-math{--cc:var(--c-math)}
 .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12.5px}
-.tag{padding:1px 8px;border-radius:999px;border:1px solid currentColor;font-size:12px}
-.reg-thai{background:var(--thai-soft);color:var(--thai);border-color:transparent}
-.reg-intl{background:var(--accent-soft);color:var(--accent);border-color:transparent}
-.verify{background:var(--warn-soft);color:var(--warn);border-color:transparent}
-.nobel{color:var(--warn)}
-.src{color:var(--muted)}
-.cat-space{color:var(--c-space)}.cat-ai{color:var(--c-ai)}.cat-bio{color:var(--c-bio)}.cat-phys{color:var(--c-phys)}.cat-energy{color:var(--c-energy)}.cat-eng{color:var(--c-eng)}.cat-math{color:var(--c-math)}
-.year-hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
-.stat .n{font-size:26px;font-weight:700;line-height:1.1}
-.stat .l{font-size:13px;color:var(--muted)}
-h2{font-size:19px;margin:22px 0 10px}
-.top5{margin:0;padding-left:20px}
-.top5 li{margin:4px 0}
-.months{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
-.month h3{margin:0 0 6px;font-size:16px;display:flex;justify-content:space-between;gap:8px}
-.month h3 span{font-size:12.5px;color:var(--muted);font-weight:400}
-.month ul{margin:0;padding-left:18px;font-size:14px}
+
+/* ---------- featured ---------- */
+.feat{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;margin-bottom:22px}
+.feat-side{display:grid;gap:12px}
+.fcard{position:relative;border-radius:var(--r);padding:18px;color:#fff;cursor:pointer;overflow:hidden;min-height:150px;display:flex;flex-direction:column;justify-content:flex-end;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s;border:0;text-align:left;background:linear-gradient(160deg,color-mix(in srgb,var(--cc) 80%,#000) 0%,color-mix(in srgb,var(--cc) 55%,#05060a) 100%)}
+.fcard:hover{transform:translateY(-2px);box-shadow:var(--shadow-h)}
+.fcard .ico{position:absolute;right:14px;top:8px;font-size:64px;opacity:.22;line-height:1}
+.fcard.big{min-height:312px;padding:22px}
+.fcard .fd{font-size:12.5px;opacity:.85;margin-bottom:4px}
+.fcard h3{margin:0;font-size:17px;line-height:1.45}
+.fcard.big h3{font-size:clamp(20px,2.6vw,25px)}
+.fcard p{margin:8px 0 0;font-size:14px;opacity:.9;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.fcard .fl{display:inline-block;margin-top:10px;font-size:13px;font-weight:600;background:#ffffff22;border-radius:999px;padding:3px 10px;align-self:flex-start}
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:6px 0 10px}
+.sec-h h2{font-size:20px;margin:0}
+.sec-h span{color:var(--muted);font-size:13px}
+
+/* ---------- news feed ---------- */
+.mgroup{margin-bottom:22px}
+.mhead{position:sticky;top:52px;z-index:5;display:flex;align-items:baseline;gap:10px;padding:6px 0 8px;background:var(--bg)}
+.mhead h3{margin:0;font-size:16px}
+.mhead span{color:var(--muted);font-size:12.5px}
+.feed{display:grid;gap:10px}
+.item{background:var(--surface);border:1px solid var(--line2);border-radius:var(--r);box-shadow:var(--shadow);display:grid;grid-template-columns:64px 1fr;gap:14px;padding:14px 16px 14px 12px;position:relative;cursor:pointer;transition:box-shadow .15s,transform .15s;text-align:left;width:100%}
+.item::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--cc)}
+.item:hover{box-shadow:var(--shadow-h);transform:translateY(-1px)}
+.dbox{text-align:center;padding-top:2px}
+.dbox .ico{display:grid;place-items:center;width:40px;height:40px;margin:0 auto 4px;border-radius:12px;background:color-mix(in srgb,var(--cc) 14%,transparent);font-size:20px}
+.dbox b{display:block;font-size:13px;line-height:1.2}
+.dbox small{font-size:11.5px;color:var(--muted)}
+.item h3{margin:0 0 4px;font-size:16.5px;line-height:1.45}
+.item p{margin:0 0 8px;color:var(--muted);font-size:14.5px}
+.why{font-size:13.5px;background:var(--surface2);border:1px dashed var(--line);border-radius:10px;padding:6px 10px;margin:0 0 8px;color:var(--ink)}
+.why b{color:var(--accent);font-weight:600}
+.more{color:var(--accent);font-size:13px;font-weight:600;margin-left:auto}
+
+/* ---------- monthly ---------- */
+.months{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.month{background:var(--surface);border:1px solid var(--line2);border-radius:var(--r);padding:14px 16px;cursor:pointer;box-shadow:var(--shadow);transition:box-shadow .15s,transform .15s;text-align:left;width:100%;display:flex;flex-direction:column}
+.month:hover{box-shadow:var(--shadow-h);transform:translateY(-1px)}
+.month.now{outline:2px solid var(--accent);outline-offset:-2px}
+.month.future{opacity:.55}
+.month h3{margin:0;font-size:17px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.month h3 span{font-size:12.5px;color:var(--muted);font-weight:500;font-family:"IBM Plex Sans Thai",sans-serif}
+.mbar{display:flex;height:6px;border-radius:99px;overflow:hidden;background:var(--line2);margin:8px 0 10px}
+.mbar i{display:block;height:100%;background:var(--cc)}
+.month .sum{font-size:13.5px;margin:0 0 8px;color:var(--ink)}
+.month ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--muted)}
 .month .empty{color:var(--muted);font-size:13.5px;margin:0}
-.month{cursor:pointer;transition:border-color .15s}
-.month:hover{border-color:var(--accent)}
-.tl-year{display:grid;grid-template-columns:70px 1fr;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
-.tl-year .y{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
-.tl-year .y small{display:block;font-size:12px;color:var(--muted);font-weight:400}
-.tl-year ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
-.tl-year li{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
-.dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none;transform:translateY(-1px)}
-.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
-.person h3{margin:0;font-size:16px}
-.person .role{color:var(--muted);font-size:13px;margin:0 0 6px}
-.person p{margin:0 0 8px;font-size:14px}
-.person{cursor:pointer;transition:border-color .15s}
-.person:hover,.person:focus-visible{border-color:var(--accent);outline:none}
-.person .more{color:var(--accent);font-size:13px;margin-left:auto}
-dialog#pDialog{border:0;padding:0;border-radius:14px;background:var(--surface);color:var(--ink);width:min(760px,calc(100% - 32px));max-height:88vh}
-dialog#pDialog::backdrop{background:rgba(10,12,16,.55)}
-.pd{padding:20px 22px 24px}
-.pd-close{position:sticky;top:0;float:right;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:4px 10px;cursor:pointer;font:inherit}
-.pd h2{margin:0 0 2px;font-size:22px;line-height:1.35}
-.pd .role{color:var(--muted);margin:0 0 12px}
-.pd-imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,190px));gap:10px;margin:14px 0}
+
+/* ---------- yearly ---------- */
+.ystats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:20px}
+.stat{background:var(--surface);border:1px solid var(--line2);border-radius:var(--r);padding:14px 16px;box-shadow:var(--shadow)}
+.stat .n{font-family:"Noto Sans Thai",sans-serif;font-size:28px;font-weight:800;line-height:1.1}
+.stat .l{font-size:13px;color:var(--muted)}
+.ygrid{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line2);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow)}
+.panel h2{font-size:18px;margin:0 0 12px}
+.top5{list-style:none;margin:0;padding:0;counter-reset:t;display:grid;gap:10px}
+.top5 li{counter-increment:t;display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;font-size:14.5px}
+.top5 li::before{content:counter(t);display:grid;place-items:center;width:30px;height:30px;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-weight:700;font-family:"Noto Sans Thai",sans-serif}
+.trends{margin:0;padding-left:18px;display:grid;gap:8px;font-size:14.5px}
+.bars{display:grid;gap:8px}
+.bar{display:grid;grid-template-columns:120px 1fr 28px;gap:8px;align-items:center;font-size:13px}
+.bar .t{height:10px;border-radius:99px;background:var(--line2);overflow:hidden}
+.bar .t i{display:block;height:100%;background:var(--cc);border-radius:99px}
+.bar b{text-align:right;font-variant-numeric:tabular-nums}
+
+/* ---------- timeline ---------- */
+.tl{position:relative;padding-left:4px}
+.tl-year{display:grid;grid-template-columns:86px 1fr;gap:16px;position:relative;padding-bottom:18px}
+.tl-year::before{content:"";position:absolute;left:96px;top:10px;bottom:0;width:2px;background:var(--line)}
+.tl-y{position:sticky;top:60px;align-self:start;text-align:right}
+.tl-y b{display:block;font-family:"Noto Sans Thai",sans-serif;font-size:24px;font-weight:800;line-height:1.1}
+.tl-y small{font-size:12px;color:var(--muted)}
+.tl-items{display:grid;gap:8px;padding-left:16px}
+.tl-it{position:relative;background:var(--surface);border:1px solid var(--line2);border-radius:14px;padding:10px 14px;box-shadow:var(--shadow)}
+.tl-it::before{content:"";position:absolute;left:-23px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--cc);box-shadow:0 0 0 3px var(--bg)}
+.tl-it .tt{font-weight:600;font-size:14.5px}
+.tl-it .td{font-size:13.5px;color:var(--muted);margin-top:3px}
+.tl-it .meta{margin-top:6px}
+
+/* ---------- people ---------- */
+.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.person{background:var(--surface);border:1px solid var(--line2);border-radius:var(--r);padding:14px;box-shadow:var(--shadow);cursor:pointer;display:grid;grid-template-columns:56px 1fr;gap:12px;transition:box-shadow .15s,transform .15s;text-align:left;width:100%}
+.person:hover{box-shadow:var(--shadow-h);transform:translateY(-1px)}
+.av{width:56px;height:56px;border-radius:50%;background:color-mix(in srgb,var(--cc) 18%,var(--surface));color:var(--cc);display:grid;place-items:center;font-family:"Noto Sans Thai",sans-serif;font-weight:800;font-size:20px;overflow:hidden;flex:none}
+.av img{width:100%;height:100%;object-fit:cover}
+.person h3{margin:0;font-size:15.5px;line-height:1.4}
+.person .role{color:var(--muted);font-size:12.5px;margin:1px 0 6px}
+.person p{margin:0 0 8px;font-size:13.5px}
+
+/* ---------- quiz tab ---------- */
+.qz-head{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-bottom:14px}
+.score{font-family:"Noto Sans Thai",sans-serif;font-weight:700;font-size:15px}
+.score span{color:var(--muted);font-weight:500;font-size:13px;font-family:"IBM Plex Sans Thai",sans-serif}
+.qlist{display:grid;gap:12px}
+.qcard{background:var(--surface);border:1px solid var(--line2);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow)}
+.qcard .qsrc{font-size:12.5px;color:var(--muted);margin-bottom:6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.qcard .qsrc button{border:0;background:none;color:var(--accent);cursor:pointer;padding:0;font-size:12.5px}
+.qq{font-weight:600;margin:0 0 10px}
+.ch{display:grid;gap:6px}
+.ch button{display:grid;grid-template-columns:26px 1fr;gap:8px;align-items:start;text-align:left;border:1px solid var(--line);background:var(--surface2);border-radius:10px;padding:8px 10px;cursor:pointer;font-size:14.5px}
+.ch button:hover:not(:disabled){border-color:var(--accent)}
+.ch button i{font-style:normal;display:grid;place-items:center;width:24px;height:24px;border-radius:7px;background:var(--line2);font-size:12.5px;font-weight:700}
+.ch button.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.ch button.right i{background:var(--ok);color:var(--surface)}
+.ch button.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.ch button.wrong i{background:var(--bad);color:var(--surface)}
+.ch button:disabled{cursor:default}
+.exp{margin-top:10px;background:var(--accent-soft);border-radius:10px;padding:9px 12px;font-size:14px}
+.exp b{color:var(--accent)}
+
+/* ---------- dialogs ---------- */
+dialog{border:0;padding:0;border-radius:20px;background:var(--surface);color:var(--ink);width:min(780px,calc(100% - 24px));max-height:90vh;box-shadow:0 30px 80px -20px rgba(0,0,0,.5)}
+dialog::backdrop{background:rgba(8,10,16,.6);backdrop-filter:blur(3px)}
+.dh{position:relative;padding:22px 24px 18px;color:#fff;background:linear-gradient(150deg,color-mix(in srgb,var(--cc) 85%,#000),color-mix(in srgb,var(--cc) 50%,#05060a))}
+.dh .ico{position:absolute;right:20px;bottom:6px;font-size:84px;opacity:.18;line-height:1}
+.dh .fd{font-size:13px;opacity:.85}
+.dh h2{margin:4px 0 6px;font-size:clamp(20px,3vw,25px);line-height:1.4;max-width:92%}
+.dh .meta .tag{background:#ffffff26;color:#fff}
+.dclose{position:absolute;right:12px;top:12px;z-index:2;border:0;background:#00000033;color:#fff;border-radius:999px;width:34px;height:34px;cursor:pointer;font-size:16px}
+.dclose:hover{background:#00000055}
+.db{padding:18px 24px 24px}
+.db h3{font-size:16px;margin:20px 0 8px;display:flex;gap:8px;align-items:center}
+.db h3::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--cc)}
+.db p{margin:0 0 10px}
+.db .lead{font-size:15.5px}
+.kw{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.kw div{background:var(--surface2);border:1px solid var(--line2);border-radius:10px;padding:8px 10px;font-size:13.5px}
+.kw b{display:block;font-size:13.5px}
+.kw span{color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+.links a{border:1px solid var(--line);border-radius:999px;padding:4px 12px;text-decoration:none;font-size:13.5px;background:var(--surface2)}
+.links a:hover{border-color:var(--accent)}
+.dnav{display:flex;justify-content:space-between;gap:8px;margin-top:22px;padding-top:14px;border-top:1px solid var(--line)}
+.dnav button{border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:8px 12px;cursor:pointer;font-size:13.5px;max-width:48%;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dnav button:disabled{opacity:.35;cursor:default}
+.dnav button:hover:not(:disabled){border-color:var(--accent)}
+.vwarn{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:8px 12px;font-size:13.5px;margin-top:12px}
+.pd-imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,180px));gap:10px;margin:2px 0 6px}
 .pd-imgs figure{margin:0}
-.pd-imgs img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;background:var(--line)}
+.pd-imgs img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:var(--line)}
 .pd-imgs figcaption{font-size:12.5px;color:var(--muted);margin-top:4px}
-.pd h3{font-size:16px;margin:18px 0 6px}
-.pd .key{background:var(--accent-soft);border-radius:10px;padding:10px 12px;margin:10px 0}
-.pd .extract p{margin:0 0 10px}
-.pd details{margin:6px 0 10px;font-size:14px;color:var(--muted)}
-.pd details summary{cursor:pointer;color:var(--accent)}
-.pd .links{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
-.pd .links a{border:1px solid var(--line);border-radius:999px;padding:4px 12px;text-decoration:none;font-size:13.5px}
-.pd .credit{font-size:12px;color:var(--muted);margin-top:14px}
-.empty-state{color:var(--muted);text-align:center;padding:30px 0}
-footer{color:var(--muted);font-size:12.5px;padding:0 0 30px}
-@media (max-width:560px){
-  .item{grid-template-columns:1fr;gap:4px}
-  .date b{display:inline;font-size:15px;margin-right:6px}
-  .tl-year{grid-template-columns:1fr;gap:6px}
+.key{background:var(--accent-soft);border-radius:12px;padding:10px 14px;margin:0 0 6px}
+.extract p{margin:0 0 10px}
+.db details{margin:6px 0 10px;font-size:14px;color:var(--muted)}
+.db details summary{cursor:pointer;color:var(--accent)}
+.credit{font-size:12px;color:var(--muted);margin-top:14px}
+.sub{color:var(--muted);font-size:14px}
+.empty-state{color:var(--muted);text-align:center;padding:40px 0}
+footer{color:var(--muted);font-size:12.5px;padding:0 0 34px;text-align:center}
+
+@media (max-width:760px){
+  .feat{grid-template-columns:1fr}
+  .fcard.big{min-height:230px}
+  .ygrid{grid-template-columns:1fr}
+  .hstats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@media (max-width:560px){
+  .item{grid-template-columns:1fr;padding:14px 14px 14px 16px;gap:6px}
+  .dbox{display:flex;gap:8px;align-items:center;text-align:left;padding:0}
+  .dbox .ico{width:30px;height:30px;font-size:16px;margin:0;border-radius:9px}
+  .dbox b,.dbox small{display:inline;font-size:12.5px}
+  .tl-year{grid-template-columns:1fr;gap:6px}
+  .tl-year::before{left:7px;top:44px}
+  .tl-y{position:static;text-align:left;display:flex;gap:8px;align-items:baseline}
+  .tl-items{padding-left:22px}
+  .tl-it::before{left:-21px}
+  .bar{grid-template-columns:96px 1fr 24px}
+  .db,.dh{padding-left:18px;padding-right:18px}
+  .mhead{top:52px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header>
-  <div class="top">
-    <div>
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
       <a class="back" href="../#/exam">← กลับ SIXENT</a>
-      <h1>STEM News Desk</h1>
-      <p class="sub">คลังข่าววิทยาศาสตร์ เทคโนโลยี วิศวกรรม ไทยและต่างประเทศ สำหรับเตรียมสอบ TPAT3</p>
+      <button class="theme-btn" id="themeBtn" type="button">◐ สลับธีม</button>
     </div>
-    <button class="theme-btn" id="themeBtn" type="button">สลับธีม</button>
+    <div class="kicker"><i></i> อัปเดตทุกเช้า · <span id="upd">—</span></div>
+    <h1>STEM News Desk</h1>
+    <p class="lead">ข่าววิทยาศาสตร์ เทคโนโลยี วิศวกรรม ไทยและต่างประเทศ พร้อมเจาะลึกแนวคิดและโจทย์ฝึก สำหรับเตรียมสอบ TPAT3</p>
+    <div class="hstats" id="hstats"></div>
   </div>
-  <div class="banner">ข่าวปี 2026 ทุกข่าวมีลิงก์แหล่งที่มา และเพิ่มอัตโนมัติทุกเช้า ป้ายสีเหลือง "รอยืนยัน" = มาจากแหล่งรองหรือวันที่ไม่ชัด ควรเช็กก่อนจำ · ไทม์ไลน์ 20 ปีและบุคคลสำคัญเขียนจากข้อเท็จจริงที่รู้กันทั่วไป</div>
+</header>
+
+<div class="tabbar"><div class="wrap">
   <nav class="tabs" role="tablist">
-    <button role="tab" data-tab="daily" aria-selected="true">รายวัน</button>
+    <button role="tab" data-tab="daily" aria-selected="true">ข่าวรายวัน</button>
+    <button role="tab" data-tab="quiz" aria-selected="false">โจทย์จากข่าว</button>
     <button role="tab" data-tab="monthly" aria-selected="false">รายเดือน</button>
     <button role="tab" data-tab="yearly" aria-selected="false">สรุปปี 2026</button>
     <button role="tab" data-tab="timeline" aria-selected="false">ย้อนหลัง 20 ปี</button>
     <button role="tab" data-tab="people" aria-selected="false">บุคคลสำคัญ</button>
   </nav>
-</header>
+</div></div>
 
-<main>
+<main class="wrap">
   <section id="tab-daily">
+    <div id="featWrap"></div>
+    <div class="sec-h"><h2>ข่าวทั้งหมด</h2><span>กดที่ข่าวเพื่ออ่านเจาะลึกและทำโจทย์</span></div>
     <div class="controls">
-      <input id="q" type="search" placeholder="ค้นหาข่าว เช่น Artemis, โนเบล, สวทช.">
-      <select id="monthSel"></select>
+      <label class="search"><input id="q" type="search" placeholder="ค้นหาข่าว เช่น Artemis, โนเบล, สวทช., ควอนตัม" aria-label="ค้นหาข่าว"></label>
+      <select id="monthSel" aria-label="เลือกเดือน"></select>
     </div>
-    <div class="controls">
-      <div class="chip-row" id="regChips"></div>
-      <div class="chip-row" id="catChips"></div>
+    <div class="controls"><div class="chip-row" id="regChips"></div></div>
+    <div class="controls"><div class="chip-row" id="catChips"></div></div>
+    <p class="count" id="nCount"></p>
+    <div id="feed"></div>
+  </section>
+
+  <section id="tab-quiz" hidden>
+    <p class="note">โจทย์แต่งขึ้นจากแนวคิดวิทยาศาสตร์ในข่าว ใช้ฝึกการเชื่อมข่าวกับเนื้อหาสอบ ไม่ใช่ข้อสอบจริง</p>
+    <div class="qz-head">
+      <div class="score" id="qzScore"></div>
+      <div class="chip-row" id="qzChips"></div>
+      <button class="chip" id="qzReset" type="button">↺ เริ่มใหม่</button>
     </div>
-    <div class="feed" id="feed"></div>
+    <div class="qlist" id="qlist"></div>
   </section>
 
   <section id="tab-monthly" hidden>
-    <p class="sub" style="margin-bottom:12px">กดที่เดือนเพื่อดูข่าวทั้งหมดของเดือนนั้นในแท็บรายวัน</p>
+    <p class="sub" style="margin:0 0 14px">แถบสีแสดงสัดส่วนหมวดข่าวของแต่ละเดือน · กดที่เดือนเพื่อดูข่าวทั้งหมดของเดือนนั้น</p>
     <div class="months" id="months"></div>
   </section>
 
   <section id="tab-yearly" hidden>
-    <div class="year-hero" id="yearStats"></div>
-    <h2>5 เรื่องใหญ่ของปี 2026 (ถึง 28 พ.ย.)</h2>
-    <ol class="top5" id="top5"></ol>
-    <h2>แนวโน้มที่ควรรู้ก่อนสอบ</h2>
-    <ul class="top5" id="trends"></ul>
+    <div class="ystats" id="yearStats"></div>
+    <div class="ygrid">
+      <div class="panel"><h2>5 เรื่องใหญ่ของปี 2026</h2><ol class="top5" id="top5"></ol></div>
+      <div style="display:grid;gap:16px">
+        <div class="panel"><h2>ข่าวแต่ละหมวด</h2><div class="bars" id="catBars"></div></div>
+        <div class="panel"><h2>แนวโน้มที่ควรรู้ก่อนสอบ</h2><ul class="trends" id="trends"></ul></div>
+      </div>
+    </div>
   </section>
 
   <section id="tab-timeline" hidden>
-    <div class="controls">
-      <div class="chip-row" id="tlChips"></div>
-    </div>
-    <div id="timeline"></div>
+    <div class="controls"><div class="chip-row" id="tlChips"></div></div>
+    <p class="count" id="tlCount"></p>
+    <div class="tl" id="timeline"></div>
   </section>
 
   <section id="tab-people" hidden>
     <div class="controls">
-      <input id="pq" type="search" placeholder="ค้นหาชื่อ ผลงาน หรือรางวัล เช่น โนเบล, DNA">
-      <select id="pSort"><option value="old">เรียงตามยุค เก่า→ใหม่</option><option value="new">เรียงตามยุค ใหม่→เก่า</option></select>
+      <label class="search"><input id="pq" type="search" placeholder="ค้นหาชื่อ ผลงาน หรือรางวัล เช่น โนเบล, DNA" aria-label="ค้นหาบุคคล"></label>
+      <select id="pSort" aria-label="เรียงลำดับ"><option value="old">ยุค เก่า → ใหม่</option><option value="new">ยุค ใหม่ → เก่า</option></select>
     </div>
-    <div class="controls">
-      <div class="chip-row" id="pChips"></div>
-      <div class="chip-row" id="pCatChips"></div>
-    </div>
-    <p class="sub" id="pCount" style="margin:0 0 10px"></p>
+    <div class="controls"><div class="chip-row" id="pChips"></div></div>
+    <div class="controls"><div class="chip-row" id="pCatChips"></div></div>
+    <p class="count" id="pCount"></p>
     <div class="people" id="people"></div>
   </section>
 </main>
-<dialog id="pDialog" aria-label="รายละเอียดบุคคล"><div class="pd" id="pdBody"></div></dialog>
-<footer id="foot">SIXENT · STEM News</footer>
-</div>
+
+<dialog id="nDialog" aria-label="รายละเอียดข่าว"><div id="ndBody"></div></dialog>
+<dialog id="pDialog" aria-label="รายละเอียดบุคคล"><div id="pdBody"></div></dialog>
+<footer class="wrap" id="foot">SIXENT · STEM News</footer>
 
 <script src="data/news.js"></script>
+<script src="data/deep.js"></script>
 <script src="data/summary.js"></script>
+<script src="data/timeline.js"></script>
 <script src="data/people.js"></script>
 <script>
 const CATS = {space:"อวกาศ", ai:"AI/คอมพิวเตอร์", bio:"ชีวะ/การแพทย์", phys:"ฟิสิกส์/เคมี", energy:"พลังงาน/สิ่งแวดล้อม", eng:"วิศวกรรม/เทคโนโลยี"};
-const REGS = {all:"ทั้งหมด", thai:"ไทย", intl:"ต่างประเทศ"};
+const ICONS = {space:"🚀", ai:"🤖", bio:"🧬", phys:"⚛️", energy:"⚡", eng:"🛠️", math:"📐"};
+const PCATS = {...CATS, math:"คณิตศาสตร์"};
+const REGS = {all:"ทั้งหมด", thai:"🇹🇭 ไทย", intl:"🌍 ต่างประเทศ"};
 const MONTHS = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
 const MONTHS_FULL = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
 
-// ข่าวปี 2026 — d: "YYYY-MM-DD" หรือ "YYYY-MM" ถ้าไม่ทราบวัน
-const NEWS = window.STEM_NEWS || [];
+const NEWS = (window.STEM_NEWS || []).slice().sort((a,b)=> b.d.localeCompare(a.d) || b.id.localeCompare(a.id));
+const DEEP = window.STEM_DEEP || {};
 const SUM = window.STEM_SUMMARY || {months:{}, year:{}};
-
-// ไทม์ไลน์ 20 ปี
-const TL = {
- 2025:[["ai","DeepSeek-R1 จากจีน โมเดล AI ต้นทุนต่ำทำให้วงการตื่นตัว (ม.ค.)"],["eng","แผ่นดินไหว M7.7 ในเมียนมา ส่งผลถึงกรุงเทพฯ อาคารก่อสร้างถล่ม (28 มี.ค.)","thai"],["space","หอดูดาว Vera C. Rubin เผยภาพแรก (มิ.ย.)"],["phys","โนเบลฟิสิกส์: Clarke, Devoret, Martinis — ควอนตัมทันเนลลิงระดับมหภาคในวงจรไฟฟ้า","n"],["phys","โนเบลเคมี: Kitagawa, Robson, Yaghi — โครงข่ายโลหะอินทรีย์ (MOFs)","n"],["bio","โนเบลการแพทย์: Brunkow, Ramsdell, Sakaguchi — T cell ควบคุมภูมิคุ้มกัน","n"]],
- 2024:[["ai","โนเบลฟิสิกส์: Hopfield & Hinton — โครงข่ายประสาทเทียม","n"],["ai","โนเบลเคมี: Baker, Hassabis, Jumper — ออกแบบโปรตีนและ AlphaFold","n"],["eng","Starship: หอส่งจับบูสเตอร์ Super Heavy ด้วยแขนกลสำเร็จ (ต.ค.)"],["ai","Google เปิดตัวชิปควอนตัม Willow (ธ.ค.)"],["phys","Peter Higgs เสียชีวิต (เม.ย.)"]],
- 2023:[["space","Chandrayaan-3 อินเดียลงจอดใกล้ขั้วใต้ดวงจันทร์ (23 ส.ค.)"],["space","ไทยส่งดาวเทียม THEOS-2 ขึ้นวงโคจร (ต.ค.)","thai"],["ai","OpenAI เปิดตัว GPT-4 (มี.ค.)"],["bio","โนเบลการแพทย์: Karikó & Weissman — เทคโนโลยีวัคซีน mRNA","n"],["phys","โนเบลฟิสิกส์: Agostini, Krausz, L'Huillier — พัลส์แสงระดับแอตโตวินาที","n"]],
- 2022:[["bio","ไทยปลดกัญชาออกจากบัญชียาเสพติดประเภท 5 (มิ.ย.)","thai"],["ai","ChatGPT เปิดให้ใช้ (30 พ.ย.)"],["space","JWST เผยภาพชุดแรก (ก.ค.)"],["space","ยาน DART ชนดาวเคราะห์น้อย Dimorphos เปลี่ยนวงโคจรได้ (ก.ย.)"],["energy","NIF สหรัฐฯ: ฟิวชันให้พลังงานออกมากกว่าพลังงานเลเซอร์ที่ใส่ (ธ.ค.)"],["phys","โนเบลฟิสิกส์: Aspect, Clauser, Zeilinger — ควอนตัมพัวพัน","n"]],
- 2021:[["bio","ChulaCov19 วัคซีน mRNA ต้นแบบของจุฬาฯ เริ่มทดลองในมนุษย์ (มิ.ย.)","thai"],["space","Perseverance ลงจอดดาวอังคาร (ก.พ.) / Ingenuity บินบนดาวดวงอื่นครั้งแรก (เม.ย.)"],["space","ปล่อยกล้อง James Webb (25 ธ.ค.)"],["energy","โนเบลฟิสิกส์: Manabe & Hasselmann (แบบจำลองภูมิอากาศ), Parisi","n"]],
- 2020:[["bio","COVID-19 ระบาดใหญ่ / วัคซีน mRNA ได้รับอนุมัติใช้ฉุกเฉิน (ธ.ค.)"],["space","SpaceX Crew Dragon ส่งนักบินอวกาศสู่ ISS ครั้งแรก (พ.ค.)"],["ai","AlphaFold 2 แก้ปัญหาการพับโปรตีนในการแข่ง CASP14 (พ.ย.)"],["eng","ไทยเปิดให้บริการ 5G เชิงพาณิชย์","thai"],["bio","โนเบลเคมี: Charpentier & Doudna — CRISPR-Cas9","n"]],
- 2019:[["space","ภาพหลุมดำครั้งแรก M87* โดย Event Horizon Telescope (10 เม.ย.)"],["space","Chang'e 4 จีนลงจอดด้านไกลดวงจันทร์ครั้งแรก (ม.ค.)"],["ai","Google อ้าง quantum supremacy ด้วยชิป Sycamore (ต.ค.)"],["energy","โนเบลเคมี: Goodenough, Whittingham, Yoshino — แบตเตอรี่ลิเทียมไอออน","n"]],
- 2018:[["space","KNACKSAT ดาวเทียมดวงแรกที่นักศึกษาไทย (มจพ.) สร้างเอง ขึ้นสู่อวกาศ (ธ.ค.)","thai"],["eng","ปฏิบัติการกู้ภัยทีมหมูป่า ถ้ำหลวง เชียงราย (มิ.ย.–ก.ค.)","thai"],["space","ปล่อย Parker Solar Probe (ส.ค.)"],["bio","ข่าวทารกตัดต่อยีนด้วย CRISPR ของ He Jiankui (พ.ย.)"],["phys","Stephen Hawking เสียชีวิต (มี.ค.)"],["phys","โนเบลฟิสิกส์: Ashkin (optical tweezers), Mourou & Strickland (CPA เลเซอร์)","n"]],
- 2017:[["ai","บทความ 'Attention Is All You Need' เสนอสถาปัตยกรรม Transformer (มิ.ย.)"],["phys","ตรวจพบดาวนิวตรอนชนกัน GW170817 ทั้งคลื่นความโน้มถ่วงและแสง (ส.ค.)"],["space","Cassini ดิ่งสู่ดาวเสาร์ จบภารกิจ (ก.ย.)"],["phys","โนเบลฟิสิกส์: Weiss, Barish, Thorne — LIGO","n"]],
- 2016:[["space","ไทยคม 8 ขึ้นสู่วงโคจร และบูสเตอร์ Falcon 9 ลงจอดบนเรือกลางทะเลสำเร็จ (พ.ค.)","thai"],["ai","AlphaGo ชนะ Lee Sedol 4–1 (มี.ค.)"],["phys","LIGO ประกาศพบคลื่นความโน้มถ่วงครั้งแรก (ก.พ.)"],["bio","ไวรัสซิกาแพร่ระบาด"],["phys","โนเบลฟิสิกส์: Thouless, Haldane, Kosterlitz — สถานะทอพอโลยีของสสาร","n"]],
- 2015:[["space","New Horizons บินผ่านพลูโต (ก.ค.)"],["eng","SpaceX นำบูสเตอร์ Falcon 9 ลงจอดบนพื้นได้ครั้งแรก (ธ.ค.)"],["energy","ข้อตกลงปารีสว่าด้วยการเปลี่ยนแปลงสภาพภูมิอากาศ (ธ.ค.)"],["phys","โนเบลฟิสิกส์: Kajita & McDonald — นิวทริโนเปลี่ยนชนิด","n"]],
- 2014:[["space","ไทยคม 6 (ม.ค.) และไทยคม 7 (ก.ย.) ขึ้นสู่วงโคจรด้วยจรวด Falcon 9","thai"],["space","ยาน Philae ของ Rosetta ลงจอดบนดาวหางครั้งแรก (พ.ย.)"],["bio","อีโบลาระบาดในแอฟริกาตะวันตก"],["eng","โนเบลฟิสิกส์: Akasaki, Amano, Nakamura — LED สีน้ำเงิน","n"]],
- 2013:[["space","หอดูดาวแห่งชาติบนดอยอินทนนท์ กล้องโทรทรรศน์ 2.4 เมตร เริ่มใช้งาน","thai"],["space","อุกกาบาตระเบิดเหนือเมืองเชเลียบินสค์ รัสเซีย (ก.พ.)"],["space","Chang'e 3 จีนลงจอดดวงจันทร์ (ธ.ค.)"],["phys","โนเบลฟิสิกส์: Englert & Higgs — กลไกฮิกส์","n"]],
- 2012:[["phys","CERN ประกาศค้นพบอนุภาคฮิกส์ (4 ก.ค.)"],["space","Curiosity ลงจอดดาวอังคาร (ส.ค.)"],["bio","Doudna & Charpentier ตีพิมพ์เทคนิค CRISPR-Cas9 (มิ.ย.)"],["space","Voyager 1 ออกจากเฮลิโอสเฟียร์สู่อวกาศระหว่างดาว (ส.ค.)"]],
- 2011:[["energy","แผ่นดินไหวโทโฮกุ สึนามิ และอุบัติเหตุนิวเคลียร์ฟุกุชิมะ (มี.ค.)"],["eng","มหาอุทกภัยไทย 2554","thai"],["space","กระสวยอวกาศปลดระวาง เที่ยวสุดท้าย Atlantis (ก.ค.)"],["phys","โนเบลฟิสิกส์: Perlmutter, Schmidt, Riess — เอกภพขยายตัวแบบเร่ง","n"]],
- 2010:[["phys","โนเบลฟิสิกส์: Geim & Novoselov — กราฟีน","n"],["bio","Craig Venter สร้างเซลล์ที่ใช้จีโนมสังเคราะห์ (พ.ค.)"],["eng","Apple เปิดตัว iPad"]],
- 2009:[["space","ก่อตั้งสถาบันวิจัยดาราศาสตร์แห่งชาติ (สดร./NARIT)","thai"],["space","NASA ปล่อยกล้อง Kepler ล่าดาวเคราะห์นอกระบบ (มี.ค.)"],["bio","ไข้หวัดใหญ่ H1N1 ระบาดใหญ่"],["eng","โนเบลฟิสิกส์: Kao (ใยแก้วนำแสง), Boyle & Smith (เซนเซอร์ CCD)","n"]],
- 2008:[["space","ไทยส่งดาวเทียม THEOS (ไทยโชต) ขึ้นวงโคจร (1 ต.ค.)","thai"],["phys","เครื่องเร่งอนุภาค LHC เดินเครื่องครั้งแรก (ก.ย.)"],["phys","โนเบลฟิสิกส์: Nambu, Kobayashi, Maskawa — การแตกสมมาตร","n"]],
- 2007:[["eng","Apple เปิดตัว iPhone รุ่นแรก (ม.ค.)"],["bio","Yamanaka สร้าง iPS cell จากเซลล์ผิวหนังมนุษย์ (พ.ย.)"],["eng","โนเบลฟิสิกส์: Fert & Grünberg — GMR ที่ใช้ในฮาร์ดดิสก์","n"]],
- 2006:[["space","ดาวเทียมไทยคม 5 ขึ้นสู่วงโคจร (พ.ค.)","thai"],["space","IAU ลดสถานะพลูโตเป็นดาวเคราะห์แคระ (ส.ค.)"],["space","ปล่อยยาน New Horizons ไปพลูโต (ม.ค.)"],["phys","โนเบลฟิสิกส์: Mather & Smoot — รังสีไมโครเวฟพื้นหลังของจักรวาล","n"]],
-};
-
+const TL = window.STEM_TIMELINE || {};
 const PEOPLE = (window.STEM_PEOPLE||[]).map(([n,y,b,reg,cat,r,p,w],i)=>({i,n,y,b,reg,cat,r,p,w:w==null?[]:[].concat(w)}));
 
 // ---------- helpers ----------
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const paras = s => String(s).split(/\n+/).filter(x=>x.trim()).map(x=>`<p>${esc(x)}</p>`).join("");
 const mIdx = d => +d.slice(5,7) - 1;
 const be = y => y + 543;
+const fdate = d => (d.length>7 ? +d.slice(8)+" " : "") + MONTHS[mIdx(d)] + " " + be(+d.slice(0,4));
 const regTag = r => `<span class="tag reg-${r}">${r==="thai"?"ไทย":"ต่างประเทศ"}</span>`;
-const catTag = c => `<span class="tag cat-${c}">${CATS[c]}</span>`;
+const catTag = c => `<span class="tag tcat cat-${c}">${ICONS[c]||""} ${PCATS[c]}</span>`;
+const store = {get(k,d){let v=null;try{v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return v==null?d:v;}}, set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 
-const PCATS = {...CATS, math:"คณิตศาสตร์"};
-const state = {reg:"all", cat:"all", q:"", month:"all", tlCat:"all", pq:"", pReg:"all", pCat:"all", pSort:"old"};
+const state = {reg:"all", cat:"all", q:"", month:"all", tlCat:"all", pq:"", pReg:"all", pCat:"all", pSort:"old", qzCat:"all"};
 
 function chips(el, opts, key, after){
   el.innerHTML = Object.entries(opts).map(([k,v]) =>
-    `<button class="chip" data-k="${k}" aria-pressed="${state[key]===k}">${v}</button>`).join("");
+    `<button class="chip" type="button" data-k="${k}" aria-pressed="${state[key]===k}">${v}</button>`).join("");
   el.onclick = e => { const b = e.target.closest(".chip"); if(!b) return;
     state[key] = b.dataset.k; chips(el, opts, key, after); after(); };
 }
 
+// ---------- hero ----------
+function renderHero(){
+  $("#upd").textContent = SUM.updated ? "ล่าสุด " + fdate(SUM.updated) : "";
+  const deepN = NEWS.filter(n=>DEEP[n.id]).length;
+  $("#hstats").innerHTML = [
+    [NEWS.length, "ข่าวปี 2026"],
+    [NEWS.filter(n=>n.reg==="thai").length, "ข่าวไทย"],
+    [Object.values(DEEP).filter(d=>d.q).length, "โจทย์จากข่าว"],
+    [PEOPLE.length, "บุคคลสำคัญ"],
+  ].map(([n,l])=>`<div class="hstat"><b>${n}</b><span>${l}</span></div>`).join("");
+}
+
 // ---------- daily ----------
+let LIST = [];
+function newsCard(n){
+  return `<button type="button" class="item cat-${n.cat}" data-id="${n.id}">
+    <div class="dbox"><span class="ico">${ICONS[n.cat]}</span><b>${n.d.length>7?+n.d.slice(8):"—"}</b> <small>${MONTHS[mIdx(n.d)]}</small></div>
+    <div>
+      <h3>${n.nobel?"🏅 ":""}${esc(n.t)}</h3>
+      <p>${esc(n.s)}</p>
+      ${n.why?`<div class="why"><b>จุดเชื่อมข้อสอบ</b> · ${esc(n.why)}</div>`:""}
+      <div class="meta">${regTag(n.reg)}${catTag(n.cat)}${n.verify?'<span class="tag verify">รอยืนยัน</span>':""}
+        <span class="more">${DEEP[n.id]?"อ่านเจาะลึก + โจทย์ →":"อ่านต่อ →"}</span></div>
+    </div></button>`;
+}
+function renderFeatured(){
+  const filtered = state.q || state.reg!=="all" || state.cat!=="all" || state.month!=="all";
+  if(filtered){ $("#featWrap").innerHTML = ""; return; }
+  const [a,b,c] = NEWS;
+  if(!a){ $("#featWrap").innerHTML = ""; return; }
+  const fc = (n,big) => `<button type="button" class="fcard ${big?"big":""} cat-${n.cat}" data-id="${n.id}">
+      <span class="ico">${ICONS[n.cat]}</span>
+      <div class="fd">${fdate(n.d)} · ${n.reg==="thai"?"ไทย":"ต่างประเทศ"} · ${CATS[n.cat]}</div>
+      <h3>${esc(n.t)}</h3>${big?`<p>${esc(n.s)}</p>`:""}
+      <span class="fl">อ่านเจาะลึก →</span></button>`;
+  $("#featWrap").innerHTML = `<div class="sec-h"><h2>ข่าวล่าสุด</h2><span>${fdate(a.d)}</span></div>
+    <div class="feat">${fc(a,true)}<div class="feat-side">${b?fc(b):""}${c?fc(c):""}</div></div>`;
+}
 function renderDaily(){
   const q = state.q.trim().toLowerCase();
-  const list = NEWS.filter(n =>
+  LIST = NEWS.filter(n =>
     (state.reg==="all" || n.reg===state.reg) &&
     (state.cat==="all" || n.cat===state.cat) &&
     (state.month==="all" || mIdx(n.d)===+state.month) &&
-    (!q || (n.t+n.s+(n.why||"")).toLowerCase().includes(q))
-  ).sort((a,b)=> b.d.localeCompare(a.d));
-  $("#feed").innerHTML = list.length ? list.map(n => {
-    const day = n.d.length>7 ? +n.d.slice(8) : "–";
-    return `<article class="card item">
-      <div class="date"><b>${day}</b>${MONTHS[mIdx(n.d)]} ${be(2026)}</div>
-      <div>
-        <h3>${n.nobel?"🏅 ":""}${esc(n.t)}</h3>
-        <p>${esc(n.s)}</p>
-        ${n.why?`<div class="why">จุดเชื่อมข้อสอบ: ${esc(n.why)}</div>`:""}
-        <div class="meta">${regTag(n.reg)}${catTag(n.cat)}${n.verify?'<span class="tag verify">รอยืนยัน</span>':""}
-          <span class="src">· ${n.src.map(([t,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(t)}</a>`).join(", ")}</span></div>
-      </div></article>`;
-  }).join("") : `<div class="empty-state">ยังไม่มีข่าวที่ตรงกับตัวกรองนี้</div>`;
+    (!q || (n.t+n.s+(n.why||"")+JSON.stringify(DEEP[n.id]||"")).toLowerCase().includes(q)));
+  renderFeatured();
+  $("#nCount").textContent = `${LIST.length} ข่าว` + (LIST.length!==NEWS.length ? ` จาก ${NEWS.length}` : "");
+  if(!LIST.length){ $("#feed").innerHTML = `<div class="empty-state">ยังไม่มีข่าวที่ตรงกับตัวกรองนี้</div>`; return; }
+  const groups = [];
+  LIST.forEach(n => { const k = n.d.slice(0,7); const g = groups[groups.length-1];
+    if(g && g.k===k) g.items.push(n); else groups.push({k, items:[n]}); });
+  $("#feed").innerHTML = groups.map(g => {
+    const th = g.items.filter(n=>n.reg==="thai").length;
+    return `<div class="mgroup"><div class="mhead"><h3>${MONTHS_FULL[mIdx(g.k)]} ${be(+g.k.slice(0,4))}</h3><span>${g.items.length} ข่าว${th?` · ไทย ${th}`:""}</span></div>
+      <div class="feed">${g.items.map(newsCard).join("")}</div></div>`;
+  }).join("");
 }
 
-// ---------- monthly ----------
-function renderMonthly(){
-  const today = new Date();
-  const now = today.getFullYear()>2026 ? 11 : today.getMonth();
-  $("#months").innerHTML = MONTHS_FULL.map((m,i) => {
-    const items = NEWS.filter(n => mIdx(n.d)===i);
-    const future = i>now;
-    const thai = items.filter(n=>n.reg==="thai").length;
-    const note = SUM.months["2026-"+String(i+1).padStart(2,"0")];
-    return `<div class="card month" data-m="${i}">
-      <h3>${m} <span>${items.length} ข่าว${thai?` · ไทย ${thai}`:""}</span></h3>
-      ${note?`<p class="why" style="margin-top:0">${esc(note)}</p>`:""}
-      ${items.length ? `<ul>${items.slice(0,3).map(n=>`<li>${esc(n.t)}</li>`).join("")}</ul>`
-        : `<p class="empty">${future?"ยังไม่ถึงเดือนนี้":"ยังไม่ได้เก็บข่าวเดือนนี้"}</p>`}
-    </div>`;
-  }).join("");
-  $("#months").onclick = e => { const c = e.target.closest(".month"); if(!c) return;
-    state.month = c.dataset.m; $("#monthSel").value = c.dataset.m; showTab("daily"); renderDaily(); };
+// ---------- news detail ----------
+function quizHTML(q, key){
+  const L = "กขคงจ";
+  return `<div class="qz" data-key="${key}"><p class="qq">${esc(q.q)}</p>
+    <div class="ch">${q.c.map((c,i)=>`<button type="button" data-i="${i}"><i>${L[i]}</i><span>${esc(c)}</span></button>`).join("")}</div>
+    <div class="exp" hidden><b>เฉลย ${L[q.a]}.</b> ${esc(q.e)}</div></div>`;
 }
+const QZ = store.get("stemQuiz", {});
+function markQuiz(box, chosen, save){
+  const id = box.dataset.key, q = DEEP[id] && DEEP[id].q; if(!q) return;
+  box.querySelectorAll(".ch button").forEach(b => { const i=+b.dataset.i; b.disabled = true;
+    if(i===q.a) b.classList.add("right"); else if(i===chosen) b.classList.add("wrong"); });
+  box.querySelector(".exp").hidden = false;
+  if(save){ QZ[id] = chosen; store.set("stemQuiz", QZ); renderScore(); }
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest(".qz .ch button"); if(!b || b.disabled) return;
+  const box = b.closest(".qz"); markQuiz(box, +b.dataset.i, true);
+  document.querySelectorAll(`.qz[data-key="${box.dataset.key}"]`).forEach(o => { if(o!==box) markQuiz(o, +b.dataset.i, false); });
+});
+function restoreQuiz(root){ root.querySelectorAll(".qz").forEach(box => { const v = QZ[box.dataset.key]; if(v!=null) markQuiz(box, v, false); }); }
+
+let curList = NEWS;
+function openNews(id, list){
+  if(list) curList = list;
+  const k = curList.findIndex(n=>n.id===id), n = curList[k] || NEWS.find(x=>x.id===id); if(!n) return;
+  const d = DEEP[n.id], prev = curList[k-1], next = curList[k+1];
+  const gq = encodeURIComponent(n.t.replace(/[“”"]/g,""));
+  $("#ndBody").className = "cat-"+n.cat;
+  $("#ndBody").innerHTML = `<div class="dh"><button class="dclose" type="button" data-close aria-label="ปิด">✕</button><span class="ico">${ICONS[n.cat]}</span>
+      <div class="fd">${fdate(n.d)}</div><h2>${n.nobel?"🏅 ":""}${esc(n.t)}</h2>
+      <div class="meta">${regTag(n.reg)}<span class="tag">${ICONS[n.cat]} ${CATS[n.cat]}</span>${n.verify?'<span class="tag">⚠ รอยืนยัน</span>':""}</div></div>
+    <div class="db">
+      <p class="lead">${esc(n.s)}</p>
+      ${n.verify?`<div class="vwarn">ข่าวนี้มาจากแหล่งรองหรือยืนยันวันที่ไม่ได้ ควรตรวจกับแหล่งข่าวหลักก่อนจำไปใช้</div>`:""}
+      ${d&&d.bg?`<h3>ภูมิหลัง</h3>${paras(d.bg)}`:""}
+      ${d&&d.sci?`<h3>วิทยาศาสตร์เบื้องหลัง</h3>${paras(d.sci)}`:""}
+      ${n.why?`<h3>จุดเชื่อมข้อสอบ TPAT3</h3><p>${esc(n.why)}</p>`:""}
+      ${d&&d.kw&&d.kw.length?`<h3>คำศัพท์สำคัญ</h3><div class="kw">${d.kw.map(([t,m])=>`<div><b>${esc(t)}</b><span>${esc(m)}</span></div>`).join("")}</div>`:""}
+      ${d&&d.q?`<h3>โจทย์ฝึกจากข่าวนี้</h3>${quizHTML(d.q, n.id)}`:""}
+      <h3>แหล่งข่าวและอ่านต่อ</h3>
+      <div class="links">${n.src.map(([t,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)} ↗</a>`).join("")}
+        <a href="https://news.google.com/search?q=${gq}&hl=th" target="_blank" rel="noopener">ค้นข่าวนี้เพิ่ม (Google News) ↗</a></div>
+      <div class="dnav"><button type="button" data-go="${prev?prev.id:""}" ${prev?"":"disabled"}>← ${prev?esc(prev.t):"ไม่มีข่าวก่อนหน้า"}</button>
+        <button type="button" data-go="${next?next.id:""}" ${next?"":"disabled"}>${next?esc(next.t):"ไม่มีข่าวถัดไป"} →</button></div>
+    </div>`;
+  restoreQuiz($("#ndBody"));
+  const dlg = $("#nDialog"); if(!dlg.open) dlg.showModal(); dlg.scrollTop = 0;
+}
+$("#nDialog").addEventListener("click", e => {
+  if(e.target.id==="nDialog" || e.target.closest("[data-close]")) return $("#nDialog").close();
+  const g = e.target.closest("[data-go]"); if(g && g.dataset.go) openNews(g.dataset.go);
+});
+$("#feed").addEventListener("click", e => { const c = e.target.closest(".item"); if(c) openNews(c.dataset.id, LIST); });
+$("#featWrap").addEventListener("click", e => { const c = e.target.closest(".fcard"); if(c) openNews(c.dataset.id, NEWS); });
+
+// ---------- quiz tab ----------
+function renderScore(){
+  const ids = NEWS.filter(n=>DEEP[n.id]&&DEEP[n.id].q).map(n=>n.id);
+  const done = ids.filter(id=>QZ[id]!=null), ok = done.filter(id=>QZ[id]===DEEP[id].q.a);
+  $("#qzScore").innerHTML = `ถูก ${ok.length} / ทำแล้ว ${done.length} <span>จากทั้งหมด ${ids.length} ข้อ</span>`;
+}
+function renderQuiz(){
+  const list = NEWS.filter(n => DEEP[n.id] && DEEP[n.id].q && (state.qzCat==="all" || n.cat===state.qzCat));
+  $("#qlist").innerHTML = list.length ? list.map((n,i)=>`<div class="qcard cat-${n.cat}">
+      <div class="qsrc">ข้อ ${i+1} · ${catTag(n.cat)} <span>จากข่าว:</span> <button type="button" data-id="${n.id}">${esc(n.t)}</button></div>
+      ${quizHTML(DEEP[n.id].q, n.id)}</div>`).join("") : `<div class="empty-state">ยังไม่มีโจทย์ในหมวดนี้</div>`;
+  restoreQuiz($("#qlist")); renderScore();
+}
+$("#qlist").addEventListener("click", e => { const b = e.target.closest(".qsrc button"); if(b) openNews(b.dataset.id, NEWS); });
+$("#qzReset").onclick = () => { if(!confirm("ล้างคำตอบโจทย์จากข่าวทั้งหมด?")) return; Object.keys(QZ).forEach(k=>delete QZ[k]); store.set("stemQuiz", QZ); renderQuiz(); };
+
+// ---------- monthly ----------
+function catBar(items){
+  if(!items.length) return `<div class="mbar"></div>`;
+  return `<div class="mbar">${Object.keys(CATS).map(c=>{const k=items.filter(n=>n.cat===c).length; return k?`<i class="cat-${c}" style="width:${k/items.length*100}%" title="${CATS[c]} ${k}"></i>`:"";}).join("")}</div>`;
+}
+function renderMonthly(){
+  const today = new Date(), now = today.getFullYear()>2026 ? 12 : today.getMonth();
+  $("#months").innerHTML = MONTHS_FULL.map((m,i) => {
+    const items = NEWS.filter(n => mIdx(n.d)===i), thai = items.filter(n=>n.reg==="thai").length;
+    const note = SUM.months["2026-"+String(i+1).padStart(2,"0")];
+    return `<button type="button" class="month ${i===now?"now":""} ${i>now?"future":""}" data-m="${i}">
+      <h3>${m}<span>${items.length} ข่าว${thai?` · ไทย ${thai}`:""}</span></h3>${catBar(items)}
+      ${note?`<p class="sum">${esc(note)}</p>`:""}
+      ${items.length ? `<ul>${items.slice(0,note?2:3).map(n=>`<li>${esc(n.t)}</li>`).join("")}</ul>`
+        : `<p class="empty">${i>now?"ยังไม่ถึงเดือนนี้":"ยังไม่ได้เก็บข่าวเดือนนี้"}</p>`}</button>`;
+  }).join("");
+}
+$("#months").onclick = e => { const c = e.target.closest(".month"); if(!c) return;
+  state.month = c.dataset.m; $("#monthSel").value = c.dataset.m; showTab("daily"); renderDaily(); window.scrollTo({top:0}); };
 
 // ---------- yearly ----------
 function renderYearly(){
   const count = c => NEWS.filter(n=>n.cat===c).length;
-  const top = Object.keys(CATS).sort((a,b)=>count(b)-count(a))[0];
+  const sorted = Object.keys(CATS).sort((a,b)=>count(b)-count(a)), max = count(sorted[0]) || 1;
   $("#yearStats").innerHTML = [
     [NEWS.length,"ข่าวในคลังปีนี้"],
     [NEWS.filter(n=>n.reg==="thai").length,"ข่าวไทย"],
     [NEWS.filter(n=>n.nobel).length,"ข่าวโนเบล"],
-    [CATS[top],"หมวดที่มีข่าวมากสุด"],
-  ].map(([n,l])=>`<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+    [ICONS[sorted[0]]+" "+CATS[sorted[0]],"หมวดที่มีข่าวมากสุด"],
+  ].map(([n,l],i)=>`<div class="stat"><div class="n" ${i===3?'style="font-size:19px;line-height:1.5"':""}>${n}</div><div class="l">${l}</div></div>`).join("");
+  $("#catBars").innerHTML = sorted.map(c=>`<div class="bar cat-${c}"><span>${ICONS[c]} ${CATS[c]}</span><div class="t"><i style="width:${count(c)/max*100}%"></i></div><b>${count(c)}</b></div>`).join("");
   const safe = x => esc(x).replace(/&lt;(\/?)b&gt;/g, "<$1b>");
-  $("#top5").innerHTML = (SUM.year.top||[]).map(x=>`<li>${safe(x)}</li>`).join("");
+  $("#top5").innerHTML = (SUM.year.top||[]).map(x=>`<li><span>${safe(x)}</span></li>`).join("");
   $("#trends").innerHTML = (SUM.year.trends||[]).map(x=>`<li>${safe(x)}</li>`).join("");
 }
 
 // ---------- timeline ----------
 function renderTimeline(){
-  const yrs = Object.keys(TL).sort((a,b)=>b-a);
-  const html = yrs.map(y => {
-    const filtered = TL[y].filter(([c,,f]) =>
-      state.tlCat==="all" || (state.tlCat==="thai" && f==="thai") || (state.tlCat==="nobel" && f==="n") || c===state.tlCat);
-    if(!filtered.length) return "";
-    return `<div class="tl-year"><div class="y">${y}<small>พ.ศ. ${be(+y)}</small></div><ul>${
-      filtered.map(([c,t,f])=>`<li class="cat-${c}"><span class="dot"></span><span style="color:var(--ink)">${f==="n"?"🏅 ":""}${esc(t)}</span>${f==="thai"?regTag("thai"):""}</li>`).join("")
-    }</ul></div>`;
+  let total = 0;
+  const html = Object.keys(TL).sort((a,b)=>b-a).map(y => {
+    const items = TL[y].filter(([c,,f]) => state.tlCat==="all" || (state.tlCat==="thai" && f==="thai") || (state.tlCat==="nobel" && f==="n") || c===state.tlCat);
+    if(!items.length) return ""; total += items.length;
+    return `<div class="tl-year"><div class="tl-y"><b>${y}</b><small>พ.ศ. ${be(+y)}</small></div><div class="tl-items">${
+      items.map(([c,t,f,d])=>`<div class="tl-it cat-${c}"><div class="tt">${f==="n"?"🏅 ":""}${esc(t)}</div>${d?`<div class="td">${esc(d)}</div>`:""}
+        <div class="meta"><span class="tag tcat cat-${c}">${ICONS[c]} ${CATS[c]}</span>${f==="thai"?regTag("thai"):""}${f==="n"?'<span class="tag verify">โนเบล</span>':""}</div></div>`).join("")
+    }</div></div>`;
   }).join("");
+  $("#tlCount").textContent = `${total} เหตุการณ์ · เขียนจากข้อเท็จจริงที่รู้กันทั่วไป`;
   $("#timeline").innerHTML = html || `<div class="empty-state">ไม่มีเหตุการณ์ในหมวดนี้</div>`;
 }
 
 // ---------- people ----------
+const initials = n => { const s = n.replace(/^(สมเด็จ|พระบาท|ศ\.|ดร\.|นพ\.|รศ\.|Sir |Lord )+/g,"").replace(/^(ศ\.|ดร\.|นพ\.)+/g,"").trim(); return s.slice(0, /[ก-๙]/.test(s[0]) ? 1 : 2).replace(/\s/g,""); };
+const thumbs = {};
 function renderPeople(){
   const q = state.pq.trim().toLowerCase();
   const list = PEOPLE.filter(p => (state.pReg==="all"||p.reg===state.pReg) && (state.pCat==="all"||p.cat===state.pCat) &&
       (!q || (p.n+p.r+p.p+PCATS[p.cat]).toLowerCase().includes(q)))
     .sort((a,b)=> state.pSort==="new" ? b.b-a.b : a.b-b.b);
-  $("#pCount").textContent = `${list.length} จาก ${PEOPLE.length} คน/กลุ่ม`;
-  $("#people").innerHTML = list.length ? list.map(p=>`<div class="card person" role="button" tabindex="0" data-i="${p.i}">
-    <h3>${esc(p.n)}</h3><p class="role">${esc(p.r)}${p.y && p.y!=="—" ? ` · ${esc(p.y)}` : ""}</p><p>${esc(p.p)}</p>
-    <div class="meta">${regTag(p.reg)}<span class="tag cat-${p.cat}">${PCATS[p.cat]}</span><span class="more">อ่านเจาะลึก →</span></div></div>`).join("")
+  $("#pCount").textContent = `${list.length} จาก ${PEOPLE.length} คน/กลุ่ม · กดการ์ดเพื่ออ่านประวัติเจาะลึกพร้อมรูป`;
+  $("#people").innerHTML = list.length ? list.map(p=>`<button type="button" class="person cat-${p.cat}" data-i="${p.i}">
+    <span class="av">${thumbs[p.i]?`<img src="${esc(thumbs[p.i])}" alt="" loading="lazy">`:esc(initials(p.n))}</span>
+    <div><h3>${esc(p.n)}</h3><p class="role">${esc(p.r)}${p.y && p.y!=="—" ? ` · ${esc(p.y)}` : ""}</p><p>${esc(p.p)}</p>
+    <div class="meta">${regTag(p.reg)}<span class="tag tcat cat-${p.cat}">${ICONS[p.cat]} ${PCATS[p.cat]}</span><span class="more">อ่านเจาะลึก →</span></div></div></button>`).join("")
     : `<div class="empty-state">ไม่พบบุคคลที่ค้นหา</div>`;
+}
+let thumbsLoaded = false;
+async function loadThumbs(){
+  if(thumbsLoaded) return; thumbsLoaded = true;
+  const byLang = {en:new Map(), th:new Map()};
+  PEOPLE.forEach(p => { const t = p.w[0]; if(!t) return; const th = t.startsWith("th:"); byLang[th?"th":"en"].set(th?t.slice(3):t, p.i); });
+  for(const lang of ["en","th"]){
+    const titles = [...byLang[lang].keys()];
+    for(let s=0; s<titles.length; s+=50){
+      try{
+        const batch = titles.slice(s, s+50);
+        const u = `https://${lang}.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=120&titles=${encodeURIComponent(batch.join("|"))}`;
+        const j = await (await fetch(u)).json();
+        const map = {}; [...(j.query.normalized||[]), ...(j.query.redirects||[])].forEach(x=>map[x.to]=x.from);
+        Object.values(j.query.pages).forEach(pg => {
+          if(!pg.thumbnail || !/^https:\/\/(upload|thumb)\.wikimedia\.org\//.test(pg.thumbnail.source)) return;
+          let t = pg.title; while(!byLang[lang].has(t) && map[t]) t = map[t];
+          const i = byLang[lang].get(t); if(i!=null) thumbs[i] = pg.thumbnail.source;
+        });
+      }catch(e){}
+    }
+  }
+  renderPeople();
 }
 
 // ---------- person detail (Wikipedia) ----------
@@ -346,7 +632,7 @@ async function wikiQuery(lang, title, withTh){
     img:(pg.thumbnail && /^https:\/\/(upload|thumb)\.wikimedia\.org\//.test(pg.thumbnail.source)) ? pg.thumbnail.source : null,
     th:(pg.langlinks && pg.langlinks[0] && pg.langlinks[0]["*"]) || null};
 }
-async function wikiPerson(t){
+function wikiPerson(t){
   if(wikiCache.has(t)) return wikiCache.get(t);
   const job = (async () => {
     if(t.startsWith("th:")){ const th = await wikiQuery("th", t.slice(3)); return {th, en:null}; }
@@ -354,34 +640,32 @@ async function wikiPerson(t){
     const th = en && en.th ? await wikiQuery("th", en.th) : null;
     return {en, th};
   })();
-  wikiCache.set(t, job);
-  job.catch(()=>wikiCache.delete(t));
+  wikiCache.set(t, job); job.catch(()=>wikiCache.delete(t));
   return job;
 }
-const paras = s => s.split(/\n+/).filter(x=>x.trim()).map(x=>`<p>${esc(x)}</p>`).join("");
 async function openPerson(i){
   const p = PEOPLE[i]; if(!p) return;
   const nobel = /โนเบล/.test(p.r+p.p);
   const q = encodeURIComponent(p.n.replace(/\(.*?\)/g,"").split(/[·&]/)[0].trim());
-  $("#pdBody").innerHTML = `<button class="pd-close" type="button" id="pdClose">ปิด ✕</button>
-    <h2>${esc(p.n)}</h2>
-    <p class="role">${esc(p.r)}${p.y&&p.y!=="—"?` · ${esc(p.y)}`:""}</p>
-    <div class="meta">${regTag(p.reg)}<span class="tag cat-${p.cat}">${PCATS[p.cat]}</span></div>
-    <div class="key"><b>ผลงานที่ควรจำ:</b> ${esc(p.p)}</div>
-    <div id="pdWiki">${p.w.length?`<p class="sub">กำลังโหลดประวัติและรูปจาก Wikipedia…</p>`:""}</div>
-    <h3>อ่านต่อ</h3><div class="links" id="pdLinks"></div>`;
-  $("#pdClose").onclick = () => $("#pDialog").close();
+  $("#pdBody").className = "cat-"+p.cat;
+  $("#pdBody").innerHTML = `<div class="dh"><button class="dclose" type="button" data-close aria-label="ปิด">✕</button><span class="ico">${ICONS[p.cat]}</span>
+      <div class="fd">${esc(p.r)}${p.y&&p.y!=="—"?` · ${esc(p.y)}`:""}</div><h2>${esc(p.n)}</h2>
+      <div class="meta">${regTag(p.reg)}<span class="tag">${ICONS[p.cat]} ${PCATS[p.cat]}</span></div></div>
+    <div class="db" id="pdMain">
+      <div class="key"><b>ผลงานที่ควรจำ:</b> ${esc(p.p)}</div>
+      <div id="pdWiki">${p.w.length?`<p class="sub">กำลังโหลดประวัติและรูปจาก Wikipedia…</p>`:""}</div>
+      <h3>อ่านต่อ</h3><div class="links" id="pdLinks"></div></div>`;
   const links = [];
-  const renderLinks = () => { $("#pdLinks").innerHTML = links.map(([t,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>`).join(""); };
+  const renderLinks = () => { $("#pdLinks").innerHTML = links.map(([t,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)} ↗</a>`).join(""); };
   if(p.reg==="intl") links.push(["Britannica", `https://www.britannica.com/search?query=${q}`]);
   if(nobel) links.push(["NobelPrize.org", `https://www.nobelprize.org/?s=${q}`]);
   if(!p.w.length) links.push(["ค้นหาข่าวและประวัติ (Google)", `https://www.google.com/search?q=${encodeURIComponent(p.n)}`]);
   renderLinks();
-  if(!$("#pDialog").open) $("#pDialog").showModal();
+  const dlg = $("#pDialog"); if(!dlg.open) dlg.showModal(); dlg.scrollTop = 0;
   if(!p.w.length) return;
   try{
     const res = await Promise.all(p.w.map(wikiPerson));
-    if(!$("#pDialog").open || $("#pdBody h2").textContent !== p.n) return;
+    if(!dlg.open || $("#pdBody h2").textContent !== p.n) return;
     const imgs = res.map(r => (r.en&&r.en.img)||(r.th&&r.th.img) ? {src:(r.en&&r.en.img)||r.th.img, cap:(r.en||r.th).title} : null).filter(Boolean);
     let html = imgs.length ? `<div class="pd-imgs">${imgs.map(x=>`<figure><img src="${esc(x.src)}" alt="${esc(x.cap)}" loading="lazy"><figcaption>${esc(x.cap)}</figcaption></figure>`).join("")}</div>` : "";
     res.forEach((r,k) => {
@@ -407,25 +691,23 @@ async function openPerson(i){
   }
 }
 $("#people").addEventListener("click", e => { const c = e.target.closest(".person"); if(c) openPerson(+c.dataset.i); });
-$("#people").addEventListener("keydown", e => { if((e.key==="Enter"||e.key===" ") && e.target.classList.contains("person")){ e.preventDefault(); openPerson(+e.target.dataset.i); } });
-$("#pDialog").addEventListener("click", e => { if(e.target.id==="pDialog") e.target.close(); });
+$("#pDialog").addEventListener("click", e => { if(e.target.id==="pDialog" || e.target.closest("[data-close]")) $("#pDialog").close(); });
 
 // ---------- tabs & theme ----------
 function showTab(t){
+  if(!document.getElementById("tab-"+t)) t = "daily";
   document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===t));
   document.querySelectorAll("main section").forEach(s=>s.hidden = s.id!=="tab-"+t);
-  try{ localStorage.setItem("stemTab", t); }catch(e){}
+  if(t==="people") loadThumbs();
+  store.set("stemTab", t);
 }
-document.querySelector("nav.tabs").onclick = e => { const b=e.target.closest("button"); if(b) showTab(b.dataset.tab); };
-
+document.querySelector("nav.tabs").onclick = e => { const b=e.target.closest("button"); if(b){ showTab(b.dataset.tab); window.scrollTo({top:0}); } };
 $("#themeBtn").onclick = () => {
-  const cur = document.documentElement.dataset.theme ||
-    (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
   const next = cur==="dark" ? "light" : "dark";
-  document.documentElement.dataset.theme = next;
-  try{ localStorage.setItem("stemTheme", next); }catch(e){}
+  document.documentElement.dataset.theme = next; store.set("stemTheme", next);
 };
-try{ const th = localStorage.getItem("stemTheme"); if(th) document.documentElement.dataset.theme = th; }catch(e){}
+{ const th = store.get("stemTheme", null); if(th) document.documentElement.dataset.theme = th; }
 
 // ---------- init ----------
 $("#monthSel").innerHTML = `<option value="all">ทุกเดือน</option>` + MONTHS_FULL.map((m,i)=>`<option value="${i}">${m} 2569</option>`).join("");
@@ -433,14 +715,15 @@ $("#monthSel").onchange = e => { state.month = e.target.value; renderDaily(); };
 $("#q").oninput = e => { state.q = e.target.value; renderDaily(); };
 $("#pq").oninput = e => { state.pq = e.target.value; renderPeople(); };
 chips($("#regChips"), REGS, "reg", renderDaily);
-chips($("#catChips"), {all:"ทุกหมวด", ...CATS}, "cat", renderDaily);
-chips($("#tlChips"), {all:"ทั้งหมด", thai:"เฉพาะไทย", nobel:"โนเบล", ...CATS}, "tlCat", renderTimeline);
+chips($("#catChips"), {all:"ทุกหมวด", ...Object.fromEntries(Object.entries(CATS).map(([k,v])=>[k,ICONS[k]+" "+v]))}, "cat", renderDaily);
+chips($("#qzChips"), {all:"ทุกหมวด", ...Object.fromEntries(Object.entries(CATS).map(([k,v])=>[k,ICONS[k]+" "+v]))}, "qzCat", renderQuiz);
+chips($("#tlChips"), {all:"ทั้งหมด", thai:"🇹🇭 เฉพาะไทย", nobel:"🏅 โนเบล", ...Object.fromEntries(Object.entries(CATS).map(([k,v])=>[k,ICONS[k]+" "+v]))}, "tlCat", renderTimeline);
 chips($("#pChips"), REGS, "pReg", renderPeople);
-chips($("#pCatChips"), {all:"ทุกสาขา", ...PCATS}, "pCat", renderPeople);
+chips($("#pCatChips"), {all:"ทุกสาขา", ...Object.fromEntries(Object.entries(PCATS).map(([k,v])=>[k,ICONS[k]+" "+v]))}, "pCat", renderPeople);
 $("#pSort").onchange = e => { state.pSort = e.target.value; renderPeople(); };
-if(SUM.updated) $("#foot").textContent = `อัปเดตล่าสุด ${SUM.updated} · ${NEWS.length} ข่าว · SIXENT`;
-renderDaily(); renderMonthly(); renderYearly(); renderTimeline(); renderPeople();
-try{ const t = localStorage.getItem("stemTab"); if(t) showTab(t); }catch(e){}
+$("#foot").textContent = `อัปเดตล่าสุด ${SUM.updated||"—"} · ${NEWS.length} ข่าว · SIXENT STEM News`;
+renderHero(); renderDaily(); renderQuiz(); renderMonthly(); renderYearly(); renderTimeline(); renderPeople();
+showTab(store.get("stemTab", "daily"));
 </script>
 </body>
 </html>

@@ -42,6 +42,22 @@ for (const [i, n] of (news || []).entries()) {
   for (const k of ["nobel", "verify"]) if (k in n && typeof n[k] !== "boolean") errs.push(`${at}: ${k} ต้องเป็น true/false`);
 }
 
+// เนื้อหาเจาะลึก (data/deep.js): ทุกข่าวต้องมี bg, sci, kw และโจทย์ q
+try { vm.runInContext(fs.readFileSync(path.join(root, "data/deep.js"), "utf8"), ctx, { filename: "data/deep.js" }); }
+catch (e) { errs.push(`data/deep.js: อ่านไม่ได้ (${e.message})`); }
+const deep = ctx.window.STEM_DEEP || {};
+for (const k of Object.keys(deep)) if (!ids.has(k)) errs.push(`deep.js: มีคีย์ ${k} แต่ไม่มีข่าว id นี้`);
+for (const id of ids) {
+  const d = deep[id], at = `deep.js ${id}`;
+  if (!d) { errs.push(`${at}: ยังไม่มีเนื้อหาเจาะลึก`); continue; }
+  for (const k of ["bg", "sci"]) if (typeof d[k] !== "string" || d[k].trim().length < 60) errs.push(`${at}: ${k} สั้นหรือว่าง (ต้อง ≥ 60 ตัวอักษร)`);
+  if (!Array.isArray(d.kw) || d.kw.length < 2 || d.kw.some(x => !Array.isArray(x) || x.length !== 2 || !x[0] || !x[1])) errs.push(`${at}: kw ต้องเป็น [[ศัพท์, ความหมาย], ...] อย่างน้อย 2 คำ`);
+  const q = d.q;
+  if (!q || typeof q.q !== "string" || !Array.isArray(q.c) || q.c.length !== 5 || q.c.some(c => typeof c !== "string" || !c.trim()) || !Number.isInteger(q.a) || q.a < 0 || q.a > 4 || typeof q.e !== "string" || q.e.length < 10)
+    errs.push(`${at}: q ต้องเป็น {q, c:[5 ตัวเลือก], a:0–4, e:เฉลย}`);
+  else if (new Set(q.c).size !== 5) errs.push(`${at}: ตัวเลือกซ้ำกัน`);
+}
+
 if (errs.length) { console.error("ไม่ผ่าน:\n- " + errs.join("\n- ")); process.exit(1); }
 const today = new Date().toLocaleDateString("sv-SE");
 const thisMonth = today.slice(0, 7);
