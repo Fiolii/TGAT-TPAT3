@@ -1,0 +1,446 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STEM News Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f5f1; --surface:#ffffff; --ink:#1b1d22; --muted:#5f636c; --line:#e3e1da;
+  --accent:#1f5eff; --accent-soft:#e8eeff; --thai:#c2410c; --thai-soft:#fff1e8;
+  --warn:#8a6100; --warn-soft:#fff6d9;
+  --c-space:#5b4bd6; --c-ai:#0f8a6a; --c-bio:#c0336f; --c-phys:#1f6fb8; --c-energy:#b8701f; --c-eng:#55606e; --c-math:#8a3fb0;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121317; --surface:#1b1d23; --ink:#ecebe7; --muted:#9a9ea8; --line:#2b2e36;
+    --accent:#7f9cff; --accent-soft:#1f2741; --thai:#ff9a5c; --thai-soft:#3a2418;
+    --warn:#ffd36b; --warn-soft:#352c12;
+    --c-space:#a79cff; --c-ai:#4fd1a9; --c-bio:#ff7fb0; --c-phys:#6fb3ff; --c-energy:#f2b56a; --c-eng:#a9b3c0; --c-math:#d39cf2;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121317; --surface:#1b1d23; --ink:#ecebe7; --muted:#9a9ea8; --line:#2b2e36;
+  --accent:#7f9cff; --accent-soft:#1f2741; --thai:#ff9a5c; --thai-soft:#3a2418;
+  --warn:#ffd36b; --warn-soft:#352c12;
+  --c-space:#a79cff; --c-ai:#4fd1a9; --c-bio:#ff7fb0; --c-phys:#6fb3ff; --c-energy:#f2b56a; --c-eng:#a9b3c0; --c-math:#d39cf2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Thai",system-ui,sans-serif;line-height:1.6;font-size:15px}
+a{color:var(--accent)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px}
+header{padding:28px 0 8px}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+h1{font-size:26px;margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:2px 0 0;font-size:14px}
+.back{display:inline-block;color:var(--muted);font-size:13px;text-decoration:none;margin-bottom:4px}
+.back:hover{color:var(--ink)}
+.theme-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit;font-size:13px}
+.banner{margin:16px 0 0;background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 14px;font-size:13.5px}
+nav.tabs{display:flex;gap:4px;margin:20px 0 0;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+nav.tabs button{border:0;background:none;font:inherit;color:var(--muted);padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;font-weight:500}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+main{padding:20px 0 60px}
+section[hidden]{display:none}
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.controls input,.controls select{font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.controls input{flex:1 1 220px;min-width:0}
+.chip-row{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:4px 10px;border-radius:999px;cursor:pointer;font:inherit;font-size:13px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.feed{display:flex;flex-direction:column;gap:10px}
+.item{display:grid;grid-template-columns:92px 1fr;gap:14px}
+.date{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;padding-top:2px}
+.date b{display:block;color:var(--ink);font-size:20px;line-height:1.1}
+.item h3{margin:0 0 4px;font-size:16px;line-height:1.45}
+.item p{margin:0 0 6px;color:var(--ink)}
+.why{font-size:13.5px;color:var(--muted);border-left:3px solid var(--accent-soft);padding-left:8px;margin:6px 0}
+.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12.5px}
+.tag{padding:1px 8px;border-radius:999px;border:1px solid currentColor;font-size:12px}
+.reg-thai{background:var(--thai-soft);color:var(--thai);border-color:transparent}
+.reg-intl{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.verify{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.nobel{color:var(--warn)}
+.src{color:var(--muted)}
+.cat-space{color:var(--c-space)}.cat-ai{color:var(--c-ai)}.cat-bio{color:var(--c-bio)}.cat-phys{color:var(--c-phys)}.cat-energy{color:var(--c-energy)}.cat-eng{color:var(--c-eng)}.cat-math{color:var(--c-math)}
+.year-hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.stat .n{font-size:26px;font-weight:700;line-height:1.1}
+.stat .l{font-size:13px;color:var(--muted)}
+h2{font-size:19px;margin:22px 0 10px}
+.top5{margin:0;padding-left:20px}
+.top5 li{margin:4px 0}
+.months{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.month h3{margin:0 0 6px;font-size:16px;display:flex;justify-content:space-between;gap:8px}
+.month h3 span{font-size:12.5px;color:var(--muted);font-weight:400}
+.month ul{margin:0;padding-left:18px;font-size:14px}
+.month .empty{color:var(--muted);font-size:13.5px;margin:0}
+.month{cursor:pointer;transition:border-color .15s}
+.month:hover{border-color:var(--accent)}
+.tl-year{display:grid;grid-template-columns:70px 1fr;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+.tl-year .y{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.tl-year .y small{display:block;font-size:12px;color:var(--muted);font-weight:400}
+.tl-year ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.tl-year li{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none;transform:translateY(-1px)}
+.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.person h3{margin:0;font-size:16px}
+.person .role{color:var(--muted);font-size:13px;margin:0 0 6px}
+.person p{margin:0 0 8px;font-size:14px}
+.person{cursor:pointer;transition:border-color .15s}
+.person:hover,.person:focus-visible{border-color:var(--accent);outline:none}
+.person .more{color:var(--accent);font-size:13px;margin-left:auto}
+dialog#pDialog{border:0;padding:0;border-radius:14px;background:var(--surface);color:var(--ink);width:min(760px,calc(100% - 32px));max-height:88vh}
+dialog#pDialog::backdrop{background:rgba(10,12,16,.55)}
+.pd{padding:20px 22px 24px}
+.pd-close{position:sticky;top:0;float:right;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:4px 10px;cursor:pointer;font:inherit}
+.pd h2{margin:0 0 2px;font-size:22px;line-height:1.35}
+.pd .role{color:var(--muted);margin:0 0 12px}
+.pd-imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,190px));gap:10px;margin:14px 0}
+.pd-imgs figure{margin:0}
+.pd-imgs img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:10px;background:var(--line)}
+.pd-imgs figcaption{font-size:12.5px;color:var(--muted);margin-top:4px}
+.pd h3{font-size:16px;margin:18px 0 6px}
+.pd .key{background:var(--accent-soft);border-radius:10px;padding:10px 12px;margin:10px 0}
+.pd .extract p{margin:0 0 10px}
+.pd details{margin:6px 0 10px;font-size:14px;color:var(--muted)}
+.pd details summary{cursor:pointer;color:var(--accent)}
+.pd .links{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.pd .links a{border:1px solid var(--line);border-radius:999px;padding:4px 12px;text-decoration:none;font-size:13.5px}
+.pd .credit{font-size:12px;color:var(--muted);margin-top:14px}
+.empty-state{color:var(--muted);text-align:center;padding:30px 0}
+footer{color:var(--muted);font-size:12.5px;padding:0 0 30px}
+@media (max-width:560px){
+  .item{grid-template-columns:1fr;gap:4px}
+  .date b{display:inline;font-size:15px;margin-right:6px}
+  .tl-year{grid-template-columns:1fr;gap:6px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="top">
+    <div>
+      <a class="back" href="../#/exam">← กลับ SIXENT</a>
+      <h1>STEM News Desk</h1>
+      <p class="sub">คลังข่าววิทยาศาสตร์ เทคโนโลยี วิศวกรรม ไทยและต่างประเทศ สำหรับเตรียมสอบ TPAT3</p>
+    </div>
+    <button class="theme-btn" id="themeBtn" type="button">สลับธีม</button>
+  </div>
+  <div class="banner">ข่าวปี 2026 ทุกข่าวมีลิงก์แหล่งที่มา และเพิ่มอัตโนมัติทุกเช้า ป้ายสีเหลือง "รอยืนยัน" = มาจากแหล่งรองหรือวันที่ไม่ชัด ควรเช็กก่อนจำ · ไทม์ไลน์ 20 ปีและบุคคลสำคัญเขียนจากข้อเท็จจริงที่รู้กันทั่วไป</div>
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="daily" aria-selected="true">รายวัน</button>
+    <button role="tab" data-tab="monthly" aria-selected="false">รายเดือน</button>
+    <button role="tab" data-tab="yearly" aria-selected="false">สรุปปี 2026</button>
+    <button role="tab" data-tab="timeline" aria-selected="false">ย้อนหลัง 20 ปี</button>
+    <button role="tab" data-tab="people" aria-selected="false">บุคคลสำคัญ</button>
+  </nav>
+</header>
+
+<main>
+  <section id="tab-daily">
+    <div class="controls">
+      <input id="q" type="search" placeholder="ค้นหาข่าว เช่น Artemis, โนเบล, สวทช.">
+      <select id="monthSel"></select>
+    </div>
+    <div class="controls">
+      <div class="chip-row" id="regChips"></div>
+      <div class="chip-row" id="catChips"></div>
+    </div>
+    <div class="feed" id="feed"></div>
+  </section>
+
+  <section id="tab-monthly" hidden>
+    <p class="sub" style="margin-bottom:12px">กดที่เดือนเพื่อดูข่าวทั้งหมดของเดือนนั้นในแท็บรายวัน</p>
+    <div class="months" id="months"></div>
+  </section>
+
+  <section id="tab-yearly" hidden>
+    <div class="year-hero" id="yearStats"></div>
+    <h2>5 เรื่องใหญ่ของปี 2026 (ถึง 28 พ.ย.)</h2>
+    <ol class="top5" id="top5"></ol>
+    <h2>แนวโน้มที่ควรรู้ก่อนสอบ</h2>
+    <ul class="top5" id="trends"></ul>
+  </section>
+
+  <section id="tab-timeline" hidden>
+    <div class="controls">
+      <div class="chip-row" id="tlChips"></div>
+    </div>
+    <div id="timeline"></div>
+  </section>
+
+  <section id="tab-people" hidden>
+    <div class="controls">
+      <input id="pq" type="search" placeholder="ค้นหาชื่อ ผลงาน หรือรางวัล เช่น โนเบล, DNA">
+      <select id="pSort"><option value="old">เรียงตามยุค เก่า→ใหม่</option><option value="new">เรียงตามยุค ใหม่→เก่า</option></select>
+    </div>
+    <div class="controls">
+      <div class="chip-row" id="pChips"></div>
+      <div class="chip-row" id="pCatChips"></div>
+    </div>
+    <p class="sub" id="pCount" style="margin:0 0 10px"></p>
+    <div class="people" id="people"></div>
+  </section>
+</main>
+<dialog id="pDialog" aria-label="รายละเอียดบุคคล"><div class="pd" id="pdBody"></div></dialog>
+<footer id="foot">SIXENT · STEM News</footer>
+</div>
+
+<script src="data/news.js"></script>
+<script src="data/summary.js"></script>
+<script src="data/people.js"></script>
+<script>
+const CATS = {space:"อวกาศ", ai:"AI/คอมพิวเตอร์", bio:"ชีวะ/การแพทย์", phys:"ฟิสิกส์/เคมี", energy:"พลังงาน/สิ่งแวดล้อม", eng:"วิศวกรรม/เทคโนโลยี"};
+const REGS = {all:"ทั้งหมด", thai:"ไทย", intl:"ต่างประเทศ"};
+const MONTHS = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+const MONTHS_FULL = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+
+// ข่าวปี 2026 — d: "YYYY-MM-DD" หรือ "YYYY-MM" ถ้าไม่ทราบวัน
+const NEWS = window.STEM_NEWS || [];
+const SUM = window.STEM_SUMMARY || {months:{}, year:{}};
+
+// ไทม์ไลน์ 20 ปี
+const TL = {
+ 2025:[["ai","DeepSeek-R1 จากจีน โมเดล AI ต้นทุนต่ำทำให้วงการตื่นตัว (ม.ค.)"],["eng","แผ่นดินไหว M7.7 ในเมียนมา ส่งผลถึงกรุงเทพฯ อาคารก่อสร้างถล่ม (28 มี.ค.)","thai"],["space","หอดูดาว Vera C. Rubin เผยภาพแรก (มิ.ย.)"],["phys","โนเบลฟิสิกส์: Clarke, Devoret, Martinis — ควอนตัมทันเนลลิงระดับมหภาคในวงจรไฟฟ้า","n"],["phys","โนเบลเคมี: Kitagawa, Robson, Yaghi — โครงข่ายโลหะอินทรีย์ (MOFs)","n"],["bio","โนเบลการแพทย์: Brunkow, Ramsdell, Sakaguchi — T cell ควบคุมภูมิคุ้มกัน","n"]],
+ 2024:[["ai","โนเบลฟิสิกส์: Hopfield & Hinton — โครงข่ายประสาทเทียม","n"],["ai","โนเบลเคมี: Baker, Hassabis, Jumper — ออกแบบโปรตีนและ AlphaFold","n"],["eng","Starship: หอส่งจับบูสเตอร์ Super Heavy ด้วยแขนกลสำเร็จ (ต.ค.)"],["ai","Google เปิดตัวชิปควอนตัม Willow (ธ.ค.)"],["phys","Peter Higgs เสียชีวิต (เม.ย.)"]],
+ 2023:[["space","Chandrayaan-3 อินเดียลงจอดใกล้ขั้วใต้ดวงจันทร์ (23 ส.ค.)"],["space","ไทยส่งดาวเทียม THEOS-2 ขึ้นวงโคจร (ต.ค.)","thai"],["ai","OpenAI เปิดตัว GPT-4 (มี.ค.)"],["bio","โนเบลการแพทย์: Karikó & Weissman — เทคโนโลยีวัคซีน mRNA","n"],["phys","โนเบลฟิสิกส์: Agostini, Krausz, L'Huillier — พัลส์แสงระดับแอตโตวินาที","n"]],
+ 2022:[["bio","ไทยปลดกัญชาออกจากบัญชียาเสพติดประเภท 5 (มิ.ย.)","thai"],["ai","ChatGPT เปิดให้ใช้ (30 พ.ย.)"],["space","JWST เผยภาพชุดแรก (ก.ค.)"],["space","ยาน DART ชนดาวเคราะห์น้อย Dimorphos เปลี่ยนวงโคจรได้ (ก.ย.)"],["energy","NIF สหรัฐฯ: ฟิวชันให้พลังงานออกมากกว่าพลังงานเลเซอร์ที่ใส่ (ธ.ค.)"],["phys","โนเบลฟิสิกส์: Aspect, Clauser, Zeilinger — ควอนตัมพัวพัน","n"]],
+ 2021:[["bio","ChulaCov19 วัคซีน mRNA ต้นแบบของจุฬาฯ เริ่มทดลองในมนุษย์ (มิ.ย.)","thai"],["space","Perseverance ลงจอดดาวอังคาร (ก.พ.) / Ingenuity บินบนดาวดวงอื่นครั้งแรก (เม.ย.)"],["space","ปล่อยกล้อง James Webb (25 ธ.ค.)"],["energy","โนเบลฟิสิกส์: Manabe & Hasselmann (แบบจำลองภูมิอากาศ), Parisi","n"]],
+ 2020:[["bio","COVID-19 ระบาดใหญ่ / วัคซีน mRNA ได้รับอนุมัติใช้ฉุกเฉิน (ธ.ค.)"],["space","SpaceX Crew Dragon ส่งนักบินอวกาศสู่ ISS ครั้งแรก (พ.ค.)"],["ai","AlphaFold 2 แก้ปัญหาการพับโปรตีนในการแข่ง CASP14 (พ.ย.)"],["eng","ไทยเปิดให้บริการ 5G เชิงพาณิชย์","thai"],["bio","โนเบลเคมี: Charpentier & Doudna — CRISPR-Cas9","n"]],
+ 2019:[["space","ภาพหลุมดำครั้งแรก M87* โดย Event Horizon Telescope (10 เม.ย.)"],["space","Chang'e 4 จีนลงจอดด้านไกลดวงจันทร์ครั้งแรก (ม.ค.)"],["ai","Google อ้าง quantum supremacy ด้วยชิป Sycamore (ต.ค.)"],["energy","โนเบลเคมี: Goodenough, Whittingham, Yoshino — แบตเตอรี่ลิเทียมไอออน","n"]],
+ 2018:[["space","KNACKSAT ดาวเทียมดวงแรกที่นักศึกษาไทย (มจพ.) สร้างเอง ขึ้นสู่อวกาศ (ธ.ค.)","thai"],["eng","ปฏิบัติการกู้ภัยทีมหมูป่า ถ้ำหลวง เชียงราย (มิ.ย.–ก.ค.)","thai"],["space","ปล่อย Parker Solar Probe (ส.ค.)"],["bio","ข่าวทารกตัดต่อยีนด้วย CRISPR ของ He Jiankui (พ.ย.)"],["phys","Stephen Hawking เสียชีวิต (มี.ค.)"],["phys","โนเบลฟิสิกส์: Ashkin (optical tweezers), Mourou & Strickland (CPA เลเซอร์)","n"]],
+ 2017:[["ai","บทความ 'Attention Is All You Need' เสนอสถาปัตยกรรม Transformer (มิ.ย.)"],["phys","ตรวจพบดาวนิวตรอนชนกัน GW170817 ทั้งคลื่นความโน้มถ่วงและแสง (ส.ค.)"],["space","Cassini ดิ่งสู่ดาวเสาร์ จบภารกิจ (ก.ย.)"],["phys","โนเบลฟิสิกส์: Weiss, Barish, Thorne — LIGO","n"]],
+ 2016:[["space","ไทยคม 8 ขึ้นสู่วงโคจร และบูสเตอร์ Falcon 9 ลงจอดบนเรือกลางทะเลสำเร็จ (พ.ค.)","thai"],["ai","AlphaGo ชนะ Lee Sedol 4–1 (มี.ค.)"],["phys","LIGO ประกาศพบคลื่นความโน้มถ่วงครั้งแรก (ก.พ.)"],["bio","ไวรัสซิกาแพร่ระบาด"],["phys","โนเบลฟิสิกส์: Thouless, Haldane, Kosterlitz — สถานะทอพอโลยีของสสาร","n"]],
+ 2015:[["space","New Horizons บินผ่านพลูโต (ก.ค.)"],["eng","SpaceX นำบูสเตอร์ Falcon 9 ลงจอดบนพื้นได้ครั้งแรก (ธ.ค.)"],["energy","ข้อตกลงปารีสว่าด้วยการเปลี่ยนแปลงสภาพภูมิอากาศ (ธ.ค.)"],["phys","โนเบลฟิสิกส์: Kajita & McDonald — นิวทริโนเปลี่ยนชนิด","n"]],
+ 2014:[["space","ไทยคม 6 (ม.ค.) และไทยคม 7 (ก.ย.) ขึ้นสู่วงโคจรด้วยจรวด Falcon 9","thai"],["space","ยาน Philae ของ Rosetta ลงจอดบนดาวหางครั้งแรก (พ.ย.)"],["bio","อีโบลาระบาดในแอฟริกาตะวันตก"],["eng","โนเบลฟิสิกส์: Akasaki, Amano, Nakamura — LED สีน้ำเงิน","n"]],
+ 2013:[["space","หอดูดาวแห่งชาติบนดอยอินทนนท์ กล้องโทรทรรศน์ 2.4 เมตร เริ่มใช้งาน","thai"],["space","อุกกาบาตระเบิดเหนือเมืองเชเลียบินสค์ รัสเซีย (ก.พ.)"],["space","Chang'e 3 จีนลงจอดดวงจันทร์ (ธ.ค.)"],["phys","โนเบลฟิสิกส์: Englert & Higgs — กลไกฮิกส์","n"]],
+ 2012:[["phys","CERN ประกาศค้นพบอนุภาคฮิกส์ (4 ก.ค.)"],["space","Curiosity ลงจอดดาวอังคาร (ส.ค.)"],["bio","Doudna & Charpentier ตีพิมพ์เทคนิค CRISPR-Cas9 (มิ.ย.)"],["space","Voyager 1 ออกจากเฮลิโอสเฟียร์สู่อวกาศระหว่างดาว (ส.ค.)"]],
+ 2011:[["energy","แผ่นดินไหวโทโฮกุ สึนามิ และอุบัติเหตุนิวเคลียร์ฟุกุชิมะ (มี.ค.)"],["eng","มหาอุทกภัยไทย 2554","thai"],["space","กระสวยอวกาศปลดระวาง เที่ยวสุดท้าย Atlantis (ก.ค.)"],["phys","โนเบลฟิสิกส์: Perlmutter, Schmidt, Riess — เอกภพขยายตัวแบบเร่ง","n"]],
+ 2010:[["phys","โนเบลฟิสิกส์: Geim & Novoselov — กราฟีน","n"],["bio","Craig Venter สร้างเซลล์ที่ใช้จีโนมสังเคราะห์ (พ.ค.)"],["eng","Apple เปิดตัว iPad"]],
+ 2009:[["space","ก่อตั้งสถาบันวิจัยดาราศาสตร์แห่งชาติ (สดร./NARIT)","thai"],["space","NASA ปล่อยกล้อง Kepler ล่าดาวเคราะห์นอกระบบ (มี.ค.)"],["bio","ไข้หวัดใหญ่ H1N1 ระบาดใหญ่"],["eng","โนเบลฟิสิกส์: Kao (ใยแก้วนำแสง), Boyle & Smith (เซนเซอร์ CCD)","n"]],
+ 2008:[["space","ไทยส่งดาวเทียม THEOS (ไทยโชต) ขึ้นวงโคจร (1 ต.ค.)","thai"],["phys","เครื่องเร่งอนุภาค LHC เดินเครื่องครั้งแรก (ก.ย.)"],["phys","โนเบลฟิสิกส์: Nambu, Kobayashi, Maskawa — การแตกสมมาตร","n"]],
+ 2007:[["eng","Apple เปิดตัว iPhone รุ่นแรก (ม.ค.)"],["bio","Yamanaka สร้าง iPS cell จากเซลล์ผิวหนังมนุษย์ (พ.ย.)"],["eng","โนเบลฟิสิกส์: Fert & Grünberg — GMR ที่ใช้ในฮาร์ดดิสก์","n"]],
+ 2006:[["space","ดาวเทียมไทยคม 5 ขึ้นสู่วงโคจร (พ.ค.)","thai"],["space","IAU ลดสถานะพลูโตเป็นดาวเคราะห์แคระ (ส.ค.)"],["space","ปล่อยยาน New Horizons ไปพลูโต (ม.ค.)"],["phys","โนเบลฟิสิกส์: Mather & Smoot — รังสีไมโครเวฟพื้นหลังของจักรวาล","n"]],
+};
+
+const PEOPLE = (window.STEM_PEOPLE||[]).map(([n,y,b,reg,cat,r,p,w],i)=>({i,n,y,b,reg,cat,r,p,w:w==null?[]:[].concat(w)}));
+
+// ---------- helpers ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const mIdx = d => +d.slice(5,7) - 1;
+const be = y => y + 543;
+const regTag = r => `<span class="tag reg-${r}">${r==="thai"?"ไทย":"ต่างประเทศ"}</span>`;
+const catTag = c => `<span class="tag cat-${c}">${CATS[c]}</span>`;
+
+const PCATS = {...CATS, math:"คณิตศาสตร์"};
+const state = {reg:"all", cat:"all", q:"", month:"all", tlCat:"all", pq:"", pReg:"all", pCat:"all", pSort:"old"};
+
+function chips(el, opts, key, after){
+  el.innerHTML = Object.entries(opts).map(([k,v]) =>
+    `<button class="chip" data-k="${k}" aria-pressed="${state[key]===k}">${v}</button>`).join("");
+  el.onclick = e => { const b = e.target.closest(".chip"); if(!b) return;
+    state[key] = b.dataset.k; chips(el, opts, key, after); after(); };
+}
+
+// ---------- daily ----------
+function renderDaily(){
+  const q = state.q.trim().toLowerCase();
+  const list = NEWS.filter(n =>
+    (state.reg==="all" || n.reg===state.reg) &&
+    (state.cat==="all" || n.cat===state.cat) &&
+    (state.month==="all" || mIdx(n.d)===+state.month) &&
+    (!q || (n.t+n.s+(n.why||"")).toLowerCase().includes(q))
+  ).sort((a,b)=> b.d.localeCompare(a.d));
+  $("#feed").innerHTML = list.length ? list.map(n => {
+    const day = n.d.length>7 ? +n.d.slice(8) : "–";
+    return `<article class="card item">
+      <div class="date"><b>${day}</b>${MONTHS[mIdx(n.d)]} ${be(2026)}</div>
+      <div>
+        <h3>${n.nobel?"🏅 ":""}${esc(n.t)}</h3>
+        <p>${esc(n.s)}</p>
+        ${n.why?`<div class="why">จุดเชื่อมข้อสอบ: ${esc(n.why)}</div>`:""}
+        <div class="meta">${regTag(n.reg)}${catTag(n.cat)}${n.verify?'<span class="tag verify">รอยืนยัน</span>':""}
+          <span class="src">· ${n.src.map(([t,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(t)}</a>`).join(", ")}</span></div>
+      </div></article>`;
+  }).join("") : `<div class="empty-state">ยังไม่มีข่าวที่ตรงกับตัวกรองนี้</div>`;
+}
+
+// ---------- monthly ----------
+function renderMonthly(){
+  const today = new Date();
+  const now = today.getFullYear()>2026 ? 11 : today.getMonth();
+  $("#months").innerHTML = MONTHS_FULL.map((m,i) => {
+    const items = NEWS.filter(n => mIdx(n.d)===i);
+    const future = i>now;
+    const thai = items.filter(n=>n.reg==="thai").length;
+    const note = SUM.months["2026-"+String(i+1).padStart(2,"0")];
+    return `<div class="card month" data-m="${i}">
+      <h3>${m} <span>${items.length} ข่าว${thai?` · ไทย ${thai}`:""}</span></h3>
+      ${note?`<p class="why" style="margin-top:0">${esc(note)}</p>`:""}
+      ${items.length ? `<ul>${items.slice(0,3).map(n=>`<li>${esc(n.t)}</li>`).join("")}</ul>`
+        : `<p class="empty">${future?"ยังไม่ถึงเดือนนี้":"ยังไม่ได้เก็บข่าวเดือนนี้"}</p>`}
+    </div>`;
+  }).join("");
+  $("#months").onclick = e => { const c = e.target.closest(".month"); if(!c) return;
+    state.month = c.dataset.m; $("#monthSel").value = c.dataset.m; showTab("daily"); renderDaily(); };
+}
+
+// ---------- yearly ----------
+function renderYearly(){
+  const count = c => NEWS.filter(n=>n.cat===c).length;
+  const top = Object.keys(CATS).sort((a,b)=>count(b)-count(a))[0];
+  $("#yearStats").innerHTML = [
+    [NEWS.length,"ข่าวในคลังปีนี้"],
+    [NEWS.filter(n=>n.reg==="thai").length,"ข่าวไทย"],
+    [NEWS.filter(n=>n.nobel).length,"ข่าวโนเบล"],
+    [CATS[top],"หมวดที่มีข่าวมากสุด"],
+  ].map(([n,l])=>`<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+  const safe = x => esc(x).replace(/&lt;(\/?)b&gt;/g, "<$1b>");
+  $("#top5").innerHTML = (SUM.year.top||[]).map(x=>`<li>${safe(x)}</li>`).join("");
+  $("#trends").innerHTML = (SUM.year.trends||[]).map(x=>`<li>${safe(x)}</li>`).join("");
+}
+
+// ---------- timeline ----------
+function renderTimeline(){
+  const yrs = Object.keys(TL).sort((a,b)=>b-a);
+  const html = yrs.map(y => {
+    const filtered = TL[y].filter(([c,,f]) =>
+      state.tlCat==="all" || (state.tlCat==="thai" && f==="thai") || (state.tlCat==="nobel" && f==="n") || c===state.tlCat);
+    if(!filtered.length) return "";
+    return `<div class="tl-year"><div class="y">${y}<small>พ.ศ. ${be(+y)}</small></div><ul>${
+      filtered.map(([c,t,f])=>`<li class="cat-${c}"><span class="dot"></span><span style="color:var(--ink)">${f==="n"?"🏅 ":""}${esc(t)}</span>${f==="thai"?regTag("thai"):""}</li>`).join("")
+    }</ul></div>`;
+  }).join("");
+  $("#timeline").innerHTML = html || `<div class="empty-state">ไม่มีเหตุการณ์ในหมวดนี้</div>`;
+}
+
+// ---------- people ----------
+function renderPeople(){
+  const q = state.pq.trim().toLowerCase();
+  const list = PEOPLE.filter(p => (state.pReg==="all"||p.reg===state.pReg) && (state.pCat==="all"||p.cat===state.pCat) &&
+      (!q || (p.n+p.r+p.p+PCATS[p.cat]).toLowerCase().includes(q)))
+    .sort((a,b)=> state.pSort==="new" ? b.b-a.b : a.b-b.b);
+  $("#pCount").textContent = `${list.length} จาก ${PEOPLE.length} คน/กลุ่ม`;
+  $("#people").innerHTML = list.length ? list.map(p=>`<div class="card person" role="button" tabindex="0" data-i="${p.i}">
+    <h3>${esc(p.n)}</h3><p class="role">${esc(p.r)}${p.y && p.y!=="—" ? ` · ${esc(p.y)}` : ""}</p><p>${esc(p.p)}</p>
+    <div class="meta">${regTag(p.reg)}<span class="tag cat-${p.cat}">${PCATS[p.cat]}</span><span class="more">อ่านเจาะลึก →</span></div></div>`).join("")
+    : `<div class="empty-state">ไม่พบบุคคลที่ค้นหา</div>`;
+}
+
+// ---------- person detail (Wikipedia) ----------
+const wikiCache = new Map();
+async function wikiQuery(lang, title, withTh){
+  const u = `https://${lang}.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1`
+    + `&prop=extracts|pageimages|info${withTh?"|langlinks&lllang=th":""}&exintro=1&explaintext=1`
+    + `&piprop=thumbnail&pithumbsize=480&inprop=url&titles=${encodeURIComponent(title)}`;
+  const j = await (await fetch(u)).json();
+  const pg = Object.values(j.query.pages)[0];
+  if(!pg || "missing" in pg) return null;
+  return {title:pg.title, url:pg.fullurl, extract:pg.extract||"",
+    img:(pg.thumbnail && /^https:\/\/(upload|thumb)\.wikimedia\.org\//.test(pg.thumbnail.source)) ? pg.thumbnail.source : null,
+    th:(pg.langlinks && pg.langlinks[0] && pg.langlinks[0]["*"]) || null};
+}
+async function wikiPerson(t){
+  if(wikiCache.has(t)) return wikiCache.get(t);
+  const job = (async () => {
+    if(t.startsWith("th:")){ const th = await wikiQuery("th", t.slice(3)); return {th, en:null}; }
+    const en = await wikiQuery("en", t, true);
+    const th = en && en.th ? await wikiQuery("th", en.th) : null;
+    return {en, th};
+  })();
+  wikiCache.set(t, job);
+  job.catch(()=>wikiCache.delete(t));
+  return job;
+}
+const paras = s => s.split(/\n+/).filter(x=>x.trim()).map(x=>`<p>${esc(x)}</p>`).join("");
+async function openPerson(i){
+  const p = PEOPLE[i]; if(!p) return;
+  const nobel = /โนเบล/.test(p.r+p.p);
+  const q = encodeURIComponent(p.n.replace(/\(.*?\)/g,"").split(/[·&]/)[0].trim());
+  $("#pdBody").innerHTML = `<button class="pd-close" type="button" id="pdClose">ปิด ✕</button>
+    <h2>${esc(p.n)}</h2>
+    <p class="role">${esc(p.r)}${p.y&&p.y!=="—"?` · ${esc(p.y)}`:""}</p>
+    <div class="meta">${regTag(p.reg)}<span class="tag cat-${p.cat}">${PCATS[p.cat]}</span></div>
+    <div class="key"><b>ผลงานที่ควรจำ:</b> ${esc(p.p)}</div>
+    <div id="pdWiki">${p.w.length?`<p class="sub">กำลังโหลดประวัติและรูปจาก Wikipedia…</p>`:""}</div>
+    <h3>อ่านต่อ</h3><div class="links" id="pdLinks"></div>`;
+  $("#pdClose").onclick = () => $("#pDialog").close();
+  const links = [];
+  const renderLinks = () => { $("#pdLinks").innerHTML = links.map(([t,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>`).join(""); };
+  if(p.reg==="intl") links.push(["Britannica", `https://www.britannica.com/search?query=${q}`]);
+  if(nobel) links.push(["NobelPrize.org", `https://www.nobelprize.org/?s=${q}`]);
+  if(!p.w.length) links.push(["ค้นหาข่าวและประวัติ (Google)", `https://www.google.com/search?q=${encodeURIComponent(p.n)}`]);
+  renderLinks();
+  if(!$("#pDialog").open) $("#pDialog").showModal();
+  if(!p.w.length) return;
+  try{
+    const res = await Promise.all(p.w.map(wikiPerson));
+    if(!$("#pDialog").open || $("#pdBody h2").textContent !== p.n) return;
+    const imgs = res.map(r => (r.en&&r.en.img)||(r.th&&r.th.img) ? {src:(r.en&&r.en.img)||r.th.img, cap:(r.en||r.th).title} : null).filter(Boolean);
+    let html = imgs.length ? `<div class="pd-imgs">${imgs.map(x=>`<figure><img src="${esc(x.src)}" alt="${esc(x.cap)}" loading="lazy"><figcaption>${esc(x.cap)}</figcaption></figure>`).join("")}</div>` : "";
+    res.forEach((r,k) => {
+      const head = p.w.length>1 ? `<h3>${esc((r.en||r.th||{}).title||p.w[k])}</h3>` : `<h3>ประวัติโดยย่อ</h3>`;
+      if(r.th && r.th.extract){
+        html += head + `<div class="extract">${paras(r.th.extract)}</div>`;
+        if(r.en && r.en.extract) html += `<details><summary>อ่านฉบับภาษาอังกฤษ (ละเอียดกว่า)</summary><div class="extract">${paras(r.en.extract)}</div></details>`;
+      } else if(r.en && r.en.extract){
+        html += head + `<p class="sub">ยังไม่มีบทความภาษาไทย แสดงจาก Wikipedia ภาษาอังกฤษ</p><div class="extract">${paras(r.en.extract)}</div>`;
+      }
+      const nm = p.w.length>1 ? ` (${(r.en||r.th||{}).title||""})` : "";
+      if(r.th) links.unshift([`Wikipedia ไทย${nm}`, r.th.url]);
+      if(r.en) links.unshift([`Wikipedia English${nm}`, r.en.url]);
+    });
+    html += `<p class="credit">ข้อความและรูปจาก Wikipedia / Wikimedia Commons (สัญญาอนุญาต CC BY-SA) ควรตรวจกับแหล่งอื่นก่อนนำไปอ้างอิง</p>`;
+    $("#pdWiki").innerHTML = html;
+    renderLinks();
+  }catch(e){
+    $("#pdWiki").innerHTML = `<p class="sub">โหลดข้อมูลจาก Wikipedia ไม่ได้ (ต้องต่ออินเทอร์เน็ต) ลองเปิดลิงก์อ่านต่อด้านล่าง</p>`;
+    p.w.forEach(t => links.unshift([t.startsWith("th:")?"Wikipedia ไทย":"Wikipedia English",
+      t.startsWith("th:") ? `https://th.wikipedia.org/wiki/${encodeURIComponent(t.slice(3))}` : `https://en.wikipedia.org/wiki/${encodeURIComponent(t)}`]));
+    renderLinks();
+  }
+}
+$("#people").addEventListener("click", e => { const c = e.target.closest(".person"); if(c) openPerson(+c.dataset.i); });
+$("#people").addEventListener("keydown", e => { if((e.key==="Enter"||e.key===" ") && e.target.classList.contains("person")){ e.preventDefault(); openPerson(+e.target.dataset.i); } });
+$("#pDialog").addEventListener("click", e => { if(e.target.id==="pDialog") e.target.close(); });
+
+// ---------- tabs & theme ----------
+function showTab(t){
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===t));
+  document.querySelectorAll("main section").forEach(s=>s.hidden = s.id!=="tab-"+t);
+  try{ localStorage.setItem("stemTab", t); }catch(e){}
+}
+document.querySelector("nav.tabs").onclick = e => { const b=e.target.closest("button"); if(b) showTab(b.dataset.tab); };
+
+$("#themeBtn").onclick = () => {
+  const cur = document.documentElement.dataset.theme ||
+    (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const next = cur==="dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = next;
+  try{ localStorage.setItem("stemTheme", next); }catch(e){}
+};
+try{ const th = localStorage.getItem("stemTheme"); if(th) document.documentElement.dataset.theme = th; }catch(e){}
+
+// ---------- init ----------
+$("#monthSel").innerHTML = `<option value="all">ทุกเดือน</option>` + MONTHS_FULL.map((m,i)=>`<option value="${i}">${m} 2569</option>`).join("");
+$("#monthSel").onchange = e => { state.month = e.target.value; renderDaily(); };
+$("#q").oninput = e => { state.q = e.target.value; renderDaily(); };
+$("#pq").oninput = e => { state.pq = e.target.value; renderPeople(); };
+chips($("#regChips"), REGS, "reg", renderDaily);
+chips($("#catChips"), {all:"ทุกหมวด", ...CATS}, "cat", renderDaily);
+chips($("#tlChips"), {all:"ทั้งหมด", thai:"เฉพาะไทย", nobel:"โนเบล", ...CATS}, "tlCat", renderTimeline);
+chips($("#pChips"), REGS, "pReg", renderPeople);
+chips($("#pCatChips"), {all:"ทุกสาขา", ...PCATS}, "pCat", renderPeople);
+$("#pSort").onchange = e => { state.pSort = e.target.value; renderPeople(); };
+if(SUM.updated) $("#foot").textContent = `อัปเดตล่าสุด ${SUM.updated} · ${NEWS.length} ข่าว · SIXENT`;
+renderDaily(); renderMonthly(); renderYearly(); renderTimeline(); renderPeople();
+try{ const t = localStorage.getItem("stemTab"); if(t) showTab(t); }catch(e){}
+</script>
+</body>
+</html>

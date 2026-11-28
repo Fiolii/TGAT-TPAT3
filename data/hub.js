@@ -6,7 +6,7 @@ const HUB_PRIMARY = { '': '', timer: '', exam: 'exam', library: 'exam', english:
 const hubPrimary = r => (r in HUB_PRIMARY ? HUB_PRIMARY[r] : '');
 const HUB_TABS = {
   today: [['', 'วันนี้'], ['timer', 'จับเวลา']],
-  practice: [['exam', 'ข้อสอบ'], ['library', 'บทเรียน'], ['english', 'อังกฤษ'], ['library:info', 'ข้อมูลสอบ']],
+  practice: [['exam', 'ข้อสอบ'], ['library', 'บทเรียน'], ['english', 'อังกฤษ'], ['library:info', 'ข้อมูลสอบ'], ['url:stem-news/index.html', 'ข่าว STEM']],
   progress: [['stats', 'สถิติ'], ['cal', 'ปฏิทิน'], ['rank', 'อันดับ']],
 };
 const hubTabs = (g, active) => `<div class="hubtabs" role="tablist">${HUB_TABS[g].map(([v, t]) => `<button role="tab" class="${v === active ? 'on' : ''}" aria-selected="${v === active}" data-a="hubGo" data-v="${v}">${t}</button>`).join('')}</div>`;
@@ -87,6 +87,7 @@ setInterval(() => { const c = document.getElementById('hubclk'); if (c && typeof
 
 const HUB_ACT = {
   hubGo(v) {
+    if (String(v).startsWith('url:')) { location.href = String(v).slice(4); return; }   // หน้าแยก เช่น ข่าว STEM (stem-news/)
     const [r, sub] = String(v).split(':'); if (r === 'library') { libTab = sub || 'lessons'; libOpen = ''; killSim(); LS = null; }
     const h = '#/' + r, cur = location.hash === '' || location.hash === '#' ? '#/' : location.hash; if (cur === h || (r === '' && cur === '#/')) render(true); else location.hash = h;
   },
